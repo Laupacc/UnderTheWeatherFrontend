@@ -1,4 +1,4 @@
-import '../styles/globals.css';
+import '../styles/globals.css'
 import Head from 'next/head';
 
 import { Provider } from 'react-redux';
@@ -10,8 +10,8 @@ import { PersistGate } from 'redux-persist/integration/react';
 
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
 import createWebStorage from "redux-persist/lib/storage/createWebStorage";
-import Header from '@/components/Header';
-import City from '@/components/City';
+import Header from '../components/Header';
+import City from '../components/City';
 
 const createNoopStorage = () => {
     return {
