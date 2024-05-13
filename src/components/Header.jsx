@@ -1,38 +1,65 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useState } from "react";
+import { addCity } from "../reducers/city.js";
+import { useEffect } from "react";
 
 function Header() {
+  const dispatch = useDispatch();
+  const cities = useSelector((state) => state.city);
+
+  const [cityName, setCityName] = useState("");
+  const [error, setError] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    fetch("https://weatherapp-backend-umber.vercel.app/weather", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ cityName: cityName }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.result) {
+          dispatch(addCity(data.weather.cityName));
+          setSuccessMessage(
+            `${data.weather.cityName} had been added to your list!`
+          );
+          setCityName(""); // Clear input field
+          setError(""); // Clear any previous errors
+        } else {
+          setError("City could not be added. Please try again.");
+          setCityName(""); // Clear input field
+          setSuccessMessage(""); // Clear any previous success messages
+        }
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+        setError("An error occurred while processing your request.");
+        setSuccessMessage(""); // Clear any previous success messages
+      });
+  };
   return (
     <>
       <div className="flex justify-between items-center px-4 py-2 bg-gray-800 text-white">
-        <a href="index.html">
-          <img className="w-12 h-12" src="images/logo.svg" alt="Logo" />
-        </a>
-
-        <div className="flex items-center">
+        <form onSubmit={handleSubmit}>
           <input
-            id="cityNameInput"
+            className="text-black"
             type="text"
-            placeholder="Add new city"
-            className="px-2 py-1 mr-2 border border-gray-500 rounded"
+            value={cityName}
+            onChange={(e) => setCityName(e.target.value)}
+            placeholder="Enter a city name"
           />
-          <button
-            id="addCity"
-            className="px-3 py-1 bg-gray-600 rounded hover:bg-gray-700"
-          >
-            <img
-              id="glass"
-              src="images/glass.png"
-              alt="Search"
-              className="w-6 h-6"
-            />
-          </button>
-        </div>
 
-        <a href="login.html" id="userButton">
-          <img id="userIcon" src="images/user.png" alt="User" />
-        </a>
+          <button type="submit">Add City</button>
+        </form>
       </div>
+      {error && <div className="text-red-500">{error}</div>}
+      {successMessage && <div className="text-green-500">{successMessage}</div>}
     </>
   );
 }

@@ -7,7 +7,7 @@ function Home() {
       <Head>
         <title>Home</title>
       </Head>
-      <div className="flex justify-center items-center h-screen">
+      {/* <div className="flex justify-center items-center h-screen">
         <div className="flex flex-col p-8 bg-gray-200 rounded-lg">
           <div className="mb-4">
             <p className="text-xl font-bold">SIGN-UP</p>
@@ -56,7 +56,7 @@ function Home() {
             Connect
           </button>
         </div>
-      </div>
+      </div> */}
     </>
   );
 }

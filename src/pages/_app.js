@@ -2,8 +2,8 @@ import '../styles/globals.css'
 import Head from 'next/head';
 
 import { Provider } from 'react-redux';
-// import user from '../reducers/user';
-// import liked from '../reducers/liked';
+import user from '../reducers/user';
+import city from '../reducers/city';
 
 import { persistStore, persistReducer } from 'redux-persist';
 import { PersistGate } from 'redux-persist/integration/react';
@@ -12,6 +12,7 @@ import { combineReducers, configureStore } from '@reduxjs/toolkit';
 import createWebStorage from "redux-persist/lib/storage/createWebStorage";
 import Header from '../components/Header';
 import City from '../components/City';
+
 
 const createNoopStorage = () => {
     return {
@@ -29,7 +30,7 @@ const createNoopStorage = () => {
 
 const storage = typeof window !== "undefined" ? createWebStorage("local") : createNoopStorage();
 
-const reducers = combineReducers({});
+const reducers = combineReducers({ user, city });
 const persistConfig = { key: 'weatherApp', storage };
 
 const store = configureStore({

@@ -1,13 +1,18 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { addCity, removeCity } from "../reducers/city.js";
 
 function City() {
-  const [cities, setCities] = useState([]);
+  const dispatch = useDispatch();
+  const cities = useSelector((state) => state.city);
+
+  const [cityNames, setCityNames] = useState([]);
 
   useEffect(() => {
     fetchCities();
-  }, []);
+  }, [cities]);
 
+  // Fetch cities from the backend
   const fetchCities = async () => {
     try {
       const response = await fetch(
@@ -15,13 +20,14 @@ function City() {
       );
       const data = await response.json();
       if (data.weather) {
-        setCities(data.weather);
+        setCityNames(data.weather);
       }
     } catch (error) {
       console.error("Error fetching cities:", error);
     }
   };
 
+  // Delete city from the backend
   const deleteCity = async (cityName) => {
     try {
       const response = await fetch(
@@ -32,7 +38,8 @@ function City() {
       );
       const data = await response.json();
       if (data.result) {
-        setCities(cities.filter((city) => city.cityName !== cityName));
+        dispatch(removeCity(data.weather.cityName));
+        setCityNames(cities.filter((city) => city.cityName !== cityName));
       }
     } catch (error) {
       console.error("Error deleting city:", error);
@@ -42,7 +49,7 @@ function City() {
   return (
     <>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
-        {cities.map((city) => (
+        {cityNames.map((city) => (
           <div
             key={city.cityName}
             className="flex flex-col justify-between p-4 bg-white rounded-lg shadow-md"
