@@ -20,12 +20,19 @@ function City() {
       );
       const data = await response.json();
       if (data.weather) {
-        setCityNames(data.weather);
-
-        // const sunriseDate = new Date(data.sunrise * 1000);
-        // const sunrise = sunriseDate.toLocaleTimeString("en-US");
-        // const sunsetDate = new Date(data.sunset * 1000);
-        // const sunset = sunsetDate.toLocaleTimeString("en-US");
+        setCityNames(
+          data.weather.map((city) => ({
+            ...city,
+            sunrise: new Date(city.sunrise * 1000).toLocaleTimeString("en-US", {
+              hour: "2-digit",
+              minute: "2-digit",
+            }),
+            sunset: new Date(city.sunset * 1000).toLocaleTimeString("en-US", {
+              hour: "2-digit",
+              minute: "2-digit",
+            }),
+          }))
+        );
       }
     } catch (error) {
       console.error("Error fetching cities:", error);
@@ -53,40 +60,93 @@ function City() {
 
   return (
     <>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 p-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-3">
         {cityNames.map((city) => (
           <div
             key={city.cityName}
-            className="bg-blue-200 rounded-md shadow-md m-2 p-6 w-auto flex flex-col justify-around items-center"
+            className="bg-blue-200 rounded-lg shadow-xl m-4 p-6 w-auto flex flex-col justify-around items-center text-center text-gray-800 "
           >
             <div className="flex flex-col items-center justify-center">
-              <p className="font-semibold">
+              <p className="font-semibold text-slate-700 text-3xl">
                 {city.cityName
                   .split(" ")
                   .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
                   .join(" ")}
               </p>
-              <img
-                className="w-16 h-16"
-                src={`images/${city.icon}.png`}
-                alt="Weather Icon"
-              />
+              <div className="flex justify-center items-center mb-5">
+                <div className="flex flex-col justify-center items-center">
+                  <div className="flex">
+                    <img
+                      src="images/thermometer.png"
+                      alt="Temperature"
+                      className="w-8 h-8"
+                    />
+                    <p className="text-3xl">
+                      {Math.round(city.temp * 2) / 2}°C
+                    </p>
+                  </div>
+                  <p>Feels like: {Math.round(city.feels_like * 2) / 2}°C</p>
+                </div>
+                <div className="flex flex-col justify-center items-center">
+                  <img
+                    className="w-16 m-3"
+                    src={`images/${city.icon}.png`}
+                    alt="Weather Icon"
+                  />
+                  <p>
+                    {city.description.charAt(0).toUpperCase() +
+                      city.description.slice(1)}{" "}
+                  </p>
+                </div>
+              </div>
 
-              <p>{city.sunrise}</p>
-              <p>{city.sunset}</p>
-              <p>
-                {city.description.charAt(0).toUpperCase() +
-                  city.description.slice(1)}{" "}
-              </p>
-              <p>Current temp: {city.temp}°C</p>
-              <p>Feels like: {city.feels_like}°C</p>
-              <p className="mr-2">Min temp: {city.tempMin}°C</p>
-              <p className="ml-2">Max temp: {city.tempMax}°C</p>
-              <p>Humidity: {city.humidity}%</p>
-              <p>Wind: {city.wind} m/s</p>
-              <p>Clouds: {city.clouds}%</p>
-              <p>Rain: {city.rain} mm</p>
-              <p>Snow: {city.snow} mm</p>
+              <div className="flex justify-center items-center p-2 m-2">
+                <div className="flex flex-col justify-center items-center">
+                  <p className="m-2">{Math.round(city.tempMin * 2) / 2}°C</p>
+                  <img
+                    src="images/thermometer_down.png"
+                    alt="Temperature"
+                    className="w-8 h-8"
+                  />
+                </div>
+                <div className="flex flex-col justify-center items-center">
+                  <p className="m-2">{Math.round(city.tempMax * 2) / 2}°C</p>
+                  <img
+                    src="images/thermometer_up.png"
+                    alt="Temperature"
+                    className="w-8 h-8"
+                  />
+                </div>
+              </div>
+              <div className="flex justify-center items-center m-2">
+                <img
+                  src="images/hygrometer.png"
+                  alt="Humidity"
+                  className="w-8 h-8"
+                />
+                <p className="m-2">Humidity: {city.humidity}%</p>
+              </div>
+              <div className="flex justify-center items-center m-2">
+                <img src="images/windsock.png" alt="Wind" className="w-8 h-8" />
+                <p className="m-2">Wind: {city.wind} m/s</p>
+              </div>
+              <p className="m-2">Clouds: {city.clouds}%</p>
+              <p className="m-2">Rain: {city.rain} mm</p>
+              <p className="m-2">Snow: {city.snow} mm</p>
+            </div>
+            <div className="flex justify-center items-center m-2 p-2">
+              <div className="flex flex-col justify-center items-center m-2">
+                <img
+                  src="images/sunrise.png"
+                  alt="Sunrise"
+                  className="w-8 h-8"
+                />
+                <p>{city.sunrise}</p>
+              </div>
+              <div className="flex flex-col justify-center items-center m-2">
+                <img src="images/sunset.png" alt="Sunset" className="w-8 h-8" />
+                <p>{city.sunset}</p>
+              </div>
             </div>
             <button
               className="mt-8 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 focus:outline-none focus:bg-red-600"
