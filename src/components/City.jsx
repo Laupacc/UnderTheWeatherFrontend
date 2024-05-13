@@ -48,16 +48,16 @@ function City() {
 
   return (
     <>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 p-3">
         {cityNames.map((city) => (
           <div
             key={city.cityName}
-            className="flex flex-col justify-between p-4 bg-white rounded-lg shadow-md"
+            className="bg-gray-100 rounded-md shadow-md m-2 p-6 w-auto flex flex-col justify-around items-center"
           >
-            <div>
+            <div className="flex flex-col items-center justify-center">
               <p className="font-semibold">{city.cityName}</p>
               <p>{city.description}</p>
-              <div className="flex items-center">
+              <div className="flex items-center justify-center">
                 <img
                   className="w-8 h-8 mr-2"
                   src={`images/${city.main}.png`}
@@ -71,7 +71,7 @@ function City() {
               </div>
             </div>
             <button
-              className="mt-4 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 focus:outline-none focus:bg-red-600"
+              className="mt-8 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 focus:outline-none focus:bg-red-600"
               onClick={() => deleteCity(city.cityName)}
             >
               Delete

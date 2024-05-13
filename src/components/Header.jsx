@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useState } from "react";
 import { addCity } from "../reducers/city.js";
 import { useEffect } from "react";
+import Alert from "@mui/material/Alert";
 
 function Header() {
   const dispatch = useDispatch();
@@ -10,12 +11,24 @@ function Header() {
 
   const [cityName, setCityName] = useState("");
   const [error, setError] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
+  const [success, setSuccess] = useState("");
+  const [fetchError, setFetchError] = useState("");
 
+  // Clear alerts after 5 seconds
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setError("");
+      setSuccess("");
+      setFetchError("");
+    }, 5000);
+    return () => clearTimeout(timer);
+  }, [error, success, fetchError]);
+
+  // Add city to the backend
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    fetch("https://weatherapp-backend-umber.vercel.app/weather", {
+    fetch("https://weatherapp-backend-umber.vercel.app/weather/current", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -26,23 +39,27 @@ function Header() {
       .then((data) => {
         if (data.result) {
           dispatch(addCity(data.weather.cityName));
-          setSuccessMessage(
-            `${data.weather.cityName} had been added to your list!`
-          );
-          setCityName(""); // Clear input field
-          setError(""); // Clear any previous errors
+          setSuccess(`${data.weather.cityName} had been added to your list!`);
+          setError("");
+          setFetchError("");
+          setCityName("");
         } else {
-          setError("City could not be added. Please try again.");
-          setCityName(""); // Clear input field
-          setSuccessMessage(""); // Clear any previous success messages
+          setError("This city is already in your list");
+          setSuccess("");
+          setFetchError("");
+          setCityName("");
         }
       })
       .catch((error) => {
         console.error("Error:", error);
-        setError("An error occurred while processing your request.");
-        setSuccessMessage(""); // Clear any previous success messages
+        setFetchError(
+          "An error occurred while processing your request. Please verify the city name and try again."
+        );
+        setSuccess("");
+        setError("");
       });
   };
+
   return (
     <>
       <div className="flex justify-between items-center px-4 py-2 bg-gray-800 text-white">
@@ -54,12 +71,12 @@ function Header() {
             onChange={(e) => setCityName(e.target.value)}
             placeholder="Enter a city name"
           />
-
           <button type="submit">Add City</button>
         </form>
       </div>
-      {error && <div className="text-red-500">{error}</div>}
-      {successMessage && <div className="text-green-500">{successMessage}</div>}
+      {success && <Alert severity="success">{success}</Alert>}
+      {error && <Alert severity="warning">{error}</Alert>}
+      {fetchError && <Alert severity="error">{fetchError}</Alert>}
     </>
   );
 }
