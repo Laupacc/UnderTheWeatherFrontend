@@ -1,4 +1,6 @@
 import Head from "next/head";
+import City from "../components/City";
+import Header from "../components/Header";
 import React, { useState, useEffect } from "react";
 
 function Home() {
@@ -7,6 +9,8 @@ function Home() {
       <Head>
         <title>Home</title>
       </Head>
+      <Header />
+      <City />
       {/* <div className="flex justify-center items-center h-screen">
         <div className="flex flex-col p-8 bg-gray-200 rounded-lg">
           <div className="mb-4">
