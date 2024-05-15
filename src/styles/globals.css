@@ -11,3 +11,8 @@ body {
 * {
   box-sizing: border-box;
 }
+
+@font-face {
+  font-family: UndertheWeather;
+  src: url("/UndertheWeather.otf") format("opentype");
+}

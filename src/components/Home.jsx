@@ -7,7 +7,7 @@ function Home() {
   return (
     <>
       <Head>
-        <title>Home</title>
+        <title>Yet Another Weather App</title>
       </Head>
       <Header />
       <City />

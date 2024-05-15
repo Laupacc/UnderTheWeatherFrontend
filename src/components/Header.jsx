@@ -120,19 +120,32 @@ function Header() {
 
   return (
     <>
-      <div className="flex justify-between items-center px-4 py-2 bg-gray-800 text-white  sticky top-0">
+      <div className="flex justify-between items-center px-4 py-2 bg-custom-blue5 text-white sticky top-0">
         <form onSubmit={handleSubmit}>
           <input
-            className="text-black"
+            className="text-black w-60 p-2 rounded m-2"
             type="text"
             value={cityName}
             onChange={(e) => setCityName(e.target.value)}
             placeholder="Enter a city name"
             required
           />
-          <button type="submit">Add City</button>
+          <button
+            className="bg-custom-blue2 hover:bg-custom-blue4 text-white font-bold py-2 px-4 rounded ml-4"
+            type="submit"
+          >
+            Add City
+          </button>
         </form>
-        <button onClick={handleLocation}>Add Current Location</button>
+        <h1 className="font-UndertheWeather text-7xl text-gray-200">
+          Under the Weather
+        </h1>
+        <button
+          className="bg-custom-blue2 hover:bg-custom-blue4 text-white font-bold py-2 px-4 rounded mr-4"
+          onClick={handleLocation}
+        >
+          Add Current Location
+        </button>
       </div>
       <div className="sticky top-10 bg-white z-10">
         {success && <Alert severity="success">{success}</Alert>}
