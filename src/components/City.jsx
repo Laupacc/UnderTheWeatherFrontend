@@ -260,7 +260,8 @@ function City() {
                     </div>
                     <div className="flex flex-col justify-center items-center my-2 mx-4">
                       <img
-                        src="images/windsock.png"
+                        // src="images/windsock.png"
+                        src={'images/windsock.png'}
                         alt="Wind"
                         className="w-12 h-12"
                       />
