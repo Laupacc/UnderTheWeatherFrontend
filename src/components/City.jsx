@@ -198,7 +198,7 @@ function City() {
                     className="w-8 h-8"
                   />
                   <Typography variant="body1" align="center" gutterBottom>
-                    Humidity: {city.humidity}%
+                    {city.humidity}%
                   </Typography>
                 </div>
                 <div className="flex justify-center items-center m-2">
@@ -208,18 +208,31 @@ function City() {
                     className="w-8 h-8"
                   />
                   <Typography variant="body1" align="center" gutterBottom>
-                    Wind: {city.wind} m/s
+                    {city.wind} m/s
                   </Typography>
                 </div>
-                <Typography variant="body1" align="center" gutterBottom>
-                  Clouds: {city.clouds}%
-                </Typography>
-                <Typography variant="body1" align="center" gutterBottom>
-                  Rain: {city.rain} mm
-                </Typography>
-                <Typography variant="body1" align="center" gutterBottom>
-                  Snow: {city.snow} mm
-                </Typography>
+                <div>
+                  <img
+                    src="images/cloud.png"
+                    alt="Clouds"
+                    className="w-8 h-8"
+                  />
+                  <Typography variant="body1" align="center" gutterBottom>
+                    {city.clouds}%
+                  </Typography>
+                </div>
+                <div>
+                  <img src="images/rain.png" alt="Rain" className="w-8 h-8" />
+                  <Typography variant="body1" align="center" gutterBottom>
+                    {city.rain} mm
+                  </Typography>
+                </div>
+                <div>
+                  <img src="images/snow.png" alt="Snow" className="w-8 h-8" />
+                  <Typography variant="body1" align="center" gutterBottom>
+                    {city.snow} mm
+                  </Typography>
+                </div>
               </div>
               <div className="flex justify-center items-center m-2 p-2">
                 <div className="flex flex-col justify-center items-center m-2">
@@ -358,7 +371,6 @@ function City() {
                     fontWeight={600}
                     gutterBottom
                     className="text-blue-700"
-               
                   >
                     {Math.round(forecast.main.temp * 2) / 2}°C
                   </Typography>

@@ -47,8 +47,8 @@ function App({ Component, pageProps }) {
             <Provider store={store}>
                 <PersistGate persistor={persistor}>
                     <Head>
-                        <title>Yet Another Weather App</title>
-                        <link rel="icon" href="favicon.ico" />
+                        <title>Under the weather</title>
+                        <link rel="icon" href="/cloudicon.ico" />
                         <meta name="description" content="Yet Another Weather App" />
                         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
                     </Head>
