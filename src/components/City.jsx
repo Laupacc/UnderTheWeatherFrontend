@@ -30,10 +30,12 @@ function City() {
             sunrise: new Date(city.sunrise * 1000).toLocaleTimeString("en-US", {
               hour: "2-digit",
               minute: "2-digit",
+              hour12: false,
             }),
             sunset: new Date(city.sunset * 1000).toLocaleTimeString("en-US", {
               hour: "2-digit",
               minute: "2-digit",
+              hour12: false,
             }),
           }));
           setCityNames(formattedCities.reverse()); // Reverse the order of cities
@@ -116,6 +118,11 @@ function City() {
     return `${weekday}, ${month} ${day}${suffix}`;
   };
 
+  // Generate Google search link
+  const generateGoogleSearchLink = (cityName) => {
+    return `https://www.google.com/search?q=${encodeURIComponent(cityName)}`;
+  };
+
   return (
     <>
       {typeof cityNames !== "undefined" || cityNames.length !== 0 ? (
@@ -123,145 +130,238 @@ function City() {
           {cityNames.map((city) => (
             <div
               key={city.cityName}
-              className="bg-gradient-to-br from-lime-100 to-sky-300 rounded-lg shadow-xl m-4 p-6 w-auto flex flex-col justify-around items-center text-center text-gray-800 "
+              className="bg-gradient-to-br from-lime-100 to-sky-300 rounded-lg shadow-xl m-4 p-6 w-auto flex flex-col justify-between items-center text-center text-gray-800 "
             >
+              {/* City Name */}
               <div className="flex flex-col items-center justify-center">
-                <Typography
-                  variant="h4"
-                  align="center"
-                  gutterBottom
-                  className="text-slate-600"
+                <a
+                  href={generateGoogleSearchLink(city.cityName)}
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
-                  {city.cityName
-                    .split(" ")
-                    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-                    .join(" ")}
-                </Typography>
-                <div className="flex justify-between items-center mb-5">
-                  <div className="flex flex-col justify-center items-center">
-                    <div className="flex">
+                  <Typography
+                    variant="h4"
+                    align="center"
+                    gutterBottom
+                    className="text-slate-600"
+                  >
+                    {city.cityName
+                      .split(" ")
+                      .map(
+                        (word) => word.charAt(0).toUpperCase() + word.slice(1)
+                      )
+                      .join(" ")}
+                  </Typography>
+                </a>
+
+                {/* Temperature */}
+                <div className="flex flex-col justify-center items-center">
+                  <div className="flex justify-center items-center">
+                    {/* <img
+                      src="images/thermometer.png"
+                      alt="Temperature"
+                      className="w-8 h-8"
+                    /> */}
+                    <Typography
+                      variant="h4"
+                      align="center"
+                      className="text-blue-700"
+                    >
+                      {Math.round(city.temp * 2) / 2}°
+                    </Typography>
+                  </div>
+                  <Typography
+                    variant="body1"
+                    align="center"
+                    gutterBottom
+                    className="text-slate-600"
+                  >
+                    Real feel {Math.round(city.feels_like * 2) / 2}°
+                  </Typography>
+                </div>
+
+                {/* Weather Description */}
+                <div className="flex flex-col justify-center items-center">
+                  <img
+                    className="w-20 m-1"
+                    src={`images/${city.icon}.png`}
+                    alt="Weather Icon"
+                  />
+                  <Typography
+                    variant="h6"
+                    align="center"
+                    className="text-slate-600"
+                  >
+                    {city.description
+                      ? city.description.charAt(0).toUpperCase() +
+                        city.description.slice(1)
+                      : "Description Not Available"}
+                  </Typography>
+                </div>
+
+                {/* View Forecast Button */}
+                <button
+                  className="mt-2 mb-4 px-3 py-1 text-lg border-2 border-blue-500 rounded bg-blue-500 text-white hover:text-blue-500 hover:bg-transparent"
+                  onClick={() => handleForecast(city.cityName)}
+                >
+                  5-Day Forecast
+                </button>
+
+                <div className="border-2 rounded-lg px-3">
+                  {/* Min and Max Temperature */}
+                  <div className="flex justify-center items-center">
+                    <div className="flex flex-col justify-center items-center my-2 mx-4">
                       <img
-                        src="images/thermometer.png"
+                        src="images/thermometer_down1.png"
                         alt="Temperature"
-                        className="w-8 h-8"
+                        className="w-12 h-12"
                       />
-                      <Typography variant="h4" align="center" gutterBottom>
-                        {Math.round(city.temp * 2) / 2}°C
+                      <Typography
+                        variant="h6"
+                        align="center"
+                        gutterBottom
+                        className="text-slate-600"
+                      >
+                        {Math.round(city.tempMin * 2) / 2}°
                       </Typography>
                     </div>
-                    <Typography variant="body1" align="center" gutterBottom>
-                      Feels like: {Math.round(city.feels_like * 2) / 2}°C
-                    </Typography>
+                    <div className="flex flex-col justify-center items-center my-2 mx-4">
+                      <img
+                        src="images/thermometer_up1.png"
+                        alt="Temperature"
+                        className="w-12 h-12"
+                      />
+                      <Typography
+                        variant="h6"
+                        align="center"
+                        gutterBottom
+                        className="text-slate-600"
+                      >
+                        {Math.round(city.tempMax * 2) / 2}°
+                      </Typography>
+                    </div>
                   </div>
-                  <div className="flex flex-col justify-center items-center">
-                    <img
-                      className="w-16 m-3"
-                      src={`images/${city.icon}.png`}
-                      alt="Weather Icon"
-                    />
-                    <Typography variant="body1" align="center" gutterBottom>
-                      {city.description
-                        ? city.description.charAt(0).toUpperCase() +
-                          city.description.slice(1)
-                        : "Description Not Available"}
-                    </Typography>
+                  {/* Humidity, Wind */}
+                  <div className="flex justify-center items-center">
+                    <div className="flex flex-col justify-center items-center my-2 mx-4">
+                      <img
+                        src="images/hygrometer.png"
+                        alt="Humidity"
+                        className="w-12 h-12"
+                      />
+                      <Typography
+                        variant="h6"
+                        align="center"
+                        gutterBottom
+                        className="text-slate-600"
+                      >
+                        {city.humidity}%
+                      </Typography>
+                    </div>
+                    <div className="flex flex-col justify-center items-center my-2 mx-4">
+                      <img
+                        src="images/windsock.png"
+                        alt="Wind"
+                        className="w-12 h-12"
+                      />
+                      <Typography
+                        variant="h6"
+                        align="center"
+                        gutterBottom
+                        className="text-slate-600"
+                      >
+                        {city.wind} m/s
+                      </Typography>
+                    </div>
                   </div>
-                </div>
+                  {/* Clouds, Rain, Snow  */}
+                  <div className="flex justify-center items-center ">
+                    <div className="flex flex-col justify-center items-center my-2 mx-4">
+                      <img
+                        src="images/cloud.png"
+                        alt="Clouds"
+                        className="w-12 h-12"
+                      />
+                      <Typography
+                        variant="h6"
+                        align="center"
+                        gutterBottom
+                        className="text-slate-600"
+                      >
+                        {city.clouds}%
+                      </Typography>
+                    </div>
+                    <div className="flex flex-col  justify-center items-center my-2 mx-4">
+                      <img
+                        src="images/rain.png"
+                        alt="Rain"
+                        className="w-12 h-12"
+                      />
+                      <Typography
+                        variant="h6"
+                        align="center"
+                        gutterBottom
+                        className="text-slate-600"
+                      >
+                        {city.rain} mm
+                      </Typography>
+                    </div>
+                    <div className="flex flex-col justify-center items-center my-2 mx-4">
+                      <img
+                        src="images/snow.png"
+                        alt="Snow"
+                        className="w-12 h-12"
+                      />
+                      <Typography
+                        variant="h6"
+                        align="center"
+                        gutterBottom
+                        className="text-slate-600"
+                      >
+                        {city.snow} mm
+                      </Typography>
+                    </div>
+                  </div>
 
-                <div className="flex justify-center items-center p-2 m-2">
-                  <div className="flex flex-col justify-center items-center">
-                    <Typography variant="body1" align="center" gutterBottom>
-                      {Math.round(city.tempMin * 2) / 2}°C
-                    </Typography>
-                    <img
-                      src="images/thermometer_down.png"
-                      alt="Temperature"
-                      className="w-8 h-8"
-                    />
+                  {/* Sunrise and Sunset */}
+                  <div className="flex justify-center items-center">
+                    <div className="flex flex-col justify-center items-center my-2 mx-4">
+                      <img
+                        src="images/sunrise.png"
+                        alt="Sunrise"
+                        className="w-12 h-12"
+                      />
+                      <Typography
+                        variant="h6"
+                        align="center"
+                        gutterBottom
+                        className="text-slate-600"
+                      >
+                        {city.sunrise}
+                      </Typography>
+                    </div>
+                    <div className="flex flex-col justify-center items-center my-2 mx-4">
+                      <img
+                        src="images/sunset.png"
+                        alt="Sunset"
+                        className="w-12 h-12"
+                      />
+                      <Typography
+                        variant="h6"
+                        align="center"
+                        gutterBottom
+                        className="text-slate-600"
+                      >
+                        {city.sunset}
+                      </Typography>
+                    </div>
                   </div>
-                  <div className="flex flex-col justify-center items-center">
-                    <Typography variant="body1" align="center" gutterBottom>
-                      {Math.round(city.tempMax * 2) / 2}°C
-                    </Typography>
-                    <img
-                      src="images/thermometer_up.png"
-                      alt="Temperature"
-                      className="w-8 h-8"
-                    />
-                  </div>
-                </div>
-
-                <div className="flex justify-center items-center m-2">
-                  <img
-                    src="images/hygrometer.png"
-                    alt="Humidity"
-                    className="w-8 h-8"
-                  />
-                  <Typography variant="body1" align="center" gutterBottom>
-                    {city.humidity}%
-                  </Typography>
-                </div>
-                <div className="flex justify-center items-center m-2">
-                  <img
-                    src="images/windsock.png"
-                    alt="Wind"
-                    className="w-8 h-8"
-                  />
-                  <Typography variant="body1" align="center" gutterBottom>
-                    {city.wind} m/s
-                  </Typography>
-                </div>
-                <div>
-                  <img
-                    src="images/cloud.png"
-                    alt="Clouds"
-                    className="w-8 h-8"
-                  />
-                  <Typography variant="body1" align="center" gutterBottom>
-                    {city.clouds}%
-                  </Typography>
-                </div>
-                <div>
-                  <img src="images/rain.png" alt="Rain" className="w-8 h-8" />
-                  <Typography variant="body1" align="center" gutterBottom>
-                    {city.rain} mm
-                  </Typography>
-                </div>
-                <div>
-                  <img src="images/snow.png" alt="Snow" className="w-8 h-8" />
-                  <Typography variant="body1" align="center" gutterBottom>
-                    {city.snow} mm
-                  </Typography>
                 </div>
               </div>
-              <div className="flex justify-center items-center m-2 p-2">
-                <div className="flex flex-col justify-center items-center m-2">
-                  <img
-                    src="images/sunrise.png"
-                    alt="Sunrise"
-                    className="w-8 h-8"
-                  />
-                  <Typography variant="body1" align="center" gutterBottom>
-                    {city.sunrise}
-                  </Typography>
-                </div>
-                <div className="flex flex-col justify-center items-center m-2">
-                  <img
-                    src="images/sunset.png"
-                    alt="Sunset"
-                    className="w-8 h-8"
-                  />
-                  <Typography variant="body1" align="center" gutterBottom>
-                    {city.sunset}
-                  </Typography>
-                </div>
-              </div>
 
-              <button onClick={() => handleForecast(city.cityName)}>
-                View Forecast
-              </button>
+              {/* Delete City Button */}
               <button
-                className="mt-8 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 focus:outline-none focus:bg-red-600"
+                className="mt-4 px-3 py-1 text-lg border-2 border-red-500 text-red-500 rounded hover:bg-red-500 hover:text-white"
                 onClick={() => deleteCity(city.cityName)}
               >
                 Delete City
@@ -275,6 +375,7 @@ function City() {
         </div>
       )}
 
+      {/* Modal for 5-day forecast */}
       <Modal
         open={isModalOpen}
         onClose={handleCloseModal}
@@ -303,6 +404,7 @@ function City() {
             },
           }}
         >
+          {/* City name and subtitle */}
           <Typography variant="h4" align="center" gutterBottom>
             {selectedCity &&
               selectedCity
@@ -314,6 +416,7 @@ function City() {
             5-Day Forecast
           </Typography>
 
+          {/* Buttons for each day */}
           <div className="flex flex-wrap justify-center mb-4">
             {forecastData &&
               Object.values(
@@ -339,6 +442,8 @@ function City() {
                 </button>
               ))}
           </div>
+
+          {/* Forecast data for the selected day */}
           {selectedDayForecast && (
             <div className="flex flex-wrap sm:flex-nowrap justify-center items-center">
               {selectedDayForecast.map((forecast) => (
@@ -352,6 +457,7 @@ function City() {
                     maxHeight: "15rem",
                   }}
                 >
+                  {/* Time */}
                   <Typography
                     variant="h6"
                     align="center"
@@ -360,20 +466,25 @@ function City() {
                   >
                     {forecast.dt_txt.split(" ")[1].slice(0, 5)}
                   </Typography>
+
+                  {/* Weather Icon */}
                   <img
                     src={`images/${forecast.weather[0].icon}.png`}
                     alt="Weather Icon"
                     className="w-12 m-3 sm:w-16"
                   />
+
+                  {/* Temperature */}
                   <Typography
                     variant="h5"
                     align="center"
-                    fontWeight={600}
                     gutterBottom
                     className="text-blue-700"
                   >
                     {Math.round(forecast.main.temp * 2) / 2}°C
                   </Typography>
+
+                  {/* Description */}
                   <Typography
                     variant="body1"
                     align="center"

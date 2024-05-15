@@ -15,7 +15,7 @@ module.exports = {
         'custom-blue4': '#166fd2',
         'custom-blue5': '#0e4f97',
         'custom-green': '#B9EDDD',
-      }
+      },
     },
   },
   plugins: [],
