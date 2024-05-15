@@ -21,7 +21,7 @@ function City() {
     const fetchCities = async () => {
       try {
         const response = await fetch(
-          "https://weatherapp-backend-umber.vercel.app/weather"
+          "https://under-the-weather-backend.vercel.app/weather"
         );
         const data = await response.json();
         if (data.weather) {
@@ -51,7 +51,7 @@ function City() {
   const deleteCity = async (cityName) => {
     try {
       const response = await fetch(
-        `https://weatherapp-backend-umber.vercel.app/weather/${cityName}`,
+        `https://under-the-weather-backend.vercel.app/weather/${cityName}`,
         {
           method: "DELETE",
         }
@@ -70,7 +70,7 @@ function City() {
   const fetchForecast = async (cityName) => {
     try {
       const response = await fetch(
-        `https://weatherapp-backend-umber.vercel.app/weather/forecast/${cityName}`
+        `https://under-the-weather-backend.vercel.app/weather/forecast/${cityName}`
       );
       const data = await response.json();
       if (data.weather.list) {

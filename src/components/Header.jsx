@@ -39,7 +39,7 @@ function Header() {
   const handleLocation = (e) => {
     e.preventDefault();
     fetch(
-      "https://weatherapp-backend-umber.vercel.app/weather/current/location",
+      "https://under-the-weather-backend.vercel.app/weather/current/location",
       {
         method: "POST",
         headers: {
@@ -82,7 +82,7 @@ function Header() {
   // Add city to the backend
   const handleSubmit = (e) => {
     e.preventDefault();
-    fetch("https://weatherapp-backend-umber.vercel.app/weather/current", {
+    fetch("https://under-the-weather-backend.vercel.app/weather/current", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
