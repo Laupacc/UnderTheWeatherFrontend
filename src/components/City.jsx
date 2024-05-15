@@ -393,15 +393,23 @@ function City() {
             borderRadius: 10,
             boxShadow: 24,
             p: 4,
-            overflow: "auto",
+            overflow: "scroll",
             width: {
-              xs: "65%", // For mobile
-              sm: "75%", // For desktop
+              xs: "85%",
+              sm: "80%",
+              md: "85%",
+              xl: "75%",
             },
             height: {
-              xs: "75%", // For mobile
-              sm: "52%", // For desktop
+              xs: "85%",
+              sm: "90%",
+              md: "65%",
+              xl: "60%",
             },
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
           }}
         >
           {/* City name and subtitle */}
@@ -445,13 +453,13 @@ function City() {
 
           {/* Forecast data for the selected day */}
           {selectedDayForecast && (
-            <div className="flex flex-wrap sm:flex-nowrap justify-center items-center">
+            <div className="flex flex-wrap md:flex-nowrap justify-center items-center">
               {selectedDayForecast.map((forecast) => (
                 <div
                   key={forecast.dt}
                   className="flex flex-col justify-between items-center m-3 p-3 bg-gradient-to-br from-emerald-100 to-sky-300 rounded-lg shadow-xl"
                   style={{
-                    minWidth: "7rem",
+                    minWidth: "4rem",
                     maxWidth: "7rem",
                     minHeight: "15rem",
                     maxHeight: "15rem",

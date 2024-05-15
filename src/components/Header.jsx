@@ -120,10 +120,19 @@ function Header() {
 
   return (
     <>
-      <div className="flex justify-between items-center px-4 py-2 bg-custom-blue5 text-white sticky top-0">
-        <form onSubmit={handleSubmit}>
+      <div className="px-4 py-2 bg-custom-blue5 text-white sticky top-0 flex flex-col sm:flex-row justify-between items-center">
+        <h1 className="font-UndertheWeather text-4xl sm:text-7xl text-gray-200">
+          Under the Weather
+        </h1>
+        <button
+          className="bg-custom-blue2 hover:bg-custom-blue4 text-white text-sm sm:text-base  font-bold py-2 px-4 mb-3 sm:mb-0 rounded"
+          onClick={handleLocation}
+        >
+          Add Current Location
+        </button>
+        <form onSubmit={handleSubmit} className="flex mb-2 sm:mb-0">
           <input
-            className="text-black w-60 p-2 rounded m-2"
+            className="text-black px-4 sm:px-8 rounded mr-4 ml-4"
             type="text"
             value={cityName}
             onChange={(e) => setCityName(e.target.value)}
@@ -131,23 +140,14 @@ function Header() {
             required
           />
           <button
-            className="bg-custom-blue2 hover:bg-custom-blue4 text-white font-bold py-2 px-4 rounded ml-4"
+            className="bg-custom-blue2 hover:bg-custom-blue4 text-white text-sm sm:text-base font-bold py-2 px-4 rounded"
             type="submit"
           >
             Add City
           </button>
         </form>
-        <h1 className="font-UndertheWeather text-7xl text-gray-200">
-          Under the Weather
-        </h1>
-        <button
-          className="bg-custom-blue2 hover:bg-custom-blue4 text-white font-bold py-2 px-4 rounded mr-4"
-          onClick={handleLocation}
-        >
-          Add Current Location
-        </button>
       </div>
-      <div className="sticky top-10 bg-white z-10">
+      <div className="sticky top-36 sm:top-20 bg-white ">
         {success && <Alert severity="success">{success}</Alert>}
         {error && <Alert severity="warning">{error}</Alert>}
         {fetchError && <Alert severity="error">{fetchError}</Alert>}
