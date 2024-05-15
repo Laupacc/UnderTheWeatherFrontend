@@ -212,7 +212,7 @@ function City() {
                   <div className="flex justify-center items-center">
                     <div className="flex flex-col justify-center items-center my-2 mx-4">
                       <img
-                        src="images/thermometer_down1.png"
+                        src="images/thermometerdown1.png"
                         alt="Temperature"
                         className="w-12 h-12"
                       />
@@ -227,7 +227,7 @@ function City() {
                     </div>
                     <div className="flex flex-col justify-center items-center my-2 mx-4">
                       <img
-                        src="images/thermometer_up1.png"
+                        src="images/thermometerup1.png"
                         alt="Temperature"
                         className="w-12 h-12"
                       />
@@ -260,8 +260,7 @@ function City() {
                     </div>
                     <div className="flex flex-col justify-center items-center my-2 mx-4">
                       <img
-                        // src="images/windsock.png"
-                        src={'images/windsock.png'}
+                        src="images/windsock.png"
                         alt="Wind"
                         className="w-12 h-12"
                       />
