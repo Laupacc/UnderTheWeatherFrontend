@@ -245,7 +245,7 @@ function City() {
                   <div className="flex justify-center items-center">
                     <div className="flex flex-col justify-center items-center my-2 mx-4">
                       <img
-                        src="images/hygrometer.png"
+                        src="images/hygrometer1.png"
                         alt="Humidity"
                         className="w-12 h-12"
                       />
@@ -260,7 +260,7 @@ function City() {
                     </div>
                     <div className="flex flex-col justify-center items-center my-2 mx-4">
                       <img
-                        src="images/windsock.png"
+                        src="images/windsock1.png"
                         alt="Wind"
                         className="w-12 h-12"
                       />
@@ -278,7 +278,7 @@ function City() {
                   <div className="flex justify-center items-center ">
                     <div className="flex flex-col justify-center items-center my-2 mx-4">
                       <img
-                        src="images/cloud.png"
+                        src="images/cloud1.png"
                         alt="Clouds"
                         className="w-12 h-12"
                       />
@@ -293,7 +293,7 @@ function City() {
                     </div>
                     <div className="flex flex-col  justify-center items-center my-2 mx-4">
                       <img
-                        src="images/rain.png"
+                        src="images/rain1.png"
                         alt="Rain"
                         className="w-12 h-12"
                       />
@@ -308,7 +308,7 @@ function City() {
                     </div>
                     <div className="flex flex-col justify-center items-center my-2 mx-4">
                       <img
-                        src="images/snow.png"
+                        src="images/snow1.png"
                         alt="Snow"
                         className="w-12 h-12"
                       />
@@ -327,7 +327,7 @@ function City() {
                   <div className="flex justify-center items-center">
                     <div className="flex flex-col justify-center items-center my-2 mx-4">
                       <img
-                        src="images/sunrise.png"
+                        src="images/sunrise1.png"
                         alt="Sunrise"
                         className="w-12 h-12"
                       />
@@ -342,7 +342,7 @@ function City() {
                     </div>
                     <div className="flex flex-col justify-center items-center my-2 mx-4">
                       <img
-                        src="images/sunset.png"
+                        src="images/sunset1.png"
                         alt="Sunset"
                         className="w-12 h-12"
                       />
