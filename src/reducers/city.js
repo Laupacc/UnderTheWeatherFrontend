@@ -11,8 +11,9 @@ const citySlice = createSlice({
         addCity: (state, action) => {
             state.city = [...state.city, action.payload]
         },
-        removeCity: (state) => {
-            state.city = [];
+        removeCity: (state, action) => {
+            state.city = state.city.filter((city) => city !== action.payload);
+            // state.city = [];
         },
     },
 });

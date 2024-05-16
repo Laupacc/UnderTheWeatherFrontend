@@ -147,7 +147,7 @@ function Header() {
           </button>
         </form>
       </div>
-      <div className="sticky top-36 sm:top-20 bg-white ">
+      <div className="sticky top-36 sm:top-20 bg-white">
         {success && <Alert severity="success">{success}</Alert>}
         {error && <Alert severity="warning">{error}</Alert>}
         {fetchError && <Alert severity="error">{fetchError}</Alert>}

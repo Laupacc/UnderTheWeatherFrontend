@@ -5,6 +5,7 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import Modal from "@mui/material/Modal";
+import Alert from "@mui/material/Alert";
 
 function City() {
   const dispatch = useDispatch();
@@ -16,6 +17,14 @@ function City() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedDayForecast, setSelectedDayForecast] = useState(null);
   const [selectedButton, setSelectedButton] = useState(0);
+  const [cityDeleted, setCityDeleted] = useState("");
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setCityDeleted("");
+    }, 3500);
+    return () => clearTimeout(timer);
+  }, [cityDeleted]);
 
   useEffect(() => {
     const fetchCities = async () => {
@@ -50,6 +59,9 @@ function City() {
   // Delete city from the backend
   const deleteCity = async (cityName) => {
     try {
+      if (!cityName) {
+        throw new Error("City name is undefined or null");
+      }
       const response = await fetch(
         `https://under-the-weather-backend.vercel.app/weather/${cityName}`,
         {
@@ -58,10 +70,17 @@ function City() {
       );
       const data = await response.json();
       if (data.result) {
-        dispatch(removeCity(data.weather.cityName));
-        setCityNames(cities.filter((city) => city.cityName !== cityName));
+        dispatch(removeCity(cityName));
+        setCityNames(cityNames.filter((city) => city.cityName !== cityName));
+        setCityDeleted(
+          `${cityName
+            .split(" ")
+            .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(" ")} deleted successfully`
+        );
       }
     } catch (error) {
+      setCityDeleted("");
       console.error("Error deleting city:", error);
     }
   };
@@ -75,6 +94,16 @@ function City() {
       const data = await response.json();
       if (data.weather.list) {
         setForecastData(data.weather.list);
+
+        // Show the forecast for the current day by default when opening the modal
+        const selectedDate = new Date().toISOString().split("T")[0]; // Current date
+        // Filter forecasts for the selected day
+        const selectedDayForecasts = data.weather.list.filter((forecast) => {
+          const forecastDate = forecast.dt_txt.split(" ")[0]; // Extracting date from datetime string
+          return forecastDate === selectedDate;
+        });
+        setSelectedDayForecast(selectedDayForecasts);
+
         setIsModalOpen(true);
       }
     } catch (error) {
@@ -125,6 +154,11 @@ function City() {
 
   return (
     <>
+      {cityDeleted && (
+        <Alert severity="error" className="sticky top-36 sm:top-20 bg-white">
+          {cityDeleted}
+        </Alert>
+      )}
       {typeof cityNames !== "undefined" || cityNames.length !== 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-3 bg-gray-200">
           {cityNames.map((city) => (
@@ -157,11 +191,6 @@ function City() {
                 {/* Temperature */}
                 <div className="flex flex-col justify-center items-center">
                   <div className="flex justify-center items-center">
-                    {/* <img
-                      src="images/thermometer.png"
-                      alt="Temperature"
-                      className="w-8 h-8"
-                    /> */}
                     <Typography
                       variant="h4"
                       align="center"
@@ -207,7 +236,7 @@ function City() {
                   5-Day Forecast
                 </button>
 
-                <div className="border-2 rounded-lg px-3">
+                <div className="border-2 rounded-lg ">
                   {/* Min and Max Temperature */}
                   <div className="flex justify-center items-center">
                     <div className="flex flex-col justify-center items-center my-2 mx-4">
@@ -394,117 +423,112 @@ function City() {
             boxShadow: 24,
             p: 4,
             overflow: "scroll",
-            width: {
-              xs: "85%",
-              sm: "80%",
-              md: "85%",
-              xl: "75%",
-            },
-            height: {
-              xs: "85%",
-              sm: "90%",
-              md: "65%",
-              xl: "60%",
-            },
+            width: { xs: "80vw", lg: "80vw" },
+            height: { xs: "70vh", lg: "60vh" },
             display: "flex",
             flexDirection: "column",
             justifyContent: "center",
             alignItems: "center",
           }}
         >
-          {/* City name and subtitle */}
-          <Typography variant="h4" align="center" gutterBottom>
-            {selectedCity &&
-              selectedCity
-                .split(" ")
-                .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-                .join(" ")}{" "}
-          </Typography>
-          <Typography variant="h6" align="center" gutterBottom>
-            5-Day Forecast
-          </Typography>
+          <div className="w-full overflow-auto">
+            {/* City name and subtitle */}
+            <Typography
+              sx={{ typography: { sm: "h4", xs: "h5" } }}
+              align="center"
+              gutterBottom
+            >
+              {selectedCity &&
+                selectedCity
+                  .split(" ")
+                  .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                  .join(" ")}{" "}
+            </Typography>
+            <Typography
+              sx={{ typography: { sm: "h6", xs: "body1" } }}
+              align="center"
+              gutterBottom
+            >
+              5-Day Forecast
+            </Typography>
 
-          {/* Buttons for each day */}
-          <div className="flex flex-wrap justify-center mb-4">
-            {forecastData &&
-              Object.values(
-                forecastData.reduce((acc, forecast) => {
-                  const date = forecast.dt_txt.split(" ")[0]; // Extracting date from datetime string
-                  if (!acc[date]) {
-                    acc[date] = [];
-                  }
-                  acc[date].push(forecast);
-                  return acc;
-                }, {})
-              ).map((dailyForecast, index) => (
-                <button
-                  key={index}
-                  className={`m-3 ${
-                    index === selectedButton
-                      ? "bg-custom-blue text-white font-medium px-4 py-2 rounded-lg focus:outline-none focus:bg-custom-blue focus:text-white"
-                      : "bg-white text-black font-medium px-4 py-2 rounded-lg hover:bg-custom-blue hover:text-white focus:outline-none focus:bg-custom-blue focus:text-white"
-                  }`}
-                  onClick={() => handleDayClick(dailyForecast, index)}
-                >
-                  {getFormattedDate(dailyForecast[0].dt_txt.split(" ")[0])}
-                </button>
-              ))}
-          </div>
-
-          {/* Forecast data for the selected day */}
-          {selectedDayForecast && (
-            <div className="flex flex-wrap md:flex-nowrap justify-center items-center">
-              {selectedDayForecast.map((forecast) => (
-                <div
-                  key={forecast.dt}
-                  className="flex flex-col justify-between items-center m-3 p-3 bg-gradient-to-br from-emerald-100 to-sky-300 rounded-lg shadow-xl"
-                  style={{
-                    minWidth: "4rem",
-                    maxWidth: "7rem",
-                    minHeight: "15rem",
-                    maxHeight: "15rem",
-                  }}
-                >
-                  {/* Time */}
-                  <Typography
-                    variant="h6"
-                    align="center"
-                    fontWeight={600}
-                    className="text-gray-600"
+            {/* Buttons for each day */}
+            <div className="flex flex-wrap justify-center mb-4">
+              {forecastData &&
+                Object.values(
+                  forecastData.reduce((acc, forecast) => {
+                    const date = forecast.dt_txt.split(" ")[0]; // Extracting date from datetime string
+                    if (!acc[date]) {
+                      acc[date] = [];
+                    }
+                    acc[date].push(forecast);
+                    return acc;
+                  }, {})
+                ).map((dailyForecast, index) => (
+                  <button
+                    key={index}
+                    className={`w-40 m-2 text-sm md:text-base md:w-44 ${
+                      index === selectedButton
+                        ? "bg-custom-blue text-white px-4 py-2 rounded-lg focus:outline-none focus:bg-custom-blue focus:text-white"
+                        : "bg-white text-black px-4 py-2 rounded-lg hover:bg-custom-blue hover:text-white focus:outline-none focus:bg-custom-blue focus:text-white"
+                    }`}
+                    onClick={() => handleDayClick(dailyForecast, index)}
                   >
-                    {forecast.dt_txt.split(" ")[1].slice(0, 5)}
-                  </Typography>
-
-                  {/* Weather Icon */}
-                  <img
-                    src={`images/${forecast.weather[0].icon}.png`}
-                    alt="Weather Icon"
-                    className="w-12 m-3 sm:w-16"
-                  />
-
-                  {/* Temperature */}
-                  <Typography
-                    variant="h5"
-                    align="center"
-                    gutterBottom
-                    className="text-blue-700"
-                  >
-                    {Math.round(forecast.main.temp * 2) / 2}°C
-                  </Typography>
-
-                  {/* Description */}
-                  <Typography
-                    variant="body1"
-                    align="center"
-                    className="text-gray-600"
-                  >
-                    {forecast.weather[0].description.charAt(0).toUpperCase() +
-                      forecast.weather[0].description.slice(1)}
-                  </Typography>
-                </div>
-              ))}
+                    {getFormattedDate(dailyForecast[0].dt_txt.split(" ")[0])}
+                  </button>
+                ))}
             </div>
-          )}
+
+            {/* Forecast data for the selected day */}
+            {selectedDayForecast && (
+              <div className="flex flex-wrap lg:flex-nowrap justify-center items-center">
+                {selectedDayForecast.map((forecast) => (
+                  <div
+                    key={forecast.dt}
+                    className="flex flex-col justify-between items-center m-3 p-3 bg-gradient-to-br from-emerald-100 to-sky-300 rounded-lg shadow-xl"
+                    style={{
+                      minWidth: "4rem",
+                      maxWidth: "6rem",
+                      minHeight: "15rem",
+                      maxHeight: "15rem",
+                    }}
+                  >
+                    {/* Time */}
+                    <Typography
+                      sx={{ typography: { sm: "h5", xs: "h6" } }}
+                      align="center"
+                      fontWeight={600}
+                      className="text-gray-600"
+                    >
+                      {forecast.dt_txt.split(" ")[1].slice(0, 5)}
+                    </Typography>
+
+                    {/* Weather Icon */}
+                    <img
+                      src={`images/${forecast.weather[0].icon}.png`}
+                      alt="Weather Icon"
+                      className="w-12 m-3 sm:w-16"
+                    />
+
+                    {/* Temperature */}
+                    <p className="text-blue-700 text-2xl font-semibold lg:text-xl xl:text-2xl">
+                      {Math.round(forecast.main.temp * 2) / 2}°
+                    </p>
+
+                    {/* Description */}
+                    <Typography
+                      variant="body1"
+                      align="center"
+                      className="text-gray-600"
+                    >
+                      {forecast.weather[0].description.charAt(0).toUpperCase() +
+                        forecast.weather[0].description.slice(1)}
+                    </Typography>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </Box>
       </Modal>
     </>
