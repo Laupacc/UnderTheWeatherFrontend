@@ -69,6 +69,7 @@ function City() {
         }
       );
       const data = await response.json();
+      console.log(data);
       if (data.result) {
         dispatch(removeCity(cityName));
         setCityNames(cityNames.filter((city) => city.cityName !== cityName));
@@ -76,7 +77,7 @@ function City() {
           `${cityName
             .split(" ")
             .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-            .join(" ")} deleted successfully`
+            .join(" ")} was deleted successfully`
         );
       }
     } catch (error) {
@@ -160,7 +161,7 @@ function City() {
         </Alert>
       )}
       {typeof cityNames !== "undefined" || cityNames.length !== 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-3 bg-gray-200">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-4 p-3 bg-gray-200">
           {cityNames.map((city) => (
             <div
               key={city.cityName}
@@ -243,7 +244,7 @@ function City() {
                       <img
                         src="images/thermometerdown1.png"
                         alt="Temperature"
-                        className="w-12 h-12"
+                        className="w-10 h-10 sm:w-12 sm:h-12"
                       />
                       <Typography
                         variant="h6"
@@ -258,7 +259,7 @@ function City() {
                       <img
                         src="images/thermometerup1.png"
                         alt="Temperature"
-                        className="w-12 h-12"
+                        className="w-10 h-10 sm:w-12 sm:h-12"
                       />
                       <Typography
                         variant="h6"
@@ -276,7 +277,7 @@ function City() {
                       <img
                         src="images/hygrometer1.png"
                         alt="Humidity"
-                        className="w-12 h-12"
+                        className="w-10 h-10 sm:w-12 sm:h-12"
                       />
                       <Typography
                         variant="h6"
@@ -291,7 +292,7 @@ function City() {
                       <img
                         src="images/windsock1.png"
                         alt="Wind"
-                        className="w-12 h-12"
+                        className="w-10 h-10 sm:w-12 sm:h-12"
                       />
                       <Typography
                         variant="h6"
@@ -309,7 +310,7 @@ function City() {
                       <img
                         src="images/cloud1.png"
                         alt="Clouds"
-                        className="w-12 h-12"
+                        className="w-10 h-10 sm:w-12 sm:h-12"
                       />
                       <Typography
                         variant="h6"
@@ -324,7 +325,7 @@ function City() {
                       <img
                         src="images/rain1.png"
                         alt="Rain"
-                        className="w-12 h-12"
+                        className="w-10 h-10 sm:w-12 sm:h-12"
                       />
                       <Typography
                         variant="h6"
@@ -339,7 +340,7 @@ function City() {
                       <img
                         src="images/snow1.png"
                         alt="Snow"
-                        className="w-12 h-12"
+                        className="w-10 h-10 sm:w-12 sm:h-12"
                       />
                       <Typography
                         variant="h6"
@@ -358,7 +359,7 @@ function City() {
                       <img
                         src="images/sunrise1.png"
                         alt="Sunrise"
-                        className="w-12 h-12"
+                        className="w-10 h-10 sm:w-12 sm:h-12"
                       />
                       <Typography
                         variant="h6"
@@ -373,7 +374,7 @@ function City() {
                       <img
                         src="images/sunset1.png"
                         alt="Sunset"
-                        className="w-12 h-12"
+                        className="w-10 h-10 sm:w-12 sm:h-12"
                       />
                       <Typography
                         variant="h6"
