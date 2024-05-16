@@ -5,17 +5,42 @@ import { addCity } from "../reducers/city.js";
 import { useEffect } from "react";
 import Alert from "@mui/material/Alert";
 
+import TextField from "@mui/material/TextField";
+import Autocomplete from "@mui/material/Autocomplete";
+
 function Header() {
   const dispatch = useDispatch();
-  const cities = useSelector((state) => state.city);
 
+  // City name
   const [cityName, setCityName] = useState("");
+
+  // Alerts
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [fetchError, setFetchError] = useState("");
 
+  // Current location coordinates
   const [lat, setLat] = useState([]);
   const [lon, setLon] = useState([]);
+
+  // Autocomplete options
+  const [options, setOptions] = useState([]);
+
+  // Get all cities from API for autocomplete feature
+  useEffect(() => {
+    fetch("https://under-the-weather-backend.vercel.app/cityautocomplete")
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.result) {
+          setOptions(data.cities);
+        } else {
+          setFetchError(data.error);
+        }
+      })
+      .catch((error) => {
+        setFetchError("An error occurred while fetching the city names");
+      });
+  }, []);
 
   // Clear alerts after 5 seconds
   useEffect(() => {
@@ -35,7 +60,7 @@ function Header() {
     });
   }, []);
 
-  // Add current location to the backend
+  // Add current location to the database
   const handleLocation = (e) => {
     e.preventDefault();
     fetch(
@@ -79,7 +104,7 @@ function Header() {
       });
   };
 
-  // Add city to the backend
+  // Add city to the database
   const handleSubmit = (e) => {
     e.preventDefault();
     fetch("https://under-the-weather-backend.vercel.app/weather/current", {
@@ -101,12 +126,12 @@ function Header() {
           );
           setError("");
           setFetchError("");
-          setCityName("");
+          // setCityName("");
         } else {
           setError("This city is already in your list");
           setSuccess("");
           setFetchError("");
-          setCityName("");
+          // setCityName("");
         }
       })
       .catch((error) => {
@@ -131,13 +156,34 @@ function Header() {
           Add Current Location
         </button>
         <form onSubmit={handleSubmit} className="flex mb-2 sm:mb-0">
-          <input
+          {/* <input
             className="text-black px-4 sm:px-8 rounded mr-4 ml-4"
             type="text"
             value={cityName}
             onChange={(e) => setCityName(e.target.value)}
             placeholder="Enter a city name"
             required
+          /> */}
+          <Autocomplete
+            sx={{
+              width: 250,
+              marginRight: 10,
+              marginLeft: 10,
+              color: "#0000",
+              backgroundColor: "#fff",
+              borderRadius: 1,
+            }}
+            id="city"
+            options={options}
+            getOptionLabel={(option) => `${option.name} (${option.iso2})`}
+            onChange={(e, value) => setCityName(value.name)}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Enter a city name"
+                variant="outlined"
+              />
+            )}
           />
           <button
             className="bg-custom-blue2 hover:bg-custom-blue4 text-white text-sm sm:text-base font-bold py-2 px-4 rounded"

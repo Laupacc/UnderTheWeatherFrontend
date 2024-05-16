@@ -13,7 +13,6 @@ const citySlice = createSlice({
         },
         removeCity: (state, action) => {
             state.city = state.city.filter((city) => city !== action.payload);
-            // state.city = [];
         },
     },
 });
