@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { addCity, removeCity } from "../reducers/city.js";
+import { removeCity } from "../reducers/city.js";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
@@ -9,7 +9,9 @@ import Alert from "@mui/material/Alert";
 
 function City() {
   const dispatch = useDispatch();
-  const cities = useSelector((state) => state.city);
+  // const cities = useSelector((state) => state.city);
+  const cities = useSelector((state) => state.city.city);
+  const unit = useSelector((state) => state.city.unit);
 
   const [cityNames, setCityNames] = useState([]);
   const [forecastData, setForecastData] = useState(null);
@@ -153,10 +155,23 @@ function City() {
     return `https://www.google.com/search?q=${encodeURIComponent(cityName)}`;
   };
 
+  const convertTemperature = (temperature) => {
+    if (unit === "Fahrenheit") {
+      return (temperature * 9) / 5 + 32;
+    }
+    return temperature;
+  };
+
+  const formatTemperature = (temperature) => {
+    return `${Math.round(convertTemperature(temperature))}°${
+      unit === "Fahrenheit" ? "F" : "C"
+    }`;
+  };
+
   return (
     <>
       {cityDeleted && (
-        <Alert severity="error" className="sticky top-36 sm:top-20 bg-white">
+        <Alert severity="success" className="sticky top-36 sm:top-20 bg-white">
           {cityDeleted}
         </Alert>
       )}
@@ -197,7 +212,7 @@ function City() {
                       align="center"
                       className="text-blue-700"
                     >
-                      {Math.round(city.temp * 2) / 2}°
+                      {formatTemperature(city.temp)}
                     </Typography>
                   </div>
                   <Typography
@@ -206,7 +221,7 @@ function City() {
                     gutterBottom
                     className="text-slate-600"
                   >
-                    Real feel {Math.round(city.feels_like * 2) / 2}°
+                    Real feel {formatTemperature(city.feels_like)}
                   </Typography>
                 </div>
 
@@ -252,7 +267,7 @@ function City() {
                         gutterBottom
                         className="text-slate-600"
                       >
-                        {Math.round(city.tempMin * 2) / 2}°
+                        {formatTemperature(city.tempMin)}
                       </Typography>
                     </div>
                     <div className="flex flex-col justify-center items-center my-2 mx-4">
@@ -267,7 +282,7 @@ function City() {
                         gutterBottom
                         className="text-slate-600"
                       >
-                        {Math.round(city.tempMax * 2) / 2}°
+                        {formatTemperature(city.tempMax)}
                       </Typography>
                     </div>
                   </div>
@@ -425,7 +440,7 @@ function City() {
             p: 4,
             overflow: "scroll",
             width: { xs: "80vw", lg: "80vw" },
-            height: { xs: "70vh", lg: "60vh" },
+            height: { xs: "70vh", lg: "70vh" },
             display: "flex",
             flexDirection: "column",
             justifyContent: "center",
@@ -513,7 +528,7 @@ function City() {
 
                     {/* Temperature */}
                     <p className="text-blue-700 text-2xl font-semibold lg:text-xl xl:text-2xl">
-                      {Math.round(forecast.main.temp * 2) / 2}°
+                      {formatTemperature(forecast.main.temp)}
                     </p>
 
                     {/* Description */}

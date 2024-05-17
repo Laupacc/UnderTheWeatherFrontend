@@ -1,7 +1,7 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useState } from "react";
-import { addCity } from "../reducers/city.js";
+import { addCity, setUnitTemp } from "../reducers/city.js";
 import { useEffect } from "react";
 import Alert from "@mui/material/Alert";
 
@@ -10,6 +10,7 @@ import Autocomplete from "@mui/material/Autocomplete";
 
 function Header() {
   const dispatch = useDispatch();
+  const unit = useSelector((state) => state.city.unit);
 
   // City name
   const [cityName, setCityName] = useState("");
@@ -126,12 +127,12 @@ function Header() {
           );
           setError("");
           setFetchError("");
-          // setCityName("");
+          setCityName("");
         } else {
           setError("This city is already in your list");
           setSuccess("");
           setFetchError("");
-          // setCityName("");
+          setCityName("");
         }
       })
       .catch((error) => {
@@ -143,12 +144,28 @@ function Header() {
       });
   };
 
+  const handleUnitChange = (event) => {
+    const selectedUnit = event.target.value;
+    dispatch(setUnitTemp(selectedUnit));
+  };
+
   return (
     <>
       <div className="px-4 py-2 bg-custom-blue5 text-white sticky top-0 flex flex-col sm:flex-row justify-between items-center">
         <h1 className="font-UndertheWeather text-4xl sm:text-7xl text-gray-200">
           Under the Weather
         </h1>
+
+        <div>
+          <label>
+            Select Unit:
+            <select value={unit} onChange={handleUnitChange}>
+              <option value="Celsius">Celsius</option>
+              <option value="Fahrenheit">Fahrenheit</option>
+            </select>
+          </label>
+        </div>
+
         <button
           className="bg-custom-blue2 hover:bg-custom-blue4 text-white text-sm sm:text-base  font-bold py-2 px-4 mb-3 sm:mb-0 rounded"
           onClick={handleLocation}
