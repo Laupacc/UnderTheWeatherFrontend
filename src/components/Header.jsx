@@ -28,20 +28,20 @@ function Header() {
   const [options, setOptions] = useState([]);
 
   // Get all cities from API for autocomplete feature
-  useEffect(() => {
-    fetch("https://under-the-weather-backend.vercel.app/cityautocomplete")
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.result) {
-          setOptions(data.cities);
-        } else {
-          setFetchError(data.error);
-        }
-      })
-      .catch((error) => {
-        setFetchError("An error occurred while fetching the city names");
-      });
-  }, []);
+  // useEffect(() => {
+  //   fetch("https://under-the-weather-backend.vercel.app/cityautocomplete")
+  //     .then((response) => response.json())
+  //     .then((data) => {
+  //       if (data.result) {
+  //         setOptions(data.cities);
+  //       } else {
+  //         setFetchError(data.error);
+  //       }
+  //     })
+  //     .catch((error) => {
+  //       setFetchError("An error occurred while fetching the city names");
+  //     });
+  // }, []);
 
   // Clear alerts after 5 seconds
   useEffect(() => {
@@ -127,12 +127,12 @@ function Header() {
           );
           setError("");
           setFetchError("");
-          setCityName("");
+          setCityName(""); // take out if autocomplete
         } else {
           setError("This city is already in your list");
           setSuccess("");
           setFetchError("");
-          setCityName("");
+          setCityName(""); // take out if autocomplete
         }
       })
       .catch((error) => {
@@ -152,22 +152,23 @@ function Header() {
   return (
     <>
       <div className="px-4 py-2 bg-custom-blue5 text-white sticky top-0 flex flex-col sm:flex-row justify-between items-center">
-        <h1 className="font-UndertheWeather text-4xl sm:text-7xl text-gray-200">
+        <h1 className="font-UndertheWeather text-5xl sm:text-7xl text-gray-200 mb-2 sm:mb-0">
           Under the Weather
         </h1>
 
         <div>
-          <label>
-            Select Unit:
-            <select value={unit} onChange={handleUnitChange}>
-              <option value="Celsius">Celsius</option>
-              <option value="Fahrenheit">Fahrenheit</option>
-            </select>
-          </label>
+          <select
+            value={unit}
+            onChange={handleUnitChange}
+            className="text-slate-600 rounded-lg p-1 mr-4 ml-4 mb-2 sm:mb-0"
+          >
+            <option value="Celsius">°C</option>
+            <option value="Fahrenheit">°F</option>
+          </select>
         </div>
 
         <button
-          className="bg-custom-blue2 hover:bg-custom-blue4 text-white text-sm sm:text-base  font-bold py-2 px-4 mb-3 sm:mb-0 rounded"
+          className="bg-custom-blue2 hover:bg-custom-blue4 text-white text-sm sm:text-base font-bold py-2 px-4 mb-3 sm:mb-0 rounded"
           onClick={handleLocation}
         >
           Add Current Location
@@ -203,7 +204,7 @@ function Header() {
             )}
           /> */}
           <button
-            className="bg-custom-blue2 hover:bg-custom-blue4 text-white text-sm sm:text-base font-bold py-2 px-4 rounded"
+            className="bg-custom-blue2 hover:bg-custom-blue4 text-white text-sm sm:text-base font-bold py-2 px-4 rounded mr-4"
             type="submit"
           >
             Add City
