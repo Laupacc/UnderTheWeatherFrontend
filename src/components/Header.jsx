@@ -156,15 +156,15 @@ function Header() {
           Add Current Location
         </button>
         <form onSubmit={handleSubmit} className="flex mb-2 sm:mb-0">
-          {/* <input
+          <input
             className="text-black px-4 sm:px-8 rounded mr-4 ml-4"
             type="text"
             value={cityName}
             onChange={(e) => setCityName(e.target.value)}
             placeholder="Enter a city name"
             required
-          /> */}
-          <Autocomplete
+          />
+          {/* <Autocomplete
             sx={{
               width: 250,
               marginRight: 10,
@@ -184,7 +184,7 @@ function Header() {
                 variant="outlined"
               />
             )}
-          />
+          /> */}
           <button
             className="bg-custom-blue2 hover:bg-custom-blue4 text-white text-sm sm:text-base font-bold py-2 px-4 rounded"
             type="submit"
