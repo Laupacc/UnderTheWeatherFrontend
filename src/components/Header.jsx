@@ -42,6 +42,7 @@ function Header() {
   //       setFetchError("An error occurred while fetching the city names");
   //     });
   // }, []);
+  
 
   // Clear alerts after 5 seconds
   useEffect(() => {
