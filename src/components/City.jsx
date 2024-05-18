@@ -104,7 +104,7 @@ function City() {
 
   useEffect(() => {
     fetchUpdatedCities();
-  }, []);
+  }, [cities]);
 
   // Delete city from the backend
   const deleteCity = async (cityName) => {
