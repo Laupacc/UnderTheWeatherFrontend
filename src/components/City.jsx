@@ -28,35 +28,83 @@ function City() {
     return () => clearTimeout(timer);
   }, [cityDeleted]);
 
-  useEffect(() => {
-    const fetchCities = async () => {
-      try {
-        const response = await fetch(
-          "https://under-the-weather-backend.vercel.app/weather"
-        );
-        const data = await response.json();
-        if (data.weather) {
-          const formattedCities = data.weather.map((city) => ({
-            ...city,
-            sunrise: new Date(city.sunrise * 1000).toLocaleTimeString("en-US", {
-              hour: "2-digit",
-              minute: "2-digit",
-              hour12: false,
-            }),
-            sunset: new Date(city.sunset * 1000).toLocaleTimeString("en-US", {
-              hour: "2-digit",
-              minute: "2-digit",
-              hour12: false,
-            }),
-          }));
-          setCityNames(formattedCities.reverse()); // Reverse the order of cities
-        }
-      } catch (error) {
-        console.error("Error fetching cities:", error);
+  // useEffect(() => {
+  //   const fetchCities = async () => {
+  //     try {
+  //       const response = await fetch(
+  //         "https://under-the-weather-backend.vercel.app/weather"
+  //       );
+  //       const data = await response.json();
+  //       if (data.weather) {
+  //         const formattedCities = data.weather.map((city) => ({
+  //           ...city,
+  //           sunrise: new Date(city.sunrise * 1000).toLocaleTimeString("en-US", {
+  //             hour: "2-digit",
+  //             minute: "2-digit",
+  //             hour12: false,
+  //           }),
+  //           sunset: new Date(city.sunset * 1000).toLocaleTimeString("en-US", {
+  //             hour: "2-digit",
+  //             minute: "2-digit",
+  //             hour12: false,
+  //           }),
+  //         }));
+  //         setCityNames(formattedCities.reverse());
+  //       }
+  //     } catch (error) {
+  //       console.error("Error fetching cities:", error);
+  //     }
+  //   };
+  //   fetchCities();
+  // }, [cities]);
+
+  const [loading, setLoading] = useState(true);
+
+  const fetchUpdatedCities = async () => {
+    try {
+      // Trigger the update of all cities' weather data
+      const updateResponse = await fetch(
+        "https://under-the-weather-backend.vercel.app/weather/updateAll"
+      );
+      const updateData = await updateResponse.json();
+      console.log("Update Response:", updateData);
+      if (!updateData.result) {
+        console.error("Error updating cities:", updateData.error);
+        return;
       }
-    };
-    fetchCities();
-  }, [cities]);
+
+      // Fetch the updated city data
+      const response = await fetch(
+        "https://under-the-weather-backend.vercel.app/weather"
+      );
+      const data = await response.json();
+      console.log("Weather Data:", data);
+      if (data.weather) {
+        const formattedCities = data.weather.map((city) => ({
+          ...city,
+          sunrise: new Date(city.sunrise * 1000).toLocaleTimeString("en-US", {
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: false,
+          }),
+          sunset: new Date(city.sunset * 1000).toLocaleTimeString("en-US", {
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: false,
+          }),
+        }));
+        setCityNames(formattedCities.reverse());
+      }
+    } catch (error) {
+      console.error("Error fetching cities:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchUpdatedCities();
+  }, []);
 
   // Delete city from the backend
   const deleteCity = async (cityName) => {
