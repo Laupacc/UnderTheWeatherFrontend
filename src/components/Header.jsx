@@ -42,7 +42,6 @@ function Header() {
   //       setFetchError("An error occurred while fetching the city names");
   //     });
   // }, []);
-  
 
   // Clear alerts after 5 seconds
   useEffect(() => {
@@ -212,7 +211,7 @@ function Header() {
           </button>
         </form>
       </div>
-      <div className="sticky top-36 sm:top-20 bg-white">
+      <div className="sticky top-48 sm:top-20 bg-white">
         {success && <Alert severity="success">{success}</Alert>}
         {error && <Alert severity="warning">{error}</Alert>}
         {fetchError && <Alert severity="error">{fetchError}</Alert>}
