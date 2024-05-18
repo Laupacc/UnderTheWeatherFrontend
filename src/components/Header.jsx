@@ -4,6 +4,7 @@ import { useState } from "react";
 import { addCity, setUnitTemp } from "../reducers/city.js";
 import { useEffect } from "react";
 import Alert from "@mui/material/Alert";
+import { Switch } from "@headlessui/react";
 
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
@@ -23,6 +24,9 @@ function Header() {
   // Current location coordinates
   const [lat, setLat] = useState([]);
   const [lon, setLon] = useState([]);
+
+  // Toggle switch
+  const [enabled, setEnabled] = useState(false);
 
   // Autocomplete options
   const [options, setOptions] = useState([]);
@@ -144,19 +148,42 @@ function Header() {
       });
   };
 
-  const handleUnitChange = (event) => {
-    const selectedUnit = event.target.value;
-    dispatch(setUnitTemp(selectedUnit));
+  // const handleUnitChange = (event) => {
+  //   const selectedUnit = event.target.value;
+  //   dispatch(setUnitTemp(selectedUnit));
+  // };
+
+  const handleUnitChange = () => {
+    const newUnit = enabled ? "Celsius" : "Fahrenheit";
+    setEnabled(!enabled);
+    dispatch(setUnitTemp(newUnit));
   };
 
   return (
     <>
       <div className="px-4 py-2 bg-custom-blue5 text-white sticky top-0 flex flex-col sm:flex-row justify-between items-center">
-        <h1 className="font-UndertheWeather text-5xl sm:text-7xl text-gray-200 mb-2 sm:mb-0">
+        <h1 className="font-UndertheWeather text-5xl lg:text-7xl text-gray-200 mb-2 sm:mb-0">
           Under the Weather
         </h1>
 
-        <div>
+        <div className="flex items-center mb-2 sm:mx-6 xl:mx-2 ">
+          <span className="text-white text-lg mr-2">°C</span>
+          <Switch
+            checked={enabled}
+            onChange={handleUnitChange}
+            className={`group inline-flex h-6 w-11 items-center rounded-full ${
+              enabled ? "bg-sky-300" : "bg-sky-300"
+            } transition`}
+          >
+            <span
+              className={`${
+                enabled ? "translate-x-6" : "translate-x-1"
+              } inline-block h-4 w-4 transform rounded-full bg-slate-500 transition`}
+            />
+          </Switch>
+          <span className="text-white text-lg ml-2">°F</span>
+        </div>
+        {/* <div>
           <select
             value={unit}
             onChange={handleUnitChange}
@@ -165,7 +192,7 @@ function Header() {
             <option value="Celsius">°C</option>
             <option value="Fahrenheit">°F</option>
           </select>
-        </div>
+        </div> */}
 
         <button
           className="bg-custom-blue2 hover:bg-custom-blue4 text-white text-sm sm:text-base font-bold py-2 px-4 mb-3 sm:mb-0 rounded"
