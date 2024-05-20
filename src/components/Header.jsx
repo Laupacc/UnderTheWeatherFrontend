@@ -1,13 +1,14 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useState } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { addCity, setUnitTemp } from "../reducers/city.js";
-import { useEffect } from "react";
 import Alert from "@mui/material/Alert";
 import { Switch } from "@headlessui/react";
 
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
+import { DebounceInput } from "react-debounce-input";
+import debounce from "lodash.debounce";
 
 function Header() {
   const dispatch = useDispatch();
@@ -32,20 +33,20 @@ function Header() {
   const [options, setOptions] = useState([]);
 
   // Get all cities from API for autocomplete feature
-  // useEffect(() => {
-  //   fetch("https://under-the-weather-backend.vercel.app/cityautocomplete")
-  //     .then((response) => response.json())
-  //     .then((data) => {
-  //       if (data.result) {
-  //         setOptions(data.cities);
-  //       } else {
-  //         setFetchError(data.error);
-  //       }
-  //     })
-  //     .catch((error) => {
-  //       setFetchError("An error occurred while fetching the city names");
-  //     });
-  // }, []);
+  useEffect(() => {
+    fetch("https://under-the-weather-backend.vercel.app/cityautocomplete")
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.result) {
+          setOptions(data.cities);
+        } else {
+          setFetchError(data.error);
+        }
+      })
+      .catch((error) => {
+        setFetchError("An error occurred while fetching the city names");
+      });
+  }, []);
 
   // Clear alerts after 5 seconds
   useEffect(() => {
@@ -131,12 +132,12 @@ function Header() {
           );
           setError("");
           setFetchError("");
-          setCityName(""); // take out if autocomplete
+          // setCityName("");
         } else {
           setError("This city is already in your list");
           setSuccess("");
           setFetchError("");
-          setCityName(""); // take out if autocomplete
+          // setCityName("");
         }
       })
       .catch((error) => {
@@ -148,15 +149,20 @@ function Header() {
       });
   };
 
-  // const handleUnitChange = (event) => {
-  //   const selectedUnit = event.target.value;
-  //   dispatch(setUnitTemp(selectedUnit));
-  // };
-
   const handleUnitChange = () => {
     const newUnit = enabled ? "Celsius" : "Fahrenheit";
     setEnabled(!enabled);
     dispatch(setUnitTemp(newUnit));
+  };
+
+  // Debounce the input change
+  const debouncedSetCityName = useCallback(
+    debounce((value) => setCityName(value), 500),
+    []
+  );
+
+  const handleInputChange = (event, value) => {
+    debouncedSetCityName(value);
   };
 
   return (
@@ -183,16 +189,6 @@ function Header() {
           </Switch>
           <span className="text-white text-lg ml-2">°F</span>
         </div>
-        {/* <div>
-          <select
-            value={unit}
-            onChange={handleUnitChange}
-            className="text-slate-600 rounded-lg p-1 mr-4 ml-4 mb-2 sm:mb-0"
-          >
-            <option value="Celsius">°C</option>
-            <option value="Fahrenheit">°F</option>
-          </select>
-        </div> */}
 
         <button
           className="bg-custom-blue2 hover:bg-custom-blue4 text-white text-sm sm:text-base font-bold py-2 px-4 mb-3 sm:mb-0 rounded"
@@ -214,22 +210,25 @@ function Header() {
               width: 250,
               marginRight: 10,
               marginLeft: 10,
-              color: "#0000",
+              color: "#000",
               backgroundColor: "#fff",
               borderRadius: 1,
             }}
+            freeSolo
             id="city"
             options={options}
             getOptionLabel={(option) => `${option.name} (${option.iso2})`}
-            onChange={(e, value) => setCityName(value.name)}
+            onInputChange={handleInputChange}
             renderInput={(params) => (
               <TextField
                 {...params}
-                label="Enter a city name"
+                placeholder="Enter a city name"
+                required
                 variant="outlined"
               />
             )}
           /> */}
+
           <button
             className="bg-custom-blue2 hover:bg-custom-blue4 text-white text-sm sm:text-base font-bold py-2 px-4 rounded mr-4"
             type="submit"
@@ -238,7 +237,7 @@ function Header() {
           </button>
         </form>
       </div>
-      <div className="sticky top-48 sm:top-20 bg-white">
+      <div className="sticky top-52 sm:top-20 bg-white">
         {success && <Alert severity="success">{success}</Alert>}
         {error && <Alert severity="warning">{error}</Alert>}
         {fetchError && <Alert severity="error">{fetchError}</Alert>}
