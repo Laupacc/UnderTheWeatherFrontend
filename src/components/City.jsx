@@ -31,36 +31,7 @@ function City() {
     return () => clearTimeout(timer);
   }, [cityDeleted]);
 
-  // useEffect(() => {
-  //   const fetchCities = async () => {
-  //     try {
-  //       const response = await fetch(
-  //         "https://under-the-weather-backend.vercel.app/weather"
-  //       );
-  //       const data = await response.json();
-  //       if (data.weather) {
-  //         const formattedCities = data.weather.map((city) => ({
-  //           ...city,
-  //           sunrise: new Date(city.sunrise * 1000).toLocaleTimeString("en-US", {
-  //             hour: "2-digit",
-  //             minute: "2-digit",
-  //             hour12: false,
-  //           }),
-  //           sunset: new Date(city.sunset * 1000).toLocaleTimeString("en-US", {
-  //             hour: "2-digit",
-  //             minute: "2-digit",
-  //             hour12: false,
-  //           }),
-  //         }));
-  //         setCityNames(formattedCities.reverse());
-  //       }
-  //     } catch (error) {
-  //       console.error("Error fetching cities:", error);
-  //     }
-  //   };
-  //   fetchCities();
-  // }, [cities]);
-
+  // Fetch updated city data
   useEffect(() => {
     const fetchUpdatedCities = async () => {
       try {
@@ -287,255 +258,254 @@ function City() {
               }}
             >
               {/* <div className="bg-white bg-opacity-50 rounded-lg py-4 "> */}
-                <div className="flex flex-col items-center justify-center">
-                  <a
-                    href={generateGoogleSearchLink(city.cityName)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <div className="flex">
-                      {/* City Name */}
-                      <Typography
-                        variant="h4"
-                        align="center"
-                        gutterBottom
-                        className="text-slate-600"
-                      >
-                        {city.cityName
-                          .split(" ")
-                          .map(
-                            (word) =>
-                              word.charAt(0).toUpperCase() + word.slice(1)
-                          )
-                          .join(" ")}
-                        {/* Country Flag */}
-                        <ReactCountryFlag
-                          className="ml-2"
-                          countryCode={city.country}
-                          svg
-                          title={city.country}
-                        />
-                      </Typography>
-                    </div>
-                  </a>
-                  {/* Temperature */}
-                  <div className="flex flex-col justify-center items-center">
-                    <div className="flex justify-center items-center">
-                      <Typography
-                        variant="h4"
-                        align="center"
-                        className="text-blue-700"
-                      >
-                        {formatTemperature(city.temp)}
-                      </Typography>
-                    </div>
+              <div className="flex flex-col items-center justify-center">
+                <a
+                  href={generateGoogleSearchLink(city.cityName)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <div className="flex">
+                    {/* City Name */}
                     <Typography
-                      variant="body1"
+                      variant="h4"
                       align="center"
                       gutterBottom
                       className="text-slate-600"
                     >
-                      Real feel {formatTemperature(city.feels_like)}
+                      {city.cityName
+                        .split(" ")
+                        .map(
+                          (word) => word.charAt(0).toUpperCase() + word.slice(1)
+                        )
+                        .join(" ")}
+                      {/* Country Flag */}
+                      <ReactCountryFlag
+                        className="ml-2"
+                        countryCode={city.country}
+                        svg
+                        title={city.country}
+                      />
                     </Typography>
                   </div>
-                  {/* Weather Description */}
-                  <div className="flex flex-col justify-center items-center">
-                    <img
-                      className="w-20 m-1"
-                      src={`images/${city.icon}.png`}
-                      alt="Weather Icon"
-                    />
+                </a>
+                {/* Temperature */}
+                <div className="flex flex-col justify-center items-center">
+                  <div className="flex justify-center items-center">
                     <Typography
-                      variant="h6"
+                      variant="h4"
                       align="center"
-                      className="text-slate-600"
+                      className="text-blue-700"
                     >
-                      {city.description
-                        ? city.description.charAt(0).toUpperCase() +
-                          city.description.slice(1)
-                        : "Description Not Available"}
+                      {formatTemperature(city.temp)}
                     </Typography>
                   </div>
-                  {/* Weather Details */}
-                  {boxVisible === city.cityName ? (
-                    <FaCircleMinus
-                      size={34}
-                      onClick={() => toggleBoxVisibility(city.cityName)}
-                      className="cursor-pointer text-slate-500 hover:text-slate-400 mt-3"
-                    />
-                  ) : (
-                    <FaCirclePlus
-                      size={34}
-                      onClick={() => toggleBoxVisibility(city.cityName)}
-                      className="cursor-pointer text-slate-500 hover:text-slate-400 mt-3"
-                    />
-                  )}
-                  {boxVisible === city.cityName && (
-                    <div className="border-2 rounded-lg mt-3">
-                      {/* Min and Max Temperature */}
-                      <div className="flex justify-center items-center">
-                        <div className="flex flex-col justify-center items-center my-2 mx-4">
-                          <img
-                            src="images/thermometerdown1.png"
-                            alt="Temperature"
-                            className="w-10 h-10 sm:w-12 sm:h-12"
-                          />
-                          <Typography
-                            variant="h6"
-                            align="center"
-                            gutterBottom
-                            className="text-slate-600"
-                          >
-                            {formatTemperature(city.tempMin)}
-                          </Typography>
-                        </div>
-                        <div className="flex flex-col justify-center items-center my-2 mx-4">
-                          <img
-                            src="images/thermometerup1.png"
-                            alt="Temperature"
-                            className="w-10 h-10 sm:w-12 sm:h-12"
-                          />
-                          <Typography
-                            variant="h6"
-                            align="center"
-                            gutterBottom
-                            className="text-slate-600"
-                          >
-                            {formatTemperature(city.tempMax)}
-                          </Typography>
-                        </div>
+                  <Typography
+                    variant="body1"
+                    align="center"
+                    gutterBottom
+                    className="text-slate-600"
+                  >
+                    Real feel {formatTemperature(city.feels_like)}
+                  </Typography>
+                </div>
+                {/* Weather Description */}
+                <div className="flex flex-col justify-center items-center">
+                  <img
+                    className="w-20 m-1"
+                    src={`images/${city.icon}.png`}
+                    alt="Weather Icon"
+                  />
+                  <Typography
+                    variant="h6"
+                    align="center"
+                    className="text-slate-600"
+                  >
+                    {city.description
+                      ? city.description.charAt(0).toUpperCase() +
+                        city.description.slice(1)
+                      : "Description Not Available"}
+                  </Typography>
+                </div>
+                {/* Weather Details */}
+                {boxVisible === city.cityName ? (
+                  <FaCircleMinus
+                    size={34}
+                    onClick={() => toggleBoxVisibility(city.cityName)}
+                    className="cursor-pointer text-slate-500 hover:text-slate-400 mt-3"
+                  />
+                ) : (
+                  <FaCirclePlus
+                    size={34}
+                    onClick={() => toggleBoxVisibility(city.cityName)}
+                    className="cursor-pointer text-slate-500 hover:text-slate-400 mt-3"
+                  />
+                )}
+                {boxVisible === city.cityName && (
+                  <div className="border-2 rounded-lg mt-3">
+                    {/* Min and Max Temperature */}
+                    <div className="flex justify-center items-center">
+                      <div className="flex flex-col justify-center items-center my-2 mx-4">
+                        <img
+                          src="images/thermometerdown1.png"
+                          alt="Temperature"
+                          className="w-10 h-10 sm:w-12 sm:h-12"
+                        />
+                        <Typography
+                          variant="h6"
+                          align="center"
+                          gutterBottom
+                          className="text-slate-600"
+                        >
+                          {formatTemperature(city.tempMin)}
+                        </Typography>
                       </div>
-                      {/* Humidity, Wind */}
-                      <div className="flex justify-center items-center">
-                        <div className="flex flex-col justify-center items-center my-2 mx-4">
-                          <img
-                            src="images/hygrometer1.png"
-                            alt="Humidity"
-                            className="w-10 h-10 sm:w-12 sm:h-12"
-                          />
-                          <Typography
-                            variant="h6"
-                            align="center"
-                            gutterBottom
-                            className="text-slate-600"
-                          >
-                            {city.humidity}%
-                          </Typography>
-                        </div>
-                        <div className="flex flex-col justify-center items-center my-2 mx-4">
-                          <img
-                            src="images/windsock1.png"
-                            alt="Wind"
-                            className="w-10 h-10 sm:w-12 sm:h-12"
-                          />
-                          <Typography
-                            variant="h6"
-                            align="center"
-                            gutterBottom
-                            className="text-slate-600"
-                          >
-                            {city.wind} m/s
-                          </Typography>
-                        </div>
-                      </div>
-                      {/* Clouds, Rain, Snow  */}
-                      <div className="flex justify-center items-center ">
-                        <div className="flex flex-col justify-center items-center my-2 mx-4">
-                          <img
-                            src="images/cloud1.png"
-                            alt="Clouds"
-                            className="w-10 h-10 sm:w-12 sm:h-12"
-                          />
-                          <Typography
-                            variant="h6"
-                            align="center"
-                            gutterBottom
-                            className="text-slate-600"
-                          >
-                            {city.clouds}%
-                          </Typography>
-                        </div>
-                        <div className="flex flex-col  justify-center items-center my-2 mx-4">
-                          <img
-                            src="images/rain1.png"
-                            alt="Rain"
-                            className="w-10 h-10 sm:w-12 sm:h-12"
-                          />
-                          <Typography
-                            variant="h6"
-                            align="center"
-                            gutterBottom
-                            className="text-slate-600"
-                          >
-                            {city.rain} mm
-                          </Typography>
-                        </div>
-                        <div className="flex flex-col justify-center items-center my-2 mx-4">
-                          <img
-                            src="images/snow1.png"
-                            alt="Snow"
-                            className="w-10 h-10 sm:w-12 sm:h-12"
-                          />
-                          <Typography
-                            variant="h6"
-                            align="center"
-                            gutterBottom
-                            className="text-slate-600"
-                          >
-                            {city.snow} mm
-                          </Typography>
-                        </div>
-                      </div>
-                      {/* Sunrise and Sunset */}
-                      <div className="flex justify-center items-center">
-                        <div className="flex flex-col justify-center items-center my-2 mx-4">
-                          <img
-                            src="images/sunrise1.png"
-                            alt="Sunrise"
-                            className="w-10 h-10 sm:w-12 sm:h-12"
-                          />
-                          <Typography
-                            variant="h6"
-                            align="center"
-                            gutterBottom
-                            className="text-slate-600"
-                          >
-                            {city.sunrise}
-                          </Typography>
-                        </div>
-                        <div className="flex flex-col justify-center items-center my-2 mx-4">
-                          <img
-                            src="images/sunset1.png"
-                            alt="Sunset"
-                            className="w-10 h-10 sm:w-12 sm:h-12"
-                          />
-                          <Typography
-                            variant="h6"
-                            align="center"
-                            gutterBottom
-                            className="text-slate-600"
-                          >
-                            {city.sunset}
-                          </Typography>
-                        </div>
+                      <div className="flex flex-col justify-center items-center my-2 mx-4">
+                        <img
+                          src="images/thermometerup1.png"
+                          alt="Temperature"
+                          className="w-10 h-10 sm:w-12 sm:h-12"
+                        />
+                        <Typography
+                          variant="h6"
+                          align="center"
+                          gutterBottom
+                          className="text-slate-600"
+                        >
+                          {formatTemperature(city.tempMax)}
+                        </Typography>
                       </div>
                     </div>
-                  )}
-                </div>
-                {/* View Forecast Button */}
-                <button
-                  className="my-3 px-3 py-1 text-lg border-2 border-blue-500 rounded bg-blue-500 text-white hover:text-blue-500 hover:bg-transparent"
-                  onClick={() => handleForecast(city.cityName)}
-                >
-                  5-Day Forecast
-                </button>
-                {/* Delete City Button */}
-                <button
-                  className="px-3 py-1 text-lg border-2 border-red-500 text-red-500 rounded hover:bg-red-500 hover:text-white"
-                  onClick={() => deleteCity(city.cityName)}
-                >
-                  Delete City
-                </button>
+                    {/* Humidity, Wind */}
+                    <div className="flex justify-center items-center">
+                      <div className="flex flex-col justify-center items-center my-2 mx-4">
+                        <img
+                          src="images/hygrometer1.png"
+                          alt="Humidity"
+                          className="w-10 h-10 sm:w-12 sm:h-12"
+                        />
+                        <Typography
+                          variant="h6"
+                          align="center"
+                          gutterBottom
+                          className="text-slate-600"
+                        >
+                          {city.humidity}%
+                        </Typography>
+                      </div>
+                      <div className="flex flex-col justify-center items-center my-2 mx-4">
+                        <img
+                          src="images/windsock1.png"
+                          alt="Wind"
+                          className="w-10 h-10 sm:w-12 sm:h-12"
+                        />
+                        <Typography
+                          variant="h6"
+                          align="center"
+                          gutterBottom
+                          className="text-slate-600"
+                        >
+                          {city.wind} m/s
+                        </Typography>
+                      </div>
+                    </div>
+                    {/* Clouds, Rain, Snow  */}
+                    <div className="flex justify-center items-center ">
+                      <div className="flex flex-col justify-center items-center my-2 mx-4">
+                        <img
+                          src="images/cloud1.png"
+                          alt="Clouds"
+                          className="w-10 h-10 sm:w-12 sm:h-12"
+                        />
+                        <Typography
+                          variant="h6"
+                          align="center"
+                          gutterBottom
+                          className="text-slate-600"
+                        >
+                          {city.clouds}%
+                        </Typography>
+                      </div>
+                      <div className="flex flex-col  justify-center items-center my-2 mx-4">
+                        <img
+                          src="images/rain1.png"
+                          alt="Rain"
+                          className="w-10 h-10 sm:w-12 sm:h-12"
+                        />
+                        <Typography
+                          variant="h6"
+                          align="center"
+                          gutterBottom
+                          className="text-slate-600"
+                        >
+                          {city.rain} mm
+                        </Typography>
+                      </div>
+                      <div className="flex flex-col justify-center items-center my-2 mx-4">
+                        <img
+                          src="images/snow1.png"
+                          alt="Snow"
+                          className="w-10 h-10 sm:w-12 sm:h-12"
+                        />
+                        <Typography
+                          variant="h6"
+                          align="center"
+                          gutterBottom
+                          className="text-slate-600"
+                        >
+                          {city.snow} mm
+                        </Typography>
+                      </div>
+                    </div>
+                    {/* Sunrise and Sunset */}
+                    <div className="flex justify-center items-center">
+                      <div className="flex flex-col justify-center items-center my-2 mx-4">
+                        <img
+                          src="images/sunrise1.png"
+                          alt="Sunrise"
+                          className="w-10 h-10 sm:w-12 sm:h-12"
+                        />
+                        <Typography
+                          variant="h6"
+                          align="center"
+                          gutterBottom
+                          className="text-slate-600"
+                        >
+                          {city.sunrise}
+                        </Typography>
+                      </div>
+                      <div className="flex flex-col justify-center items-center my-2 mx-4">
+                        <img
+                          src="images/sunset1.png"
+                          alt="Sunset"
+                          className="w-10 h-10 sm:w-12 sm:h-12"
+                        />
+                        <Typography
+                          variant="h6"
+                          align="center"
+                          gutterBottom
+                          className="text-slate-600"
+                        >
+                          {city.sunset}
+                        </Typography>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+              {/* View Forecast Button */}
+              <button
+                className="my-3 px-3 py-1 text-lg border-2 border-blue-500 rounded bg-blue-500 text-white hover:text-blue-500 hover:bg-transparent"
+                onClick={() => handleForecast(city.cityName)}
+              >
+                5-Day Forecast
+              </button>
+              {/* Delete City Button */}
+              <button
+                className="px-3 py-1 text-lg border-2 border-red-500 text-red-500 rounded hover:bg-red-500 hover:text-white"
+                onClick={() => deleteCity(city.cityName)}
+              >
+                Delete City
+              </button>
               {/* </div> */}
             </div>
           ))}
@@ -627,14 +597,18 @@ function City() {
                 {selectedDayForecast.map((forecast) => (
                   <div
                     key={forecast.dt}
-                    className={`flex flex-col justify-between items-center m-3 p-3 bg-gradient-to-br from-emerald-100 to-sky-300 rounded-lg shadow-xl ${getBackgroundColor(
-                      forecast.weather[0].icon
-                    )}`}
+                    className="flex flex-col justify-between items-center m-3 p-3 bg-gradient-to-br from-emerald-100 to-sky-300 rounded-lg shadow-xl"
                     style={{
                       minWidth: "4rem",
                       maxWidth: "6rem",
                       minHeight: "15rem",
                       maxHeight: "15rem",
+
+                      // backgroundImage: `url(${getBackgroundImage(
+                      //   forecast.weather[0].icon
+                      // )})`,
+                      // backgroundSize: "cover",
+                      // backgroundPosition: "center",
                     }}
                   >
                     {/* Time */}
