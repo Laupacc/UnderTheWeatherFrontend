@@ -1,13 +1,12 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useMemo } from "react";
 import { addCity, setUnitTemp } from "../reducers/city.js";
 import Alert from "@mui/material/Alert";
 import { Switch } from "@headlessui/react";
 
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
-import { DebounceInput } from "react-debounce-input";
 import debounce from "lodash.debounce";
 
 function Header() {
@@ -33,20 +32,46 @@ function Header() {
   const [options, setOptions] = useState([]);
 
   // Get all cities from API for autocomplete feature
-  useEffect(() => {
-    fetch("https://under-the-weather-backend.vercel.app/cityautocomplete")
-      .then((response) => response.json())
-      .then((data) => {
+  // useEffect(() => {
+  //   fetch("https://under-the-weather-backend.vercel.app/cityautocomplete")
+  //     .then((response) => response.json())
+  //     .then((data) => {
+  //       if (data.result) {
+  //         setOptions(data.cities);
+  //       } else {
+  //         setFetchError(data.error);
+  //       }
+  //     })
+  //     .catch((error) => {
+  //       setFetchError("An error occurred while fetching the city names");
+  //     });
+  // }, []);
+
+  const fetchCities = useCallback(
+    debounce(async (query) => {
+      if (query.length < 3) return; // avoid making requests for very short queries
+      try {
+        const response = await fetch(
+          `https://under-the-weather-backend.vercel.app/cityautocomplete?query=${query}`
+        );
+        const data = await response.json();
         if (data.result) {
           setOptions(data.cities);
         } else {
           setFetchError(data.error);
         }
-      })
-      .catch((error) => {
+      } catch {
         setFetchError("An error occurred while fetching the city names");
-      });
-  }, []);
+      }
+    }, 300),
+    []
+  );
+
+  const handleCityChange = (event, value) => {
+    if (value) {
+      setCityName(value.name);
+    }
+  };
 
   // Clear alerts after 5 seconds
   useEffect(() => {
@@ -155,15 +180,7 @@ function Header() {
     dispatch(setUnitTemp(newUnit));
   };
 
-  // Debounce the input change
-  const debouncedSetCityName = useCallback(
-    debounce((value) => setCityName(value), 500),
-    []
-  );
-
-  const handleInputChange = (event, value) => {
-    debouncedSetCityName(value);
-  };
+  const memoizedOptions = useMemo(() => options, [options]);
 
   return (
     <>
@@ -197,15 +214,15 @@ function Header() {
           Add Current Location
         </button>
         <form onSubmit={handleSubmit} className="flex mb-2 sm:mb-0">
-          <input
+          {/* <input
             className="text-black px-4 sm:px-8 rounded mr-4 ml-4"
             type="text"
             value={cityName}
             onChange={(e) => setCityName(e.target.value)}
             placeholder="Enter a city name"
             required
-          />
-          {/* <Autocomplete
+          /> */}
+          <Autocomplete
             sx={{
               width: 250,
               marginRight: 10,
@@ -216,19 +233,19 @@ function Header() {
             }}
             freeSolo
             id="city"
-            options={options}
+            options={memoizedOptions}
             getOptionLabel={(option) => `${option.name} (${option.iso2})`}
-            onInputChange={handleInputChange}
+            onInputChange={(e, value) => fetchCities(value)}
+            onChange={handleCityChange}
             renderInput={(params) => (
               <TextField
                 {...params}
-                placeholder="Enter a city name"
-                required
+                label="Enter a city name"
+                margin="normal"
                 variant="outlined"
               />
             )}
-          /> */}
-
+          />
           <button
             className="bg-custom-blue2 hover:bg-custom-blue4 text-white text-sm sm:text-base font-bold py-2 px-4 rounded mr-4"
             type="submit"
