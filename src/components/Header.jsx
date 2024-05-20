@@ -1,6 +1,6 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useState, useCallback, useEffect, useMemo } from "react";
+import { useState, useCallback, useEffect, useMemo, useRef } from "react";
 import { addCity, setUnitTemp } from "../reducers/city.js";
 import Alert from "@mui/material/Alert";
 import { Switch } from "@headlessui/react";
@@ -30,26 +30,12 @@ function Header() {
 
   // Autocomplete options
   const [options, setOptions] = useState([]);
+  const autocompleteRef = useRef(null);
 
-  // Get all cities from API for autocomplete feature
-  // useEffect(() => {
-  //   fetch("https://under-the-weather-backend.vercel.app/cityautocomplete")
-  //     .then((response) => response.json())
-  //     .then((data) => {
-  //       if (data.result) {
-  //         setOptions(data.cities);
-  //       } else {
-  //         setFetchError(data.error);
-  //       }
-  //     })
-  //     .catch((error) => {
-  //       setFetchError("An error occurred while fetching the city names");
-  //     });
-  // }, []);
-
+  // Get cities from API for autocomplete feature
   const fetchCities = useCallback(
     debounce(async (query) => {
-      if (query.length < 3) return; // avoid making requests for very short queries
+      if (query.length < 3) return;
       try {
         const response = await fetch(
           `https://under-the-weather-backend.vercel.app/cityautocomplete?query=${query}`
@@ -67,6 +53,7 @@ function Header() {
     []
   );
 
+  // Handle city change from autocomplete
   const handleCityChange = (event, value) => {
     if (value) {
       setCityName(value.name);
@@ -157,12 +144,14 @@ function Header() {
           );
           setError("");
           setFetchError("");
-          // setCityName("");
+          setCityName("");
+          autocompleteRef.current.value = "";
         } else {
           setError("This city is already in your list");
           setSuccess("");
           setFetchError("");
-          // setCityName("");
+          setCityName("");
+          autocompleteRef.current.value = "";
         }
       })
       .catch((error) => {
@@ -174,12 +163,14 @@ function Header() {
       });
   };
 
+  // Handle unit change from switch
   const handleUnitChange = () => {
     const newUnit = enabled ? "Celsius" : "Fahrenheit";
     setEnabled(!enabled);
     dispatch(setUnitTemp(newUnit));
   };
 
+  // Memoize options to prevent unnecessary re-renders
   const memoizedOptions = useMemo(() => options, [options]);
 
   return (
@@ -224,25 +215,33 @@ function Header() {
           /> */}
           <Autocomplete
             sx={{
-              width: 250,
-              marginRight: 10,
-              marginLeft: 10,
-              color: "#000",
+              width: 230,
+              height: "100%",
+              marginRight: 2,
+              marginLeft: 2,
+              color: "bg-custom-blue2",
               backgroundColor: "#fff",
               borderRadius: 1,
             }}
             freeSolo
+            ref={autocompleteRef}
             id="city"
             options={memoizedOptions}
             getOptionLabel={(option) => `${option.name} (${option.iso2})`}
             onInputChange={(e, value) => fetchCities(value)}
             onChange={handleCityChange}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                handleSubmit(e);
+              }
+            }}
             renderInput={(params) => (
               <TextField
                 {...params}
-                label="Enter a city name"
-                margin="normal"
                 variant="outlined"
+                placeholder="Enter a city name"
+                required
               />
             )}
           />

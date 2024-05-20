@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { removeCity } from "../reducers/city.js";
+import city, { removeCity } from "../reducers/city.js";
 import Box from "@mui/material/Box";
 import { FaCirclePlus, FaCircleMinus } from "react-icons/fa6";
 import Typography from "@mui/material/Typography";
 import Modal from "@mui/material/Modal";
 import Alert from "@mui/material/Alert";
+import ReactCountryFlag from "react-country-flag";
 
 function City() {
   const dispatch = useDispatch();
-  // const cities = useSelector((state) => state.city);
   const cities = useSelector((state) => state.city.city);
   const unit = useSelector((state) => state.city.unit);
 
@@ -21,12 +21,13 @@ function City() {
   const [selectedButton, setSelectedButton] = useState(0);
   const [cityDeleted, setCityDeleted] = useState("");
   const [loading, setLoading] = useState(true);
-  const [boxVisible, setBoxVisible] = useState(false);
+  const [boxVisible, setBoxVisible] = useState(null);
 
+  // Remove the city deleted alert after 3 seconds
   useEffect(() => {
     const timer = setTimeout(() => {
       setCityDeleted("");
-    }, 3500);
+    }, 3000);
     return () => clearTimeout(timer);
   }, [cityDeleted]);
 
@@ -203,6 +204,7 @@ function City() {
     return `https://www.google.com/search?q=${encodeURIComponent(cityName)}`;
   };
 
+  // Convert temperature to Fahrenheit
   const convertTemperature = (temperature) => {
     if (unit === "Fahrenheit") {
       return (temperature * 9) / 5 + 32;
@@ -210,14 +212,46 @@ function City() {
     return temperature;
   };
 
+  // Format temperature to display in the UI
   const formatTemperature = (temperature) => {
     return `${Math.round(convertTemperature(temperature))}°${
       unit === "Fahrenheit" ? "F" : "C"
     }`;
   };
 
-  const toggleBoxVisibility = () => {
-    setBoxVisible(!boxVisible);
+  // Toggle visibility of the weather details box
+  const toggleBoxVisibility = (cityName) => {
+    setBoxVisible(boxVisible === cityName ? null : cityName);
+  };
+
+  const getBackgroundColor = (icon) => {
+    switch (icon) {
+      case "01d": // clear sky day
+      case "01n": // clear sky night
+        return "bg-gradient-to-br from-yellow-100 to-yellow-300";
+      case "02d": // few clouds day
+      case "02n": // few clouds night
+      case "03d": // scattered clouds day
+      case "03n": // scattered clouds night
+      case "04d": // broken clouds day
+      case "04n": // broken clouds night
+        return "bg-gradient-to-br from-lime-100 to-sky-300";
+      case "09d": // shower rain day
+      case "09n": // shower rain night
+      case "10d": // rain day
+      case "10n": // rain night
+      case "11d": // thunderstorm day
+      case "11n": // thunderstorm night
+        return "bg-gradient-to-br from-gray-300 to-gray-500";
+      case "13d": // snow day
+      case "13n": // snow night
+        return "bg-gradient-to-br from-white to-sky-200";
+      case "50d": // mist day
+      case "50n": // mist night
+        return "bg-gradient-to-br from-gray-200 to-gray-400";
+      default:
+        return "bg-gradient-to-br from-lime-100 to-sky-300"; // default color
+    }
   };
 
   return (
@@ -228,32 +262,44 @@ function City() {
         </Alert>
       )}
       {typeof cityNames !== "undefined" || cityNames.length !== 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 gap-3 p-3 bg-gray-200">
+        <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 gap-3 p-3 bg-gray-200 items-start">
           {cityNames.map((city) => (
             <div
               key={city.cityName}
-              className="bg-gradient-to-br from-lime-100 to-sky-300 rounded-lg shadow-xl m-2 p-6 w-auto flex flex-col justify-between items-center text-center text-gray-800 "
+              className={`rounded-lg shadow-xl m-2 p-6 w-auto flex flex-col justify-between items-center text-center text-gray-800 min-h-[32rem] ${getBackgroundColor(
+                city.icon
+              )}`}
             >
-              {/* City Name */}
               <div className="flex flex-col items-center justify-center">
                 <a
                   href={generateGoogleSearchLink(city.cityName)}
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  <Typography
-                    variant="h4"
-                    align="center"
-                    gutterBottom
-                    className="text-slate-600"
-                  >
-                    {city.cityName
-                      .split(" ")
-                      .map(
-                        (word) => word.charAt(0).toUpperCase() + word.slice(1)
-                      )
-                      .join(" ")}
-                  </Typography>
+                  <div className="flex">
+                    {/* City Name */}
+                    <Typography
+                      variant="h4"
+                      align="center"
+                      gutterBottom
+                      className="text-slate-600"
+                    >
+                      {city.cityName
+                        .split(" ")
+                        .map(
+                          (word) => word.charAt(0).toUpperCase() + word.slice(1)
+                        )
+                        .join(" ")}
+
+                      {/* Country Flag */}
+                      <ReactCountryFlag
+                        className="ml-2"
+                        countryCode={city.country}
+                        svg
+                        title={city.country}
+                      />
+                    </Typography>
+                  </div>
                 </a>
 
                 {/* Temperature */}
@@ -297,21 +343,21 @@ function City() {
                 </div>
 
                 {/* Weather Details */}
-                {boxVisible ? (
+                {boxVisible === city.cityName ? (
                   <FaCircleMinus
                     size={34}
-                    onClick={toggleBoxVisibility}
+                    onClick={() => toggleBoxVisibility(city.cityName)}
                     className="cursor-pointer text-slate-500 hover:text-slate-400 mt-3"
                   />
                 ) : (
                   <FaCirclePlus
                     size={34}
-                    onClick={toggleBoxVisibility}
+                    onClick={() => toggleBoxVisibility(city.cityName)}
                     className="cursor-pointer text-slate-500 hover:text-slate-400 mt-3"
                   />
                 )}
 
-                {boxVisible && (
+                {boxVisible === city.cityName && (
                   <div className="border-2 rounded-lg mt-3">
                     {/* Min and Max Temperature */}
                     <div className="flex justify-center items-center">
@@ -570,7 +616,9 @@ function City() {
                 {selectedDayForecast.map((forecast) => (
                   <div
                     key={forecast.dt}
-                    className="flex flex-col justify-between items-center m-3 p-3 bg-gradient-to-br from-emerald-100 to-sky-300 rounded-lg shadow-xl"
+                    className={`flex flex-col justify-between items-center m-3 p-3 bg-gradient-to-br from-emerald-100 to-sky-300 rounded-lg shadow-xl ${getBackgroundColor(
+                      forecast.weather[0].icon
+                    )}`}
                     style={{
                       minWidth: "4rem",
                       maxWidth: "6rem",
