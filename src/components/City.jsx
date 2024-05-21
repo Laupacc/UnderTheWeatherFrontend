@@ -238,6 +238,49 @@ function City() {
     }
   };
 
+  const getTextColor = (icon) => {
+    switch (icon) {
+      case "01d": // clear sky day
+        return "text-slate-100";
+      case "01n": // clear sky night
+        return "text-slate-100";
+      case "02d": // few clouds day
+        return "text-slate-100";
+      case "02n": // few clouds night
+        return "text-slate-100";
+      case "03d": // scattered clouds day
+        return "text-slate-100";
+      case "03n": // scattered clouds night
+        return "text-slate-100";
+      case "04d": // broken clouds day
+        return "text-slate-800";
+      case "04n": // broken clouds night
+        return "text-slate-100";
+      case "09d": // shower rain day
+        return "text-slate-100";
+      case "09n": // shower rain night
+        return "text-slate-100";
+      case "10d": // rain day
+        return "text-slate-100";
+      case "10n": // rain night
+        return "text-slate-100";
+      case "11d": // thunderstorm day
+        return "text-slate-100";
+      case "11n": // thunderstorm night
+        return "text-slate-100";
+      case "13d": // snow day
+        return "text-slate-800";
+      case "13n": // snow night
+        return "text-slate-100";
+      case "50d": // mist day
+        return "text-slate-800";
+      case "50n": // mist night
+        return "text-slate-100";
+      default:
+        return "text-slate-100";
+    }
+  };
+
   return (
     <>
       {cityDeleted && (
@@ -250,15 +293,14 @@ function City() {
           {cityNames.map((city) => (
             <div
               key={city.cityName}
-              className="rounded-lg shadow-xl m-2 p-6 w-auto flex flex-col justify-between items-center text-center text-gray-800 min-h-[32rem]"
+              className="rounded-lg shadow-xl m-2 w-auto flex flex-col justify-between items-center text-center min-h-[32rem]"
               style={{
                 backgroundImage: `url(${getBackgroundImage(city.icon)})`,
                 backgroundSize: "cover",
                 backgroundPosition: "center",
               }}
             >
-              {/* <div className="bg-white bg-opacity-50 rounded-lg py-4 "> */}
-              <div className="flex flex-col items-center justify-center">
+              <div className="flex flex-col items-center justify-center mt-4">
                 <a
                   href={generateGoogleSearchLink(city.cityName)}
                   target="_blank"
@@ -270,7 +312,7 @@ function City() {
                       variant="h4"
                       align="center"
                       gutterBottom
-                      className="text-slate-600"
+                      className={`${getTextColor(city.icon)}`}
                     >
                       {city.cityName
                         .split(" ")
@@ -294,7 +336,7 @@ function City() {
                     <Typography
                       variant="h4"
                       align="center"
-                      className="text-blue-700"
+                      className={`${getTextColor(city.icon)}`}
                     >
                       {formatTemperature(city.temp)}
                     </Typography>
@@ -303,13 +345,14 @@ function City() {
                     variant="body1"
                     align="center"
                     gutterBottom
-                    className="text-slate-600"
+                    className={`${getTextColor(city.icon)}`}
                   >
                     Real feel {formatTemperature(city.feels_like)}
                   </Typography>
                 </div>
+
                 {/* Weather Description */}
-                <div className="flex flex-col justify-center items-center">
+                <div className="flex flex-col justify-center items-center bg-opacity-80 rounded-lg">
                   <img
                     className="w-20 m-1"
                     src={`images/${city.icon}.png`}
@@ -318,7 +361,7 @@ function City() {
                   <Typography
                     variant="h6"
                     align="center"
-                    className="text-slate-600"
+                    className={`${getTextColor(city.icon)}`}
                   >
                     {city.description
                       ? city.description.charAt(0).toUpperCase() +
@@ -331,17 +374,17 @@ function City() {
                   <FaCircleMinus
                     size={34}
                     onClick={() => toggleBoxVisibility(city.cityName)}
-                    className="cursor-pointer text-slate-500 hover:text-slate-400 mt-3"
+                    className={`cursor-pointer hover:text-slate-500 mt-3 ${getTextColor(city.icon)}`}
                   />
                 ) : (
                   <FaCirclePlus
                     size={34}
                     onClick={() => toggleBoxVisibility(city.cityName)}
-                    className="cursor-pointer text-slate-500 hover:text-slate-400 mt-3"
+                    className={`cursor-pointer hover:text-slate-500 mt-3 ${getTextColor(city.icon)}`}
                   />
                 )}
                 {boxVisible === city.cityName && (
-                  <div className="border-2 rounded-lg mt-3">
+                  <div className="border-2 rounded-lg mt-3 bg-white bg-opacity-80">
                     {/* Min and Max Temperature */}
                     <div className="flex justify-center items-center">
                       <div className="flex flex-col justify-center items-center my-2 mx-4">
@@ -493,20 +536,21 @@ function City() {
                 )}
               </div>
               {/* View Forecast Button */}
-              <button
-                className="my-3 px-3 py-1 text-lg border-2 border-blue-500 rounded bg-blue-500 text-white hover:text-blue-500 hover:bg-transparent"
-                onClick={() => handleForecast(city.cityName)}
-              >
-                5-Day Forecast
-              </button>
-              {/* Delete City Button */}
-              <button
-                className="px-3 py-1 text-lg border-2 border-red-500 text-red-500 rounded hover:bg-red-500 hover:text-white"
-                onClick={() => deleteCity(city.cityName)}
-              >
-                Delete City
-              </button>
-              {/* </div> */}
+              <div className="flex flex-col mb-4">
+                <button
+                  className="my-2 px-3 py-1 text-lg border-2 border-blue-500 rounded-lg bg-blue-500 text-white hover:text-blue-500 hover:bg-white"
+                  onClick={() => handleForecast(city.cityName)}
+                >
+                  5-Day Forecast
+                </button>
+                {/* Delete City Button */}
+                <button
+                  className="my-2 px-3 py-1 text-lg border-2 border-red-500 rounded-lg bg-red-500 text-white hover:text-red-500 hover:bg-white"
+                  onClick={() => deleteCity(city.cityName)}
+                >
+                  Delete City
+                </button>
+              </div>
             </div>
           ))}
         </div>
@@ -582,7 +626,7 @@ function City() {
                     className={`w-44 m-2 text-sm md:text-base md:w-52 ${
                       index === selectedButton
                         ? "bg-custom-blue text-white px-4 py-2 rounded-lg focus:outline-none focus:bg-custom-blue focus:text-white"
-                        : "bg-white text-black px-4 py-2 rounded-lg hover:bg-custom-blue hover:text-white focus:outline-none focus:bg-custom-blue focus:text-white"
+                        : "bg-white text-slate-700 px-4 py-2 rounded-lg hover:bg-custom-blue hover:text-white focus:outline-none focus:bg-custom-blue focus:text-white"
                     }`}
                     onClick={() => handleDayClick(dailyForecast, index)}
                   >
