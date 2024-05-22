@@ -1,17 +1,20 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import city, { removeCity } from "../reducers/city.js";
+import { removeCity } from "../reducers/city.js";
 import Box from "@mui/material/Box";
 import { FaCirclePlus, FaCircleMinus } from "react-icons/fa6";
 import Typography from "@mui/material/Typography";
 import Modal from "@mui/material/Modal";
 import Alert from "@mui/material/Alert";
 import ReactCountryFlag from "react-country-flag";
+import { useMemo } from "react";
 
 function City() {
   const dispatch = useDispatch();
   const cities = useSelector((state) => state.city.city);
   const unit = useSelector((state) => state.city.unit);
+  const sortCriteria = useSelector((state) => state.city.sortCriteria);
+  const sortOrder = useSelector((state) => state.city.sortOrder);
 
   const [cityNames, setCityNames] = useState([]);
   const [forecastData, setForecastData] = useState(null);
@@ -281,6 +284,31 @@ function City() {
     }
   };
 
+  // Sort cities based on the sort criteria and order
+  const sortedCities = useMemo(() => {
+    // Create a copy of cityNames
+    const cities = [...cityNames];
+
+    if (sortCriteria === "temperature") {
+      return cities.sort((a, b) => {
+        if (sortOrder === "asc") {
+          return a.temp - b.temp;
+        }
+        return b.temp - a.temp;
+      });
+    } else if (sortCriteria === "alphabetical") {
+      return cities.sort((a, b) => {
+        if (sortOrder === "asc") {
+          return a.cityName.localeCompare(b.cityName);
+        }
+        return b.cityName.localeCompare(a.cityName);
+      });
+    }
+
+    // If sortCriteria is neither "temperature" nor "alphabetical", return the cities as is
+    return cities;
+  }, [cityNames, sortCriteria, sortOrder]);
+
   return (
     <>
       {cityDeleted && (
@@ -288,9 +316,9 @@ function City() {
           {cityDeleted}
         </Alert>
       )}
-      {typeof cityNames !== "undefined" || cityNames.length !== 0 ? (
+      {typeof sortedCities !== "undefined" && sortedCities.length !== 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 gap-3 p-3 bg-gray-200 items-start">
-          {cityNames.map((city) => (
+          {sortedCities.map((city) => (
             <div
               key={city.cityName}
               className="rounded-lg shadow-xl m-2 w-auto flex flex-col justify-between items-center text-center min-h-[32rem]"
@@ -306,7 +334,7 @@ function City() {
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  <div className="flex">
+                  <div className="flex mx-2 my-2">
                     {/* City Name */}
                     <Typography
                       variant="h4"
@@ -374,17 +402,21 @@ function City() {
                   <FaCircleMinus
                     size={34}
                     onClick={() => toggleBoxVisibility(city.cityName)}
-                    className={`cursor-pointer hover:text-slate-500 mt-3 ${getTextColor(city.icon)}`}
+                    className={`cursor-pointer hover:text-slate-500 mt-3 ${getTextColor(
+                      city.icon
+                    )}`}
                   />
                 ) : (
                   <FaCirclePlus
                     size={34}
                     onClick={() => toggleBoxVisibility(city.cityName)}
-                    className={`cursor-pointer hover:text-slate-500 mt-3 ${getTextColor(city.icon)}`}
+                    className={`cursor-pointer hover:text-slate-500 mt-3 ${getTextColor(
+                      city.icon
+                    )}`}
                   />
                 )}
                 {boxVisible === city.cityName && (
-                  <div className="border-2 rounded-lg mt-3 bg-white bg-opacity-80">
+                  <div className="border-2 rounded-lg my-3 mx-3 bg-white bg-opacity-80">
                     {/* Min and Max Temperature */}
                     <div className="flex justify-center items-center">
                       <div className="flex flex-col justify-center items-center my-2 mx-4">
@@ -556,7 +588,7 @@ function City() {
         </div>
       ) : (
         <div className="flex justify-center items-center p-4">
-          <p className="text-2xl">No cities added yet</p>
+          <p className="text-2xl">Loading cities</p>
         </div>
       )}
 
@@ -648,11 +680,11 @@ function City() {
                       minHeight: "15rem",
                       maxHeight: "15rem",
 
-                      // backgroundImage: `url(${getBackgroundImage(
-                      //   forecast.weather[0].icon
-                      // )})`,
-                      // backgroundSize: "cover",
-                      // backgroundPosition: "center",
+                      backgroundImage: `url(${getBackgroundImage(
+                        forecast.weather[0].icon
+                      )})`,
+                      backgroundSize: "cover",
+                      backgroundPosition: "center",
                     }}
                   >
                     {/* Time */}
@@ -660,7 +692,7 @@ function City() {
                       sx={{ typography: { sm: "h5", xs: "h6" } }}
                       align="center"
                       fontWeight={600}
-                      className="text-gray-600"
+                      className={`${getTextColor(forecast.weather[0].icon)}`}
                     >
                       {forecast.dt_txt.split(" ")[1].slice(0, 5)}
                     </Typography>
@@ -673,7 +705,11 @@ function City() {
                     />
 
                     {/* Temperature */}
-                    <p className="text-blue-700 text-2xl font-semibold lg:text-xl xl:text-2xl">
+                    <p
+                      className={`${getTextColor(
+                        forecast.weather[0].icon
+                      )} text-2xl font-semibold lg:text-xl xl:text-2xl`}
+                    >
                       {formatTemperature(forecast.main.temp)}
                     </p>
 
@@ -681,7 +717,7 @@ function City() {
                     <Typography
                       variant="body1"
                       align="center"
-                      className="text-gray-600"
+                      className={`${getTextColor(forecast.weather[0].icon)}`}
                     >
                       {forecast.weather[0].description.charAt(0).toUpperCase() +
                         forecast.weather[0].description.slice(1)}

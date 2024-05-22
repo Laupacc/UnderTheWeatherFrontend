@@ -2,7 +2,9 @@ import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
     city: [],
-    unit: "Celsius"
+    unit: "Celsius",
+    sortCriteria: "alphabetical",
+    sortOrder: "asc",
 };
 
 const citySlice = createSlice({
@@ -18,8 +20,14 @@ const citySlice = createSlice({
         setUnitTemp: (state, action) => {
             state.unit = action.payload;
         },
+        setSortCriteria: (state, action) => {
+            state.sortCriteria = action.payload;
+        },
+        setSortOrder: (state, action) => {
+            state.sortOrder = action.payload;
+        },
     },
 });
 
-export const { addCity, removeCity, setUnitTemp } = citySlice.actions;
+export const { addCity, removeCity, setUnitTemp, setSortCriteria, setSortOrder } = citySlice.actions;
 export default citySlice.reducer;

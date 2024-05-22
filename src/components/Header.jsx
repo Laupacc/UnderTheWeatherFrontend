@@ -1,17 +1,26 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useState, useCallback, useEffect, useMemo, useRef } from "react";
-import { addCity, setUnitTemp } from "../reducers/city.js";
+import {
+  addCity,
+  setUnitTemp,
+  setSortCriteria,
+  setSortOrder,
+} from "../reducers/city.js";
 import Alert from "@mui/material/Alert";
 import { Switch } from "@headlessui/react";
 
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
 import debounce from "lodash.debounce";
+import { Popover } from "@mui/material";
+import Button from "@mui/material/Button";
+// import { Button, Popover, OverlayTrigger } from 'react-bootstrap';
 
-function Header() {
+function Header({ props }) {
   const dispatch = useDispatch();
   const unit = useSelector((state) => state.city.unit);
+  const cities = useSelector((state) => state.city.cities);
 
   // City name
   const [cityName, setCityName] = useState("");
@@ -30,6 +39,7 @@ function Header() {
 
   // Autocomplete options
   const [options, setOptions] = useState([]);
+
   const autocompleteRef = useRef(null);
 
   // Get cities from API for autocomplete feature
@@ -173,6 +183,25 @@ function Header() {
   // Memoize options to prevent unnecessary re-renders
   const memoizedOptions = useMemo(() => options, [options]);
 
+  // Popover sort
+  const [anchorEl, setAnchorEl] = useState(null);
+
+  const handlePopoverOpen = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handlePopoverClose = () => {
+    setAnchorEl(null);
+  };
+
+  const open = Boolean(anchorEl);
+
+  const handleSort = (criteria, order) => {
+    console.log("handleSort called", criteria, order);
+    dispatch(setSortCriteria(criteria));
+    dispatch(setSortOrder(order));
+    setAnchorEl(null);
+  };
   return (
     <>
       <div className="px-4 py-2 bg-custom-blue5 text-white sticky top-0 flex flex-col sm:flex-row justify-between items-center">
@@ -186,13 +215,13 @@ function Header() {
             checked={enabled}
             onChange={handleUnitChange}
             className={`group inline-flex h-6 w-11 items-center rounded-full ${
-              enabled ? "bg-sky-300" : "bg-sky-300"
+              enabled ? "bg-red-600" : "bg-red-600"
             } transition`}
           >
             <span
               className={`${
                 enabled ? "translate-x-6" : "translate-x-1"
-              } inline-block h-4 w-4 transform rounded-full bg-slate-500 transition`}
+              } inline-block h-4 w-4 transform rounded-full bg-white transition`}
             />
           </Switch>
           <span className="text-white text-lg ml-2">°F</span>
@@ -252,6 +281,43 @@ function Header() {
             Add City
           </button>
         </form>
+        <Button
+          aria-describedby={open ? "sort-popover" : undefined}
+          variant="contained"
+          color="primary"
+          onClick={handlePopoverOpen}
+        >
+          Sort
+        </Button>
+        <Popover
+          id="sort-popover"
+          open={open}
+          anchorEl={anchorEl}
+          onClose={handlePopoverClose}
+          anchorOrigin={{
+            vertical: "bottom",
+            horizontal: "center",
+          }}
+          transformOrigin={{
+            vertical: "top",
+            horizontal: "center",
+          }}
+        >
+          <div className="flex flex-col ">
+            <Button onClick={() => handleSort("alphabetical", "asc")}>
+              Sort Alphabetically Ascending
+            </Button>
+            <Button onClick={() => handleSort("alphabetical", "desc")}>
+              Sort Alphabetically Descending
+            </Button>
+            <Button onClick={() => handleSort("temperature", "asc")}>
+              Sort by Temperature Ascending
+            </Button>
+            <Button onClick={() => handleSort("temperature", "desc")}>
+              Sort by Temperature Descending
+            </Button>
+          </div>
+        </Popover>
       </div>
       <div className="sticky top-52 sm:top-20 bg-white">
         {success && <Alert severity="success">{success}</Alert>}
