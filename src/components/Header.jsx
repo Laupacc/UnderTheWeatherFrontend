@@ -208,10 +208,13 @@ function Header({ props }) {
 
   const open = Boolean(anchorEl);
 
+  const [selectedSort, setSelectedSort] = useState("");
+
   const handleSort = (criteria, order) => {
     dispatch(setSortCriteria(criteria));
     dispatch(setSortOrder(order));
     setAnchorEl(null);
+    setSelectedSort(`${criteria}-${order}`);
   };
 
   return (
@@ -316,135 +319,219 @@ function Header({ props }) {
         >
           <div className="flex flex-col p-4">
             <button
-              onClick={() => handleSort("firstAdded")}
-              className="p-2 text-sky-800 hover:bg-sky-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-opacity-50"
-            >
-              First Added
-            </button>
-            <button
               onClick={() => handleSort("lastAdded")}
-              className="p-2 text-sky-800 hover:bg-sky-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-opacity-50"
+              className={`${
+                selectedSort === "lastAdded"
+                  ? "p-1 bg-sky-800 rounded-lg text-white"
+                  : "p-1 text-sky-800 hover:bg-sky-800 hover:text-white rounded-lg"
+              }`}
             >
               Last Added
             </button>
             <button
-              onClick={() => handleSort("alphabetical", "asc")}
-              className="p-2 text-sky-800 hover:bg-sky-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-opacity-50"
+              onClick={() => handleSort("firstAdded")}
+              className={`${
+                selectedSort === "firstAdded"
+                  ? "p-1 bg-sky-800 rounded-lg text-white"
+                  : "p-1 text-sky-800 hover:bg-sky-800 hover:text-white rounded-lg"
+              }`}
             >
-              <div className="flex">
-                <TiSortAlphabeticallyOutline size={40} />
-                <MdKeyboardDoubleArrowUp size={40} />
+              First Added
+            </button>
+            <button
+              onClick={() => handleSort("alphabetical", "asc")}
+              className={`${
+                selectedSort === "alphabetical-asc"
+                  ? "p-1 bg-sky-800 rounded-lg text-white"
+                  : "p-1 text-sky-800 hover:bg-sky-800 hover:text-white rounded-lg"
+              }`}
+            >
+              <div className="flex justify-center items-center">
+                City Name (A-Z)
+                {/* <TiSortAlphabeticallyOutline size={20} />
+                <MdKeyboardDoubleArrowUp size={20} /> */}
               </div>
             </button>
             <button
               onClick={() => handleSort("alphabetical", "desc")}
-              className="p-2 text-sky-800 hover:bg-sky-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-opacity-50"
+              className={`${
+                selectedSort === "alphabetical-desc"
+                  ? "p-1 bg-sky-800 rounded-lg text-white"
+                  : "p-1 text-sky-800 hover:bg-sky-800 hover:text-white rounded-lg"
+              }`}
             >
-              <div className="flex">
-                <TiSortAlphabeticallyOutline size={40} />
-                <MdKeyboardDoubleArrowDown size={40} />
+              <div className="flex justify-center items-center">
+                City Name (Z-A)
+                {/* <TiSortAlphabeticallyOutline size={40} />
+                <MdKeyboardDoubleArrowDown size={40} /> */}
               </div>
             </button>
             <button
               onClick={() => handleSort("temperature", "asc")}
-              className="p-2 text-sky-800 hover:bg-sky-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-opacity-50"
+              className={`${
+                selectedSort === "temperature-asc"
+                  ? "p-1 bg-sky-800 rounded-lg text-white"
+                  : "p-1 text-sky-800 hover:bg-sky-800 hover:text-white rounded-lg"
+              }`}
             >
-              <div className="flex">
-                <FaTemperatureHigh size={40} />
-                <MdKeyboardDoubleArrowUp size={40} />
+              <div className="flex justify-center items-center">
+                <FaTemperatureHigh size={20} className="mr-2" />
+                Temperature (Low to High)
+                {/* <MdKeyboardDoubleArrowUp size={40} /> */}
               </div>
             </button>
             <button
               onClick={() => handleSort("temperature", "desc")}
-              className="p-2 text-sky-800 hover:bg-sky-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-opacity-50"
+              className={`${
+                selectedSort === "temperature-desc"
+                  ? "p-1 bg-sky-800 rounded-lg text-white"
+                  : "p-1 text-sky-800 hover:bg-sky-800 hover:text-white rounded-lg"
+              }`}
             >
-              <div className="flex">
-                <FaTemperatureLow size={40} />
-                <MdKeyboardDoubleArrowDown size={40} />
+              <div className="flex justify-center items-center">
+                <FaTemperatureLow size={20} className="mr-2" />
+                Temperature (High to Low)
+                {/* <MdKeyboardDoubleArrowDown size={40} /> */}
               </div>
             </button>
             <button
               onClick={() => handleSort("wind", "asc")}
-              className="p-2 text-sky-800 hover:bg-sky-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-opacity-50"
+              className={`${
+                selectedSort === "wind-asc"
+                  ? "p-1 bg-sky-800 rounded-lg text-white"
+                  : "p-1 text-sky-800 hover:bg-sky-800 hover:text-white rounded-lg"
+              }`}
             >
-              <div className="flex">
-                <GiWindsock size={40} /> <MdKeyboardDoubleArrowUp size={40} />
+              <div className="flex justify-center items-center">
+                <GiWindsock size={26} className="mr-2" />
+                Wind Speed (Low to High)
+                {/* <MdKeyboardDoubleArrowUp size={40} /> */}
               </div>
             </button>
             <button
               onClick={() => handleSort("wind", "desc")}
-              className="p-2 text-sky-800 hover:bg-sky-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-opacity-50"
+              className={`${
+                selectedSort === "wind-desc"
+                  ? "p-1 bg-sky-800 rounded-lg text-white"
+                  : "p-1 text-sky-800 hover:bg-sky-800 hover:text-white rounded-lg"
+              }`}
             >
-              <div className="flex">
-                <GiWindsock size={40} /> <MdKeyboardDoubleArrowDown size={40} />
+              <div className="flex justify-center items-center">
+                <GiWindsock size={26} className="mr-2" />
+                Wind Speed (High to Low)
+                {/* <MdKeyboardDoubleArrowDown size={40} /> */}
               </div>
             </button>
             <button
               onClick={() => handleSort("humidity", "asc")}
-              className="p-2 text-sky-800 hover:bg-sky-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-opacity-50"
+              className={`${
+                selectedSort === "humidity-asc"
+                  ? "p-1 bg-sky-800 rounded-lg text-white"
+                  : "p-1 text-sky-800 hover:bg-sky-800 hover:text-white rounded-lg"
+              }`}
             >
-              <div className="flex">
-                <WiHumidity size={40} /> <MdKeyboardDoubleArrowUp size={40} />
+              <div className="flex justify-center items-center">
+                <WiHumidity size={28} className="mr-2" />
+                Humidity (Low to High)
+                {/* <MdKeyboardDoubleArrowUp size={40} /> */}
               </div>
             </button>
             <button
               onClick={() => handleSort("humidity", "desc")}
-              className="p-2 text-sky-800 hover:bg-sky-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-opacity-50"
+              className={`${
+                selectedSort === "humidity-desc"
+                  ? "p-1 bg-sky-800 rounded-lg text-white"
+                  : "p-1 text-sky-800 hover:bg-sky-800 hover:text-white rounded-lg"
+              }`}
             >
-              <div className="flex">
-                <WiHumidity size={40} /> <MdKeyboardDoubleArrowDown size={40} />
+              <div className="flex justify-center items-center">
+                <WiHumidity size={28} className="mr-2" />
+                Humidity (High to Low)
+                {/* <MdKeyboardDoubleArrowDown size={40} /> */}
               </div>
             </button>
             <button
               onClick={() => handleSort("clouds", "asc")}
-              className="p-2 text-sky-800 hover:bg-sky-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-opacity-50"
+              className={`${
+                selectedSort === "clouds-asc"
+                  ? "p-1 bg-sky-800 rounded-lg text-white"
+                  : "p-1 text-sky-800 hover:bg-sky-800 hover:text-white rounded-lg"
+              }`}
             >
-              <div className="flex">
-                <BsCloudsFill size={40} /> <MdKeyboardDoubleArrowUp size={40} />
+              <div className="flex justify-center items-center">
+                <BsCloudsFill size={20} className="mr-2" />
+                Cloud coverage (Low to High)
+                {/* <MdKeyboardDoubleArrowUp size={40} /> */}
               </div>
             </button>
             <button
               onClick={() => handleSort("clouds", "desc")}
-              className="p-2 text-sky-800 hover:bg-sky-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-opacity-50"
+              className={`${
+                selectedSort === "clouds-desc"
+                  ? "p-1 bg-sky-800 rounded-lg text-white"
+                  : "p-1 text-sky-800 hover:bg-sky-800 hover:text-white rounded-lg"
+              }`}
             >
-              <div className="flex">
-                <BsCloudsFill size={40} />{" "}
-                <MdKeyboardDoubleArrowDown size={40} />
+              <div className="flex justify-center items-center">
+                <BsCloudsFill size={20} className="mr-2" />
+                Cloud coverage (High to Low)
+                {/* <MdKeyboardDoubleArrowDown size={40} /> */}
               </div>
             </button>
             <button
               onClick={() => handleSort("rain", "asc")}
-              className="p-2 text-sky-800 hover:bg-sky-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-opacity-50"
+              className={`${
+                selectedSort === "rain-asc"
+                  ? "p-1 bg-sky-800 rounded-lg text-white"
+                  : "p-1 text-sky-800 hover:bg-sky-800 hover:text-white rounded-lg"
+              }`}
             >
-              <div className="flex">
-                <FaCloudRain size={40} /> <MdKeyboardDoubleArrowUp size={40} />
+              <div className="flex justify-center items-center">
+                <FaCloudRain size={20} className="mr-2" />
+                Rain Chance (Low to High)
+                {/* <MdKeyboardDoubleArrowUp size={40} /> */}
               </div>
             </button>
             <button
               onClick={() => handleSort("rain", "desc")}
-              className="p-2 text-sky-800 hover:bg-sky-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-opacity-50"
+              className={`${
+                selectedSort === "rain-desc"
+                  ? "p-1 bg-sky-800 rounded-lg text-white"
+                  : "p-1 text-sky-800 hover:bg-sky-800 hover:text-white rounded-lg"
+              }`}
             >
-              <div className="flex">
-                <FaCloudRain size={40} />{" "}
-                <MdKeyboardDoubleArrowDown size={40} />
+              <div className="flex justify-center items-center">
+                <FaCloudRain size={20} className="mr-2" />
+                Rain Chance (High to Low)
+                {/* <MdKeyboardDoubleArrowDown size={40} /> */}
               </div>
             </button>
             <button
               onClick={() => handleSort("snow", "asc")}
-              className="p-2 text-sky-800 hover:bg-sky-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-opacity-50"
+              className={`${
+                selectedSort === "snow-asc"
+                  ? "p-1 bg-sky-800 rounded-lg text-white"
+                  : "p-1 text-sky-800 hover:bg-sky-800 hover:text-white rounded-lg"
+              }`}
             >
-              <div className="flex">
-                <FaRegSnowflake size={40} />
-                <MdKeyboardDoubleArrowUp size={40} />
+              <div className="flex justify-center items-center">
+                <FaRegSnowflake size={20} className="mr-2" />
+                Snow Chance (Low to High)
+                {/* <MdKeyboardDoubleArrowUp size={40} /> */}
               </div>
             </button>
             <button
               onClick={() => handleSort("snow", "desc")}
-              className="p-2 text-sky-800 hover:bg-sky-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-opacity-50"
+              className={`${
+                selectedSort === "snow-desc"
+                  ? "p-1 bg-sky-800 rounded-lg text-white"
+                  : "p-1 text-sky-800 hover:bg-sky-800 hover:text-white rounded-lg"
+              }`}
             >
-              <div className="flex">
-                <FaRegSnowflake size={40} />
-                <MdKeyboardDoubleArrowDown size={40} />
+              <div className="flex justify-center items-center">
+                <FaRegSnowflake size={20} className="mr-2" />
+                Snow Chance (High to Low)
+                {/* <MdKeyboardDoubleArrowDown size={40} /> */}
               </div>
             </button>
           </div>

@@ -625,8 +625,8 @@ function City() {
           ))}
         </div>
       ) : (
-        <div className="flex justify-center items-center p-4">
-          <p className="text-2xl">Loading cities</p>
+        <div className="flex justify-center items-center p-4 mt-8">
+          <p className="text-2xl text-sky-900">Loading cities...</p>
         </div>
       )}
 
