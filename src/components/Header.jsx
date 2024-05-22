@@ -14,8 +14,20 @@ import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
 import debounce from "lodash.debounce";
 import { Popover } from "@mui/material";
-import Button from "@mui/material/Button";
-// import { Button, Popover, OverlayTrigger } from 'react-bootstrap';
+import { TiSortAlphabeticallyOutline } from "react-icons/ti";
+import { GiWindsock } from "react-icons/gi";
+import {
+  MdKeyboardDoubleArrowDown,
+  MdKeyboardDoubleArrowUp,
+} from "react-icons/md";
+import {
+  FaTemperatureHigh,
+  FaTemperatureLow,
+  FaCloudRain,
+  FaRegSnowflake,
+} from "react-icons/fa6";
+import { WiHumidity } from "react-icons/wi";
+import { BsCloudsFill } from "react-icons/bs";
 
 function Header({ props }) {
   const dispatch = useDispatch();
@@ -197,11 +209,11 @@ function Header({ props }) {
   const open = Boolean(anchorEl);
 
   const handleSort = (criteria, order) => {
-    console.log("handleSort called", criteria, order);
     dispatch(setSortCriteria(criteria));
     dispatch(setSortOrder(order));
     setAnchorEl(null);
   };
+
   return (
     <>
       <div className="px-4 py-2 bg-custom-blue5 text-white sticky top-0 flex flex-col sm:flex-row justify-between items-center">
@@ -228,7 +240,7 @@ function Header({ props }) {
         </div>
 
         <button
-          className="bg-custom-blue2 hover:bg-custom-blue4 text-white text-sm sm:text-base font-bold py-2 px-4 mb-3 sm:mb-0 rounded"
+          className="bg-custom-blue2 hover:bg-custom-blue4 text-white text-sm sm:text-base font-bold py-2 px-4 mb-3 sm:mb-0 rounded shadow-md shadow-gray-700"
           onClick={handleLocation}
         >
           Add Current Location
@@ -275,20 +287,19 @@ function Header({ props }) {
             )}
           />
           <button
-            className="bg-custom-blue2 hover:bg-custom-blue4 text-white text-sm sm:text-base font-bold py-2 px-4 rounded mr-4"
+            className="bg-custom-blue2 hover:bg-custom-blue4 text-white text-sm sm:text-base font-bold py-2 px-4 rounded mr-4 shadow-md shadow-gray-700"
             type="submit"
           >
             Add City
           </button>
         </form>
-        <Button
+        <button
           aria-describedby={open ? "sort-popover" : undefined}
-          variant="contained"
-          color="primary"
+          className="bg-custom-blue2 hover:bg-custom-blue4 text-white text-sm sm:text-base font-bold py-2 px-4 rounded shadow-md shadow-gray-700"
           onClick={handlePopoverOpen}
         >
           Sort
-        </Button>
+        </button>
         <Popover
           id="sort-popover"
           open={open}
@@ -303,19 +314,139 @@ function Header({ props }) {
             horizontal: "center",
           }}
         >
-          <div className="flex flex-col ">
-            <Button onClick={() => handleSort("alphabetical", "asc")}>
-              Sort Alphabetically Ascending
-            </Button>
-            <Button onClick={() => handleSort("alphabetical", "desc")}>
-              Sort Alphabetically Descending
-            </Button>
-            <Button onClick={() => handleSort("temperature", "asc")}>
-              Sort by Temperature Ascending
-            </Button>
-            <Button onClick={() => handleSort("temperature", "desc")}>
-              Sort by Temperature Descending
-            </Button>
+          <div className="flex flex-col p-4">
+            <button
+              onClick={() => handleSort("firstAdded")}
+              className="p-2 text-sky-800 hover:bg-sky-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-opacity-50"
+            >
+              First Added
+            </button>
+            <button
+              onClick={() => handleSort("lastAdded")}
+              className="p-2 text-sky-800 hover:bg-sky-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-opacity-50"
+            >
+              Last Added
+            </button>
+            <button
+              onClick={() => handleSort("alphabetical", "asc")}
+              className="p-2 text-sky-800 hover:bg-sky-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-opacity-50"
+            >
+              <div className="flex">
+                <TiSortAlphabeticallyOutline size={40} />
+                <MdKeyboardDoubleArrowUp size={40} />
+              </div>
+            </button>
+            <button
+              onClick={() => handleSort("alphabetical", "desc")}
+              className="p-2 text-sky-800 hover:bg-sky-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-opacity-50"
+            >
+              <div className="flex">
+                <TiSortAlphabeticallyOutline size={40} />
+                <MdKeyboardDoubleArrowDown size={40} />
+              </div>
+            </button>
+            <button
+              onClick={() => handleSort("temperature", "asc")}
+              className="p-2 text-sky-800 hover:bg-sky-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-opacity-50"
+            >
+              <div className="flex">
+                <FaTemperatureHigh size={40} />
+                <MdKeyboardDoubleArrowUp size={40} />
+              </div>
+            </button>
+            <button
+              onClick={() => handleSort("temperature", "desc")}
+              className="p-2 text-sky-800 hover:bg-sky-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-opacity-50"
+            >
+              <div className="flex">
+                <FaTemperatureLow size={40} />
+                <MdKeyboardDoubleArrowDown size={40} />
+              </div>
+            </button>
+            <button
+              onClick={() => handleSort("wind", "asc")}
+              className="p-2 text-sky-800 hover:bg-sky-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-opacity-50"
+            >
+              <div className="flex">
+                <GiWindsock size={40} /> <MdKeyboardDoubleArrowUp size={40} />
+              </div>
+            </button>
+            <button
+              onClick={() => handleSort("wind", "desc")}
+              className="p-2 text-sky-800 hover:bg-sky-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-opacity-50"
+            >
+              <div className="flex">
+                <GiWindsock size={40} /> <MdKeyboardDoubleArrowDown size={40} />
+              </div>
+            </button>
+            <button
+              onClick={() => handleSort("humidity", "asc")}
+              className="p-2 text-sky-800 hover:bg-sky-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-opacity-50"
+            >
+              <div className="flex">
+                <WiHumidity size={40} /> <MdKeyboardDoubleArrowUp size={40} />
+              </div>
+            </button>
+            <button
+              onClick={() => handleSort("humidity", "desc")}
+              className="p-2 text-sky-800 hover:bg-sky-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-opacity-50"
+            >
+              <div className="flex">
+                <WiHumidity size={40} /> <MdKeyboardDoubleArrowDown size={40} />
+              </div>
+            </button>
+            <button
+              onClick={() => handleSort("clouds", "asc")}
+              className="p-2 text-sky-800 hover:bg-sky-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-opacity-50"
+            >
+              <div className="flex">
+                <BsCloudsFill size={40} /> <MdKeyboardDoubleArrowUp size={40} />
+              </div>
+            </button>
+            <button
+              onClick={() => handleSort("clouds", "desc")}
+              className="p-2 text-sky-800 hover:bg-sky-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-opacity-50"
+            >
+              <div className="flex">
+                <BsCloudsFill size={40} />{" "}
+                <MdKeyboardDoubleArrowDown size={40} />
+              </div>
+            </button>
+            <button
+              onClick={() => handleSort("rain", "asc")}
+              className="p-2 text-sky-800 hover:bg-sky-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-opacity-50"
+            >
+              <div className="flex">
+                <FaCloudRain size={40} /> <MdKeyboardDoubleArrowUp size={40} />
+              </div>
+            </button>
+            <button
+              onClick={() => handleSort("rain", "desc")}
+              className="p-2 text-sky-800 hover:bg-sky-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-opacity-50"
+            >
+              <div className="flex">
+                <FaCloudRain size={40} />{" "}
+                <MdKeyboardDoubleArrowDown size={40} />
+              </div>
+            </button>
+            <button
+              onClick={() => handleSort("snow", "asc")}
+              className="p-2 text-sky-800 hover:bg-sky-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-opacity-50"
+            >
+              <div className="flex">
+                <FaRegSnowflake size={40} />
+                <MdKeyboardDoubleArrowUp size={40} />
+              </div>
+            </button>
+            <button
+              onClick={() => handleSort("snow", "desc")}
+              className="p-2 text-sky-800 hover:bg-sky-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-opacity-50"
+            >
+              <div className="flex">
+                <FaRegSnowflake size={40} />
+                <MdKeyboardDoubleArrowDown size={40} />
+              </div>
+            </button>
           </div>
         </Popover>
       </div>
