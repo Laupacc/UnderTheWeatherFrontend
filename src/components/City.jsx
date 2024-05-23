@@ -8,6 +8,7 @@ import Modal from "@mui/material/Modal";
 import Alert from "@mui/material/Alert";
 import ReactCountryFlag from "react-country-flag";
 import { useMemo } from "react";
+import moment from "moment-timezone";
 
 function City() {
   const dispatch = useDispatch();
@@ -56,19 +57,19 @@ function City() {
         const data = await response.json();
         console.log("Weather Data:", data);
         if (data.weather) {
-          const formattedCities = data.weather.map((city) => ({
-            ...city,
-            sunrise: new Date(city.sunrise * 1000).toLocaleTimeString("en-US", {
-              hour: "2-digit",
-              minute: "2-digit",
-              hour12: false,
-            }),
-            sunset: new Date(city.sunset * 1000).toLocaleTimeString("en-US", {
-              hour: "2-digit",
-              minute: "2-digit",
-              hour12: false,
-            }),
-          }));
+          const formattedCities = data.weather.map((city) => {
+            return {
+              ...city,
+              sunrise: moment
+                .unix(city.sunrise)
+                .utcOffset(city.timezone / 60)
+                .format("HH:mm"),
+              sunset: moment
+                .unix(city.sunset)
+                .utcOffset(city.timezone / 60)
+                .format("HH:mm"),
+            };
+          });
           setCityNames(formattedCities.reverse());
         }
       } catch (error) {
@@ -119,13 +120,31 @@ function City() {
       );
       const data = await response.json();
       if (data.weather.list) {
-        setForecastData(data.weather.list);
+        // Get the timezone offset of the city
+        const cityTimezoneOffset = data.weather.city.timezone / 60;
+
+        // Convert the forecast data to the city's timezone
+        const forecastData = data.weather.list.map((forecast) => {
+          const date = moment
+            .utc(forecast.dt_txt)
+            .utcOffset(cityTimezoneOffset);
+          forecast.dt_txt = date.format("YYYY-MM-DD HH:mm:ss");
+          return forecast;
+        });
+
+        setForecastData(forecastData);
 
         // Show the forecast for the current day by default when opening the modal
-        const selectedDate = new Date().toISOString().split("T")[0]; // Current date
+        const selectedDate = moment
+          .utc()
+          .utcOffset(cityTimezoneOffset)
+          .format("YYYY-MM-DD"); // Current date
         // Filter forecasts for the selected day
-        const selectedDayForecasts = data.weather.list.filter((forecast) => {
-          const forecastDate = forecast.dt_txt.split(" ")[0]; // Extracting date from datetime string
+        const selectedDayForecasts = forecastData.filter((forecast) => {
+          const forecastDate = moment
+            .utc(forecast.dt_txt)
+            .utcOffset(cityTimezoneOffset)
+            .format("YYYY-MM-DD"); // Extracting date from datetime string
           return forecastDate === selectedDate;
         });
         setSelectedDayForecast(selectedDayForecasts);
@@ -668,7 +687,7 @@ function City() {
                 selectedCity
                   .split(" ")
                   .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-                  .join(" ")}{" "}
+                  .join(" ")}
             </Typography>
             <Typography
               sx={{ typography: { sm: "h6", xs: "body1" } }}
