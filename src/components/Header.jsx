@@ -16,10 +16,11 @@ import debounce from "lodash.debounce";
 import { Popover } from "@mui/material";
 import { TiSortAlphabeticallyOutline } from "react-icons/ti";
 import { GiWindsock } from "react-icons/gi";
+import { IoCalendarNumberOutline } from "react-icons/io5";
 import {
-  MdKeyboardDoubleArrowDown,
-  MdKeyboardDoubleArrowUp,
-} from "react-icons/md";
+  LiaSortAlphaDownSolid,
+  LiaSortAlphaDownAltSolid,
+} from "react-icons/lia";
 import {
   FaTemperatureHigh,
   FaTemperatureLow,
@@ -326,7 +327,10 @@ function Header({ props }) {
                   : "p-1 text-sky-800 hover:bg-sky-800 hover:text-white rounded-lg"
               }`}
             >
-              Last Added
+              <div className="flex justify-center items-center">
+                <IoCalendarNumberOutline size={20} className="mr-2" />
+                Last Added
+              </div>
             </button>
             <button
               onClick={() => handleSort("firstAdded")}
@@ -336,7 +340,10 @@ function Header({ props }) {
                   : "p-1 text-sky-800 hover:bg-sky-800 hover:text-white rounded-lg"
               }`}
             >
-              First Added
+              <div className="flex justify-center items-center">
+                <IoCalendarNumberOutline size={20} className="mr-2" />
+                First Added
+              </div>
             </button>
             <button
               onClick={() => handleSort("alphabetical", "asc")}
@@ -347,9 +354,8 @@ function Header({ props }) {
               }`}
             >
               <div className="flex justify-center items-center">
+                <LiaSortAlphaDownSolid size={20} className="mr-2" />
                 City Name (A-Z)
-                {/* <TiSortAlphabeticallyOutline size={20} />
-                <MdKeyboardDoubleArrowUp size={20} /> */}
               </div>
             </button>
             <button
@@ -361,9 +367,8 @@ function Header({ props }) {
               }`}
             >
               <div className="flex justify-center items-center">
+                <LiaSortAlphaDownAltSolid size={20} className="mr-2" />
                 City Name (Z-A)
-                {/* <TiSortAlphabeticallyOutline size={40} />
-                <MdKeyboardDoubleArrowDown size={40} /> */}
               </div>
             </button>
             <button
@@ -377,7 +382,6 @@ function Header({ props }) {
               <div className="flex justify-center items-center">
                 <FaTemperatureHigh size={20} className="mr-2" />
                 Temperature (Low to High)
-                {/* <MdKeyboardDoubleArrowUp size={40} /> */}
               </div>
             </button>
             <button
@@ -391,7 +395,6 @@ function Header({ props }) {
               <div className="flex justify-center items-center">
                 <FaTemperatureLow size={20} className="mr-2" />
                 Temperature (High to Low)
-                {/* <MdKeyboardDoubleArrowDown size={40} /> */}
               </div>
             </button>
             <button
@@ -405,7 +408,6 @@ function Header({ props }) {
               <div className="flex justify-center items-center">
                 <GiWindsock size={26} className="mr-2" />
                 Wind Speed (Low to High)
-                {/* <MdKeyboardDoubleArrowUp size={40} /> */}
               </div>
             </button>
             <button
@@ -419,7 +421,6 @@ function Header({ props }) {
               <div className="flex justify-center items-center">
                 <GiWindsock size={26} className="mr-2" />
                 Wind Speed (High to Low)
-                {/* <MdKeyboardDoubleArrowDown size={40} /> */}
               </div>
             </button>
             <button
@@ -433,7 +434,6 @@ function Header({ props }) {
               <div className="flex justify-center items-center">
                 <WiHumidity size={28} className="mr-2" />
                 Humidity (Low to High)
-                {/* <MdKeyboardDoubleArrowUp size={40} /> */}
               </div>
             </button>
             <button
@@ -447,7 +447,6 @@ function Header({ props }) {
               <div className="flex justify-center items-center">
                 <WiHumidity size={28} className="mr-2" />
                 Humidity (High to Low)
-                {/* <MdKeyboardDoubleArrowDown size={40} /> */}
               </div>
             </button>
             <button
@@ -461,7 +460,6 @@ function Header({ props }) {
               <div className="flex justify-center items-center">
                 <BsCloudsFill size={20} className="mr-2" />
                 Cloud coverage (Low to High)
-                {/* <MdKeyboardDoubleArrowUp size={40} /> */}
               </div>
             </button>
             <button
@@ -475,7 +473,6 @@ function Header({ props }) {
               <div className="flex justify-center items-center">
                 <BsCloudsFill size={20} className="mr-2" />
                 Cloud coverage (High to Low)
-                {/* <MdKeyboardDoubleArrowDown size={40} /> */}
               </div>
             </button>
             <button
@@ -489,7 +486,6 @@ function Header({ props }) {
               <div className="flex justify-center items-center">
                 <FaCloudRain size={20} className="mr-2" />
                 Rain Chance (Low to High)
-                {/* <MdKeyboardDoubleArrowUp size={40} /> */}
               </div>
             </button>
             <button
@@ -503,7 +499,6 @@ function Header({ props }) {
               <div className="flex justify-center items-center">
                 <FaCloudRain size={20} className="mr-2" />
                 Rain Chance (High to Low)
-                {/* <MdKeyboardDoubleArrowDown size={40} /> */}
               </div>
             </button>
             <button
@@ -517,7 +512,6 @@ function Header({ props }) {
               <div className="flex justify-center items-center">
                 <FaRegSnowflake size={20} className="mr-2" />
                 Snow Chance (Low to High)
-                {/* <MdKeyboardDoubleArrowUp size={40} /> */}
               </div>
             </button>
             <button
@@ -531,7 +525,6 @@ function Header({ props }) {
               <div className="flex justify-center items-center">
                 <FaRegSnowflake size={20} className="mr-2" />
                 Snow Chance (High to Low)
-                {/* <MdKeyboardDoubleArrowDown size={40} /> */}
               </div>
             </button>
           </div>
