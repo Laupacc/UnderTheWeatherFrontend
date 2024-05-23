@@ -10,8 +10,6 @@ import { PersistGate } from 'redux-persist/integration/react';
 
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
 import createWebStorage from "redux-persist/lib/storage/createWebStorage";
-import Header from '../components/Header';
-import City from '../components/City';
 
 
 const createNoopStorage = () => {
@@ -31,7 +29,7 @@ const createNoopStorage = () => {
 const storage = typeof window !== "undefined" ? createWebStorage("local") : createNoopStorage();
 
 const reducers = combineReducers({ user, city });
-const persistConfig = { key: 'weatherApp', storage };
+const persistConfig = { key: 'UnderTheWeather', storage };
 
 const store = configureStore({
     reducer: persistReducer(persistConfig, reducers),

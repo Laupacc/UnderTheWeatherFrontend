@@ -9,6 +9,7 @@ import Alert from "@mui/material/Alert";
 import ReactCountryFlag from "react-country-flag";
 import { useMemo } from "react";
 import moment from "moment-timezone";
+import { ProgressBar } from "react-loader-spinner";
 
 function City() {
   const dispatch = useDispatch();
@@ -139,6 +140,7 @@ function City() {
           .utc()
           .utcOffset(cityTimezoneOffset)
           .format("YYYY-MM-DD"); // Current date
+
         // Filter forecasts for the selected day
         const selectedDayForecasts = forecastData.filter((forecast) => {
           const forecastDate = moment
@@ -644,8 +646,16 @@ function City() {
           ))}
         </div>
       ) : (
-        <div className="flex justify-center items-center p-4 mt-8">
-          <p className="text-2xl text-sky-900">Loading cities...</p>
+        <div className="flex flex-col justify-center items-center p-4 mt-14">
+          <p className="text-3xl text-sky-900">Loading cities</p>
+          <ProgressBar
+            visible={true}
+            height="100"
+            width="100"
+            barColor="#156ED2"
+            borderColor="#012B5B"
+            ariaLabel="progress-bar-loading"
+          />
         </div>
       )}
 
