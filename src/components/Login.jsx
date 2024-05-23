@@ -55,6 +55,7 @@ function Login() {
           dispatch(login({ username: regUsername, token: data.token }));
           setRegUsername("");
           setRegPassword("");
+          setOpen(false);
         } else {
           console.log("User already exists");
           setSignUpError("User already exists. Please sign in instead.");
@@ -84,6 +85,7 @@ function Login() {
           dispatch(login({ username: loginUsername, token: data.token }));
           setLoginUsername("");
           setLoginPassword("");
+          setOpen(false);
         } else {
           console.log("Invalid username or password");
           setSignInError("Invalid username or password");
@@ -125,30 +127,38 @@ function Login() {
                 handleLogin();
               }}
             >
-              <input
-                type="text"
-                placeholder="Username"
-                value={loginUsername}
-                onChange={(e) => setLoginUsername(e.target.value)}
-                className=""
-              />
-              <input
-                type="password"
-                placeholder="Password"
-                value={loginPassword}
-                onChange={(e) => setLoginPassword(e.target.value)}
-                className=""
-              />
-              <button onClick={() => handleLogin()}>Login</button>
-              {signInError && <p>{signInError}</p>}
+              <div className="flex flex-col justify-center items-center">
+                <input
+                  type="text"
+                  placeholder="Username"
+                  value={loginUsername}
+                  onChange={(e) => setLoginUsername(e.target.value)}
+                  className="border-2 border-gray-300 p-2 m-2 w-48 rounded-lg text-center bg-sky-100"
+                />
+                <input
+                  type="password"
+                  placeholder="Password"
+                  value={loginPassword}
+                  onChange={(e) => setLoginPassword(e.target.value)}
+                  className="border-2 border-gray-300 p-2 m-2 w-48 rounded-lg text-center bg-sky-100"
+                />
+                <button onClick={() => handleLogin()}>Login</button>
+                {signInError && <p>{signInError}</p>}
+              </div>
             </form>
-
-            <button onClick={() => setIsRegisterVisible(true)}>
+            <p>Not registered ?</p>
+            <button
+              className="m-2 p-2 bg-sky-100 rounded-lg border-2 border-gray-300"
+              onClick={() => setIsRegisterVisible(true)}
+            >
               Create an Account
             </button>
             {isRegisterVisible && (
               <>
-                <button onClick={() => setIsRegisterVisible(false)}>
+                <button
+                  className="m-2 p-2 bg-sky-100 rounded-lg border-2 border-gray-300"
+                  onClick={() => setIsRegisterVisible(false)}
+                >
                   Back to Login
                 </button>
                 <div>
@@ -163,13 +173,14 @@ function Login() {
                       placeholder="Username"
                       value={regUsername}
                       onChange={(e) => setRegUsername(e.target.value)}
+                      className="border-2 border-gray-300 p-2 m-2 w-48 rounded-lg text-center bg-sky-100"
                     />
                     <input
                       type="password"
                       placeholder="Password"
                       value={regPassword}
                       onChange={(e) => setRegPassword(e.target.value)}
-                      className=""
+                      className="border-2 border-gray-300 p-2 m-2 w-48 rounded-lg text-center bg-sky-100"
                     />
                     <button onClick={() => handleRegister()}>Register</button>
                     {signUpError && <p>{signUpError}</p>}
