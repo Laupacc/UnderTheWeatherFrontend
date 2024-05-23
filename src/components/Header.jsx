@@ -7,14 +7,13 @@ import {
   setSortCriteria,
   setSortOrder,
 } from "../reducers/city.js";
+import Login from "./Login.jsx";
 import Alert from "@mui/material/Alert";
 import { Switch } from "@headlessui/react";
-
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
 import debounce from "lodash.debounce";
 import { Popover } from "@mui/material";
-import { TiSortAlphabeticallyOutline } from "react-icons/ti";
 import { GiWindsock } from "react-icons/gi";
 import { IoCalendarNumberOutline } from "react-icons/io5";
 import {
@@ -30,7 +29,7 @@ import {
 import { WiHumidity } from "react-icons/wi";
 import { BsCloudsFill } from "react-icons/bs";
 
-function Header({ props }) {
+function Header({ handleLogin }) {
   const dispatch = useDispatch();
   const unit = useSelector((state) => state.city.unit);
   const cities = useSelector((state) => state.city.cities);
@@ -529,6 +528,7 @@ function Header({ props }) {
             </button>
           </div>
         </Popover>
+        <Login />
       </div>
       <div className="sticky top-52 sm:top-20 bg-white">
         {success && <Alert severity="success">{success}</Alert>}

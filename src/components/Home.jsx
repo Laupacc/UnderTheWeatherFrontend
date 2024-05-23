@@ -11,7 +11,6 @@ function Home() {
       <Head>
         <title>Under the Weather</title>
       </Head>
-      <Login />
       <Header />
       <City />
     </>
