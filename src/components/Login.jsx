@@ -4,20 +4,9 @@ import Head from "next/head";
 import { login, logout } from "../reducers/user";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import Typography from "@mui/material/Typography";
 import Modal from "@mui/material/Modal";
-
-const style = {
-  position: "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  width: 400,
-  bgcolor: "background.paper",
-  border: "2px solid #000",
-  boxShadow: 24,
-  p: 4,
-};
+import { ToastContainer, toast, Zoom } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function Login() {
   const dispatch = useDispatch();
@@ -38,6 +27,22 @@ function Login() {
 
   // New state for register part visibility
   const [isRegisterVisible, setIsRegisterVisible] = useState(false);
+  const [isLoginVisible, setIsLoginVisible] = useState(true);
+
+  // Clear error messages after 3 seconds
+  useEffect(() => {
+    if (signUpError) {
+      const timer = setTimeout(() => setSignUpError(""), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [signUpError]);
+
+  useEffect(() => {
+    if (signInError) {
+      const timer = setTimeout(() => setSignInError(""), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [signInError]);
 
   // Sign up function
   const handleRegister = () => {
@@ -98,9 +103,11 @@ function Login() {
 
   // Sign out function
   const handleSignOut = () => {
-    dispatch(logout());
     console.log("Logged out");
+    dispatch(logout());
+    toast("👏🏼 Logged out successfully");
   };
+  //   bg-slate-100 bg-opacity-70 hover:bg-opacity-90
 
   return (
     <>
@@ -110,86 +117,149 @@ function Login() {
 
       <div>
         {user.token ? (
-          <Button onClick={handleSignOut}>Logout</Button>
+          <button
+            className="flex justify-center items-center m-2 w-20 h-8 rounded-full bg-slate-100 bg-opacity-60 hover:bg-opacity-90 hover:text-slate-600"
+            onClick={handleSignOut}
+          >
+            Logout
+          </button>
         ) : (
-          <Button onClick={handleOpen}>Login</Button>
+          <button
+            className="flex justify-center items-center m-2 w-20 h-8 rounded-full bg-slate-100 bg-opacity-60 hover:bg-opacity-90 hover:text-slate-600"
+            onClick={handleOpen}
+          >
+            Login
+          </button>
         )}
         <Modal
           open={open}
           onClose={handleClose}
-          aria-labelledby="modal-modal-title"
-          aria-describedby="modal-modal-description"
+          aria-labelledby="Login Modal"
+          aria-describedby="Login Modal"
         >
-          <Box sx={style}>
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                handleLogin();
-              }}
-            >
-              <div className="flex flex-col justify-center items-center">
-                <input
-                  type="text"
-                  placeholder="Username"
-                  value={loginUsername}
-                  onChange={(e) => setLoginUsername(e.target.value)}
-                  className="border-2 border-gray-300 p-2 m-2 w-48 rounded-lg text-center bg-sky-100"
-                />
-                <input
-                  type="password"
-                  placeholder="Password"
-                  value={loginPassword}
-                  onChange={(e) => setLoginPassword(e.target.value)}
-                  className="border-2 border-gray-300 p-2 m-2 w-48 rounded-lg text-center bg-sky-100"
-                />
-                <button onClick={() => handleLogin()}>Login</button>
-                {signInError && <p>{signInError}</p>}
-              </div>
-            </form>
-            <p>Not registered ?</p>
-            <button
-              className="m-2 p-2 bg-sky-100 rounded-lg border-2 border-gray-300"
-              onClick={() => setIsRegisterVisible(true)}
-            >
-              Create an Account
-            </button>
-            {isRegisterVisible && (
+          <Box
+            sx={{
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              width: 320,
+              minHeight: 400,
+              background:
+                "radial-gradient(circle, rgba(28,181,224,1) 0%, rgba(0,0,70,1) 100%)",
+              border: "1px solid #0E2F44",
+              borderRadius: "1rem",
+              boxShadow: 24,
+              p: 4,
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "space-around",
+              alignItems: "center",
+            }}
+          >
+            {isLoginVisible && (
               <>
-                <button
-                  className="m-2 p-2 bg-sky-100 rounded-lg border-2 border-gray-300"
-                  onClick={() => setIsRegisterVisible(false)}
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    handleLogin();
+                  }}
                 >
-                  Back to Login
-                </button>
-                <div>
-                  <form
-                    onSubmit={(e) => {
-                      e.preventDefault();
-                      handleRegister();
+                  <div className="flex flex-col justify-center items-center">
+                    <input
+                      type="text"
+                      placeholder="Username"
+                      value={loginUsername}
+                      onChange={(e) => setLoginUsername(e.target.value)}
+                      className="p-2 m-2 w-56 rounded-lg text-center bg-slate-100 bg-opacity-50"
+                    />
+                    <input
+                      type="password"
+                      placeholder="Password"
+                      value={loginPassword}
+                      onChange={(e) => setLoginPassword(e.target.value)}
+                      className="p-2 m-2 w-56 rounded-lg text-center bg-slate-100 bg-opacity-50"
+                    />
+                    <button
+                      className="m-2 p-2 w-44 rounded-full bg-slate-100 bg-opacity-70 hover:bg-opacity-90"
+                      onClick={() => handleLogin()}
+                    >
+                      Login
+                    </button>
+                    {signInError && <p className="text-white">{signInError}</p>}
+                  </div>
+                </form>
+                <div className="flex flex-col justify-center items-center">
+                  <p className="text-blue-300">Don't have an account?</p>
+                  <button
+                    className="text-xl text-blue-300 hover:text-white"
+                    onClick={() => {
+                      setIsRegisterVisible(true);
+                      setIsLoginVisible(false);
                     }}
                   >
+                    Register
+                  </button>
+                </div>
+              </>
+            )}
+            {isRegisterVisible && (
+              <>
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    handleRegister();
+                  }}
+                >
+                  <div className="flex flex-col justify-center items-center">
                     <input
                       type="text"
                       placeholder="Username"
                       value={regUsername}
                       onChange={(e) => setRegUsername(e.target.value)}
-                      className="border-2 border-gray-300 p-2 m-2 w-48 rounded-lg text-center bg-sky-100"
+                      className="p-2 m-2 w-56 rounded-lg text-center bg-slate-100 bg-opacity-50 "
                     />
                     <input
                       type="password"
                       placeholder="Password"
                       value={regPassword}
                       onChange={(e) => setRegPassword(e.target.value)}
-                      className="border-2 border-gray-300 p-2 m-2 w-48 rounded-lg text-center bg-sky-100"
+                      className="p-2 m-2 w-56 rounded-lg text-center bg-slate-100 bg-opacity-50 "
                     />
-                    <button onClick={() => handleRegister()}>Register</button>
-                    {signUpError && <p>{signUpError}</p>}
-                  </form>
+                    <button
+                      className="m-2 p-2 w-44 rounded-full bg-slate-100 bg-opacity-70 hover:bg-opacity-90"
+                      onClick={() => handleRegister()}
+                    >
+                      Register
+                    </button>
+                  </div>
+                  {signUpError && <p className="text-white">{signUpError}</p>}
+                </form>
+                <div className="flex flex-col justify-center items-center">
+                  <p className="text-blue-300">Already have an account?</p>
+                  <button
+                    className="text-xl text-blue-300 hover:text-white"
+                    onClick={() => {
+                      setIsRegisterVisible(false);
+                      setIsLoginVisible(true);
+                    }}
+                  >
+                    Back to Login
+                  </button>
                 </div>
               </>
             )}
           </Box>
         </Modal>
+        <ToastContainer
+          className={"flex justify-center items-center text-lg"}
+          position="top-right"
+          autoClose={2000}
+          closeOnClick
+          rtl={false}
+          theme="colored"
+          transition={Zoom}
+        />
       </div>
     </>
   );

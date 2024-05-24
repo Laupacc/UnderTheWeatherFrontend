@@ -376,7 +376,7 @@ function City() {
         </Alert>
       )}
       {typeof sortedCities !== "undefined" && sortedCities.length !== 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 gap-3 p-3 bg-gray-200 items-start">
+        <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 gap-3 p-3 items-start">
           {sortedCities.map((city) => (
             <div
               key={city.cityName}

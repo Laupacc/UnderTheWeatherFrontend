@@ -11,8 +11,10 @@ function Home() {
       <Head>
         <title>Under the Weather</title>
       </Head>
-      <Header />
-      <City />
+      <div className="bg-gray-200 min-h-screen">
+        <Header />
+        <City />
+      </div>
     </>
   );
 }

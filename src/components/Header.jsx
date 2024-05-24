@@ -1,17 +1,18 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useState, useCallback, useEffect, useMemo, useRef } from "react";
+import Login from "./Login.jsx";
 import {
   addCity,
   setUnitTemp,
   setSortCriteria,
   setSortOrder,
 } from "../reducers/city.js";
-import Login from "./Login.jsx";
 import Alert from "@mui/material/Alert";
 import { Switch } from "@headlessui/react";
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
+import Paper from "@mui/material/Paper";
 import debounce from "lodash.debounce";
 import { Popover } from "@mui/material";
 import { GiWindsock } from "react-icons/gi";
@@ -29,7 +30,7 @@ import {
 import { WiHumidity } from "react-icons/wi";
 import { BsCloudsFill } from "react-icons/bs";
 
-function Header({ handleLogin }) {
+function Header() {
   const dispatch = useDispatch();
   const unit = useSelector((state) => state.city.unit);
   const cities = useSelector((state) => state.city.cities);
@@ -51,8 +52,6 @@ function Header({ handleLogin }) {
 
   // Autocomplete options
   const [options, setOptions] = useState([]);
-
-  const autocompleteRef = useRef(null);
 
   // Get cities from API for autocomplete feature
   const fetchCities = useCallback(
@@ -167,13 +166,11 @@ function Header({ handleLogin }) {
           setError("");
           setFetchError("");
           setCityName("");
-          autocompleteRef.current.value = "";
         } else {
           setError("This city is already in your list");
           setSuccess("");
           setFetchError("");
           setCityName("");
-          autocompleteRef.current.value = "";
         }
       })
       .catch((error) => {
@@ -219,317 +216,377 @@ function Header({ handleLogin }) {
 
   return (
     <>
-      <div className="px-4 py-2 bg-custom-blue5 text-white sticky top-0 flex flex-col sm:flex-row justify-between items-center">
-        <h1 className="font-UndertheWeather text-5xl lg:text-7xl text-gray-200 mb-2 sm:mb-0">
-          Under the Weather
-        </h1>
-
-        <div className="flex items-center mb-2 sm:mx-6 xl:mx-2 ">
-          <span className="text-white text-lg mr-2">°C</span>
-          <Switch
-            checked={enabled}
-            onChange={handleUnitChange}
-            className={`group inline-flex h-6 w-11 items-center rounded-full ${
-              enabled ? "bg-red-600" : "bg-red-600"
-            } transition`}
-          >
-            <span
-              className={`${
-                enabled ? "translate-x-6" : "translate-x-1"
-              } inline-block h-4 w-4 transform rounded-full bg-white transition`}
-            />
-          </Switch>
-          <span className="text-white text-lg ml-2">°F</span>
+      {/* Header background and title */}
+      <div
+        className="px-4 py-2 rounded-b-3xl text-white sticky top-0 flex flex-col justify-center items-center"
+        style={{
+          background:
+            "radial-gradient(circle, rgba(28,181,224,1) 0%, rgba(0,0,70,1) 100%)",
+        }}
+      >
+        <div className="flex justify-between items-center w-full mb-2">
+          <h1 className="font-UndertheWeather text-4xl sm:text-6xl md:text-7xl text-gray-200">
+            Under the Weather
+          </h1>
+          <Login />
         </div>
 
-        <button
-          className="bg-custom-blue2 hover:bg-custom-blue4 text-white text-sm sm:text-base font-bold py-2 px-4 mb-3 sm:mb-0 rounded shadow-md shadow-gray-700"
-          onClick={handleLocation}
-        >
-          Add Current Location
-        </button>
-        <form onSubmit={handleSubmit} className="flex mb-2 sm:mb-0">
-          {/* <input
-            className="text-black px-4 sm:px-8 rounded mr-4 ml-4"
-            type="text"
-            value={cityName}
-            onChange={(e) => setCityName(e.target.value)}
-            placeholder="Enter a city name"
-            required
-          /> */}
-          <Autocomplete
-            sx={{
-              width: 230,
-              height: "100%",
-              marginRight: 2,
-              marginLeft: 2,
-              color: "bg-custom-blue2",
-              backgroundColor: "#fff",
-              borderRadius: 1,
-            }}
-            freeSolo
-            ref={autocompleteRef}
-            id="city"
-            options={memoizedOptions}
-            getOptionLabel={(option) => `${option.name} (${option.iso2})`}
-            onInputChange={(e, value) => fetchCities(value)}
-            onChange={handleCityChange}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                e.preventDefault();
-                handleSubmit(e);
-              }
-            }}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                variant="outlined"
-                placeholder="Enter a city name"
-                required
-              />
-            )}
-          />
+        <div className="flex flex-col sm:flex-row justify-center items-center sm:justify-evenly sm:w-full">
+          {/* Add current location */}
           <button
-            className="bg-custom-blue2 hover:bg-custom-blue4 text-white text-sm sm:text-base font-bold py-2 px-4 rounded mr-4 shadow-md shadow-gray-700"
-            type="submit"
+            className="bg-custom-blue6 hover:bg-custom-blue7 text-white hover:text-slate-700  text-sm font-bold py-2 px-4 mb-3 rounded-full shadow-md shadow-gray-700 h-8 sm:h-11 md:h-8 flex justify-center items-center"
+            onClick={handleLocation}
           >
-            Add City
+            Add Current Location
           </button>
-        </form>
-        <button
-          aria-describedby={open ? "sort-popover" : undefined}
-          className="bg-custom-blue2 hover:bg-custom-blue4 text-white text-sm sm:text-base font-bold py-2 px-4 rounded shadow-md shadow-gray-700"
-          onClick={handlePopoverOpen}
-        >
-          Sort
-        </button>
-        <Popover
-          id="sort-popover"
-          open={open}
-          anchorEl={anchorEl}
-          onClose={handlePopoverClose}
-          anchorOrigin={{
-            vertical: "bottom",
-            horizontal: "center",
-          }}
-          transformOrigin={{
-            vertical: "top",
-            horizontal: "center",
-          }}
-        >
-          <div className="flex flex-col p-4">
+          {/* Add city form */}
+          <form
+            onSubmit={handleSubmit}
+            className="mb-2 flex justify-center items-center"
+          >
+            {/* <input
+              className="text-black px-4 sm:px-8 rounded mr-4 ml-4"
+              type="text"
+              value={cityName}
+              onChange={(e) => setCityName(e.target.value)}
+              placeholder="Enter a city name"
+              required
+            /> */}
+            <Autocomplete
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                width: { xs: 200, sm: 170, md: 200, lg: 220, xl: 240 },
+                height: 34,
+                marginRight: 2,
+                marginLeft: 2,
+                color: "bg-custom-blue2",
+                backgroundColor: "rgba(241, 245, 249, 0.5)",
+                borderRadius: 10,
+              }}
+              freeSolo
+              id="city"
+              clearOnEscape
+              options={memoizedOptions}
+              getOptionLabel={(option) => `${option.name} (${option.iso2})`}
+              onInputChange={(e, value) => fetchCities(value)}
+              onChange={handleCityChange}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  handleSubmit(e);
+                }
+              }}
+              renderOption={(props, option) => {
+                return (
+                  <li {...props}>
+                    <div className="flex items-center">
+                      <span className="text-sky-800 ml-1">{option.name}</span>
+                      <span className="text-gray-400 ml-2 mr-1">
+                        {option.iso2}
+                      </span>
+                    </div>
+                  </li>
+                );
+              }}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  variant="outlined"
+                  placeholder="Enter a city name"
+                  required
+                  sx={{
+                    "& .MuiOutlinedInput-notchedOutline": {
+                      border: "none",
+                    },
+                  }}
+                />
+              )}
+              PaperComponent={({ children }) => (
+                <Paper
+                  sx={{
+                    backgroundColor: "#F1F5F9",
+                    borderRadius: "2rem",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  {children}
+                </Paper>
+              )}
+            />
             <button
-              onClick={() => handleSort("lastAdded")}
-              className={`${
-                selectedSort === "lastAdded"
-                  ? "p-1 bg-sky-800 rounded-lg text-white"
-                  : "p-1 text-sky-800 hover:bg-sky-800 hover:text-white rounded-lg"
-              }`}
+              className="bg-custom-blue6 hover:bg-custom-blue7 text-white hover:text-slate-700 text-sm font-bold py-2 px-4 rounded-full shadow-md shadow-gray-700 h-8 sm:h-11 md:h-8 flex justify-center items-center"
+              type="submit"
             >
-              <div className="flex justify-center items-center">
-                <IoCalendarNumberOutline size={20} className="mr-2" />
-                Last Added
-              </div>
+              Add City
             </button>
+          </form>
+          <div className="flex justify-center items-center mb-2">
+            {/* Switch between Celsius and Fahrenheit */}
+            <div className="flex items-center mr-2 sm:mx-6 xl:mx-2 ">
+              <span className="text-white text-lg mr-2">°C</span>
+              <Switch
+                checked={enabled}
+                onChange={handleUnitChange}
+                className={`group inline-flex h-6 w-11 items-center rounded-full ${
+                  enabled ? "bg-orange-500" : "bg-red-600"
+                } transition`}
+              >
+                <span
+                  className={`${
+                    enabled ? "translate-x-6" : "translate-x-1"
+                  } inline-block h-4 w-4 transform rounded-full bg-slate-100 transition`}
+                />
+              </Switch>
+              <span className="text-slate-100 text-lg ml-2">°F</span>
+            </div>
+            {/* Sort button and popover */}
             <button
-              onClick={() => handleSort("firstAdded")}
-              className={`${
-                selectedSort === "firstAdded"
-                  ? "p-1 bg-sky-800 rounded-lg text-white"
-                  : "p-1 text-sky-800 hover:bg-sky-800 hover:text-white rounded-lg"
-              }`}
+              aria-describedby={open ? "sort-popover" : undefined}
+              className="ml-2 sm:ml-0 bg-custom-blue6 hover:bg-custom-blue7 text-white hover:text-slate-700 text-sm font-bold py-2 px-4 rounded-full shadow-md shadow-gray-700 h-8 sm:h-11 md:h-8 flex justify-center items-center"
+              onClick={handlePopoverOpen}
             >
-              <div className="flex justify-center items-center">
-                <IoCalendarNumberOutline size={20} className="mr-2" />
-                First Added
-              </div>
+              Sort
             </button>
-            <button
-              onClick={() => handleSort("alphabetical", "asc")}
-              className={`${
-                selectedSort === "alphabetical-asc"
-                  ? "p-1 bg-sky-800 rounded-lg text-white"
-                  : "p-1 text-sky-800 hover:bg-sky-800 hover:text-white rounded-lg"
-              }`}
+            <Popover
+              id="sort-popover"
+              open={open}
+              anchorEl={anchorEl}
+              onClose={handlePopoverClose}
+              anchorOrigin={{
+                vertical: "bottom",
+                horizontal: "center",
+              }}
+              transformOrigin={{
+                vertical: "top",
+                horizontal: "center",
+              }}
+              PaperProps={{
+                style: {
+                  backgroundColor: "#E2E8F0",
+                  borderRadius: "1rem",
+                },
+              }}
             >
-              <div className="flex justify-center items-center">
-                <LiaSortAlphaDownSolid size={20} className="mr-2" />
-                City Name (A-Z)
+              <div className="flex flex-col p-4">
+                <button
+                  onClick={() => handleSort("lastAdded")}
+                  className={`${
+                    selectedSort === "lastAdded"
+                      ? "p-1 bg-sky-800 rounded-lg text-white"
+                      : "p-1 text-sky-800 hover:bg-sky-800 hover:text-white rounded-lg"
+                  }`}
+                >
+                  <div className="flex justify-center items-center">
+                    <IoCalendarNumberOutline size={20} className="mr-2" />
+                    Last Added
+                  </div>
+                </button>
+                <button
+                  onClick={() => handleSort("firstAdded")}
+                  className={`${
+                    selectedSort === "firstAdded"
+                      ? "p-1 bg-sky-800 rounded-lg text-white"
+                      : "p-1 text-sky-800 hover:bg-sky-800 hover:text-white rounded-lg"
+                  }`}
+                >
+                  <div className="flex justify-center items-center">
+                    <IoCalendarNumberOutline size={20} className="mr-2" />
+                    First Added
+                  </div>
+                </button>
+                <button
+                  onClick={() => handleSort("alphabetical", "asc")}
+                  className={`${
+                    selectedSort === "alphabetical-asc"
+                      ? "p-1 bg-sky-800 rounded-lg text-white"
+                      : "p-1 text-sky-800 hover:bg-sky-800 hover:text-white rounded-lg"
+                  }`}
+                >
+                  <div className="flex justify-center items-center">
+                    <LiaSortAlphaDownSolid size={20} className="mr-2" />
+                    City Name (A-Z)
+                  </div>
+                </button>
+                <button
+                  onClick={() => handleSort("alphabetical", "desc")}
+                  className={`${
+                    selectedSort === "alphabetical-desc"
+                      ? "p-1 bg-sky-800 rounded-lg text-white"
+                      : "p-1 text-sky-800 hover:bg-sky-800 hover:text-white rounded-lg"
+                  }`}
+                >
+                  <div className="flex justify-center items-center">
+                    <LiaSortAlphaDownAltSolid size={20} className="mr-2" />
+                    City Name (Z-A)
+                  </div>
+                </button>
+                <button
+                  onClick={() => handleSort("temperature", "asc")}
+                  className={`${
+                    selectedSort === "temperature-asc"
+                      ? "p-1 bg-sky-800 rounded-lg text-white"
+                      : "p-1 text-sky-800 hover:bg-sky-800 hover:text-white rounded-lg"
+                  }`}
+                >
+                  <div className="flex justify-center items-center">
+                    <FaTemperatureHigh size={20} className="mr-2" />
+                    Temperature (Low to High)
+                  </div>
+                </button>
+                <button
+                  onClick={() => handleSort("temperature", "desc")}
+                  className={`${
+                    selectedSort === "temperature-desc"
+                      ? "p-1 bg-sky-800 rounded-lg text-white"
+                      : "p-1 text-sky-800 hover:bg-sky-800 hover:text-white rounded-lg"
+                  }`}
+                >
+                  <div className="flex justify-center items-center">
+                    <FaTemperatureLow size={20} className="mr-2" />
+                    Temperature (High to Low)
+                  </div>
+                </button>
+                <button
+                  onClick={() => handleSort("wind", "asc")}
+                  className={`${
+                    selectedSort === "wind-asc"
+                      ? "p-1 bg-sky-800 rounded-lg text-white"
+                      : "p-1 text-sky-800 hover:bg-sky-800 hover:text-white rounded-lg"
+                  }`}
+                >
+                  <div className="flex justify-center items-center">
+                    <GiWindsock size={26} className="mr-2" />
+                    Wind Speed (Low to High)
+                  </div>
+                </button>
+                <button
+                  onClick={() => handleSort("wind", "desc")}
+                  className={`${
+                    selectedSort === "wind-desc"
+                      ? "p-1 bg-sky-800 rounded-lg text-white"
+                      : "p-1 text-sky-800 hover:bg-sky-800 hover:text-white rounded-lg"
+                  }`}
+                >
+                  <div className="flex justify-center items-center">
+                    <GiWindsock size={26} className="mr-2" />
+                    Wind Speed (High to Low)
+                  </div>
+                </button>
+                <button
+                  onClick={() => handleSort("humidity", "asc")}
+                  className={`${
+                    selectedSort === "humidity-asc"
+                      ? "p-1 bg-sky-800 rounded-lg text-white"
+                      : "p-1 text-sky-800 hover:bg-sky-800 hover:text-white rounded-lg"
+                  }`}
+                >
+                  <div className="flex justify-center items-center">
+                    <WiHumidity size={28} className="mr-2" />
+                    Humidity (Low to High)
+                  </div>
+                </button>
+                <button
+                  onClick={() => handleSort("humidity", "desc")}
+                  className={`${
+                    selectedSort === "humidity-desc"
+                      ? "p-1 bg-sky-800 rounded-lg text-white"
+                      : "p-1 text-sky-800 hover:bg-sky-800 hover:text-white rounded-lg"
+                  }`}
+                >
+                  <div className="flex justify-center items-center">
+                    <WiHumidity size={28} className="mr-2" />
+                    Humidity (High to Low)
+                  </div>
+                </button>
+                <button
+                  onClick={() => handleSort("clouds", "asc")}
+                  className={`${
+                    selectedSort === "clouds-asc"
+                      ? "p-1 bg-sky-800 rounded-lg text-white"
+                      : "p-1 text-sky-800 hover:bg-sky-800 hover:text-white rounded-lg"
+                  }`}
+                >
+                  <div className="flex justify-center items-center">
+                    <BsCloudsFill size={20} className="mr-2" />
+                    Cloud coverage (Low to High)
+                  </div>
+                </button>
+                <button
+                  onClick={() => handleSort("clouds", "desc")}
+                  className={`${
+                    selectedSort === "clouds-desc"
+                      ? "p-1 bg-sky-800 rounded-lg text-white"
+                      : "p-1 text-sky-800 hover:bg-sky-800 hover:text-white rounded-lg"
+                  }`}
+                >
+                  <div className="flex justify-center items-center">
+                    <BsCloudsFill size={20} className="mr-2" />
+                    Cloud coverage (High to Low)
+                  </div>
+                </button>
+                <button
+                  onClick={() => handleSort("rain", "asc")}
+                  className={`${
+                    selectedSort === "rain-asc"
+                      ? "p-1 bg-sky-800 rounded-lg text-white"
+                      : "p-1 text-sky-800 hover:bg-sky-800 hover:text-white rounded-lg"
+                  }`}
+                >
+                  <div className="flex justify-center items-center">
+                    <FaCloudRain size={20} className="mr-2" />
+                    Rain Chance (Low to High)
+                  </div>
+                </button>
+                <button
+                  onClick={() => handleSort("rain", "desc")}
+                  className={`${
+                    selectedSort === "rain-desc"
+                      ? "p-1 bg-sky-800 rounded-lg text-white"
+                      : "p-1 text-sky-800 hover:bg-sky-800 hover:text-white rounded-lg"
+                  }`}
+                >
+                  <div className="flex justify-center items-center">
+                    <FaCloudRain size={20} className="mr-2" />
+                    Rain Chance (High to Low)
+                  </div>
+                </button>
+                <button
+                  onClick={() => handleSort("snow", "asc")}
+                  className={`${
+                    selectedSort === "snow-asc"
+                      ? "p-1 bg-sky-800 rounded-lg text-white"
+                      : "p-1 text-sky-800 hover:bg-sky-800 hover:text-white rounded-lg"
+                  }`}
+                >
+                  <div className="flex justify-center items-center">
+                    <FaRegSnowflake size={20} className="mr-2" />
+                    Snow Chance (Low to High)
+                  </div>
+                </button>
+                <button
+                  onClick={() => handleSort("snow", "desc")}
+                  className={`${
+                    selectedSort === "snow-desc"
+                      ? "p-1 bg-sky-800 rounded-lg text-white"
+                      : "p-1 text-sky-800 hover:bg-sky-800 hover:text-white rounded-lg"
+                  }`}
+                >
+                  <div className="flex justify-center items-center">
+                    <FaRegSnowflake size={20} className="mr-2" />
+                    Snow Chance (High to Low)
+                  </div>
+                </button>
               </div>
-            </button>
-            <button
-              onClick={() => handleSort("alphabetical", "desc")}
-              className={`${
-                selectedSort === "alphabetical-desc"
-                  ? "p-1 bg-sky-800 rounded-lg text-white"
-                  : "p-1 text-sky-800 hover:bg-sky-800 hover:text-white rounded-lg"
-              }`}
-            >
-              <div className="flex justify-center items-center">
-                <LiaSortAlphaDownAltSolid size={20} className="mr-2" />
-                City Name (Z-A)
-              </div>
-            </button>
-            <button
-              onClick={() => handleSort("temperature", "asc")}
-              className={`${
-                selectedSort === "temperature-asc"
-                  ? "p-1 bg-sky-800 rounded-lg text-white"
-                  : "p-1 text-sky-800 hover:bg-sky-800 hover:text-white rounded-lg"
-              }`}
-            >
-              <div className="flex justify-center items-center">
-                <FaTemperatureHigh size={20} className="mr-2" />
-                Temperature (Low to High)
-              </div>
-            </button>
-            <button
-              onClick={() => handleSort("temperature", "desc")}
-              className={`${
-                selectedSort === "temperature-desc"
-                  ? "p-1 bg-sky-800 rounded-lg text-white"
-                  : "p-1 text-sky-800 hover:bg-sky-800 hover:text-white rounded-lg"
-              }`}
-            >
-              <div className="flex justify-center items-center">
-                <FaTemperatureLow size={20} className="mr-2" />
-                Temperature (High to Low)
-              </div>
-            </button>
-            <button
-              onClick={() => handleSort("wind", "asc")}
-              className={`${
-                selectedSort === "wind-asc"
-                  ? "p-1 bg-sky-800 rounded-lg text-white"
-                  : "p-1 text-sky-800 hover:bg-sky-800 hover:text-white rounded-lg"
-              }`}
-            >
-              <div className="flex justify-center items-center">
-                <GiWindsock size={26} className="mr-2" />
-                Wind Speed (Low to High)
-              </div>
-            </button>
-            <button
-              onClick={() => handleSort("wind", "desc")}
-              className={`${
-                selectedSort === "wind-desc"
-                  ? "p-1 bg-sky-800 rounded-lg text-white"
-                  : "p-1 text-sky-800 hover:bg-sky-800 hover:text-white rounded-lg"
-              }`}
-            >
-              <div className="flex justify-center items-center">
-                <GiWindsock size={26} className="mr-2" />
-                Wind Speed (High to Low)
-              </div>
-            </button>
-            <button
-              onClick={() => handleSort("humidity", "asc")}
-              className={`${
-                selectedSort === "humidity-asc"
-                  ? "p-1 bg-sky-800 rounded-lg text-white"
-                  : "p-1 text-sky-800 hover:bg-sky-800 hover:text-white rounded-lg"
-              }`}
-            >
-              <div className="flex justify-center items-center">
-                <WiHumidity size={28} className="mr-2" />
-                Humidity (Low to High)
-              </div>
-            </button>
-            <button
-              onClick={() => handleSort("humidity", "desc")}
-              className={`${
-                selectedSort === "humidity-desc"
-                  ? "p-1 bg-sky-800 rounded-lg text-white"
-                  : "p-1 text-sky-800 hover:bg-sky-800 hover:text-white rounded-lg"
-              }`}
-            >
-              <div className="flex justify-center items-center">
-                <WiHumidity size={28} className="mr-2" />
-                Humidity (High to Low)
-              </div>
-            </button>
-            <button
-              onClick={() => handleSort("clouds", "asc")}
-              className={`${
-                selectedSort === "clouds-asc"
-                  ? "p-1 bg-sky-800 rounded-lg text-white"
-                  : "p-1 text-sky-800 hover:bg-sky-800 hover:text-white rounded-lg"
-              }`}
-            >
-              <div className="flex justify-center items-center">
-                <BsCloudsFill size={20} className="mr-2" />
-                Cloud coverage (Low to High)
-              </div>
-            </button>
-            <button
-              onClick={() => handleSort("clouds", "desc")}
-              className={`${
-                selectedSort === "clouds-desc"
-                  ? "p-1 bg-sky-800 rounded-lg text-white"
-                  : "p-1 text-sky-800 hover:bg-sky-800 hover:text-white rounded-lg"
-              }`}
-            >
-              <div className="flex justify-center items-center">
-                <BsCloudsFill size={20} className="mr-2" />
-                Cloud coverage (High to Low)
-              </div>
-            </button>
-            <button
-              onClick={() => handleSort("rain", "asc")}
-              className={`${
-                selectedSort === "rain-asc"
-                  ? "p-1 bg-sky-800 rounded-lg text-white"
-                  : "p-1 text-sky-800 hover:bg-sky-800 hover:text-white rounded-lg"
-              }`}
-            >
-              <div className="flex justify-center items-center">
-                <FaCloudRain size={20} className="mr-2" />
-                Rain Chance (Low to High)
-              </div>
-            </button>
-            <button
-              onClick={() => handleSort("rain", "desc")}
-              className={`${
-                selectedSort === "rain-desc"
-                  ? "p-1 bg-sky-800 rounded-lg text-white"
-                  : "p-1 text-sky-800 hover:bg-sky-800 hover:text-white rounded-lg"
-              }`}
-            >
-              <div className="flex justify-center items-center">
-                <FaCloudRain size={20} className="mr-2" />
-                Rain Chance (High to Low)
-              </div>
-            </button>
-            <button
-              onClick={() => handleSort("snow", "asc")}
-              className={`${
-                selectedSort === "snow-asc"
-                  ? "p-1 bg-sky-800 rounded-lg text-white"
-                  : "p-1 text-sky-800 hover:bg-sky-800 hover:text-white rounded-lg"
-              }`}
-            >
-              <div className="flex justify-center items-center">
-                <FaRegSnowflake size={20} className="mr-2" />
-                Snow Chance (Low to High)
-              </div>
-            </button>
-            <button
-              onClick={() => handleSort("snow", "desc")}
-              className={`${
-                selectedSort === "snow-desc"
-                  ? "p-1 bg-sky-800 rounded-lg text-white"
-                  : "p-1 text-sky-800 hover:bg-sky-800 hover:text-white rounded-lg"
-              }`}
-            >
-              <div className="flex justify-center items-center">
-                <FaRegSnowflake size={20} className="mr-2" />
-                Snow Chance (High to Low)
-              </div>
-            </button>
+            </Popover>
           </div>
-        </Popover>
-        <Login />
+        </div>
       </div>
+
+      {/* Alerts */}
       <div className="sticky top-52 sm:top-20 bg-white">
         {success && <Alert severity="success">{success}</Alert>}
         {error && <Alert severity="warning">{error}</Alert>}
