@@ -36,6 +36,7 @@ import FormGroup from "@mui/material/FormGroup";
 
 function Header() {
   const dispatch = useDispatch();
+  const user = useSelector((state) => state.user.value);
 
   // City name
   const [cityName, setCityName] = useState("");
@@ -233,7 +234,7 @@ function Header() {
     <>
       {/* Header background and title */}
       <div
-        className="px-4 py-2 rounded-b-3xl text-white sticky top-0 flex flex-col justify-center items-center"
+        className="px-4 py-2 rounded-2xl text-white sticky top-0 flex flex-col justify-center items-center"
         style={{
           background:
             "radial-gradient(circle, rgba(28,181,224,1) 0%, rgba(0,0,70,1) 100%)",
@@ -243,7 +244,21 @@ function Header() {
           <h1 className="font-UndertheWeather text-4xl sm:text-6xl md:text-7xl text-gray-200">
             Under the Weather
           </h1>
-          <Login />
+          <div className="flex justify-center items-center">
+            {user.token ? (
+              <p>
+                Welcome
+                {user && user.username
+                  ? user.username.charAt(0).toUpperCase() +
+                    user.username.slice(1)
+                  : ""}
+              </p>
+            ) : (
+              <></>
+            )}
+
+            <Login />
+          </div>
         </div>
 
         <div className="flex flex-col sm:flex-row justify-center items-center sm:justify-evenly sm:w-full">
@@ -297,7 +312,7 @@ function Header() {
                 return (
                   <li {...props}>
                     <div className="flex items-center">
-                      <span className="text-sky-800 ml-1">{option.name}</span>
+                      <span className="text-slate-200 ml-1">{option.name}</span>
                       <span className="text-gray-400 ml-2 mr-1">
                         {option.iso2}
                       </span>
@@ -321,7 +336,8 @@ function Header() {
               PaperComponent={({ children }) => (
                 <Paper
                   sx={{
-                    backgroundColor: "#F1F5F9",
+                    backgroundImage:
+                      "radial-gradient(circle, rgba(28,181,224,1) 0%, rgba(0,0,70,1) 100%)",
                     borderRadius: "2rem",
                     display: "flex",
                     justifyContent: "center",
@@ -347,16 +363,16 @@ function Header() {
                 checked={enabled}
                 onChange={handleUnitChange}
                 className={`group inline-flex h-6 w-11 items-center rounded-full ${
-                  enabled ? "bg-orange-500" : "bg-red-600"
+                  enabled ? "bg-yellow-400" : "bg-red-600"
                 } transition`}
               >
                 <span
                   className={`${
                     enabled ? "translate-x-6" : "translate-x-1"
-                  } inline-block h-4 w-4 transform rounded-full bg-slate-100 transition`}
+                  } inline-block h-4 w-4 transform rounded-full bg-slate-200 transition`}
                 />
               </Switch>
-              <span className="text-slate-100 text-lg ml-2">°F</span>
+              <span className="text-slate-200 text-lg ml-2">°F</span>
             </div>
             {/* Sort button and popover */}
             <button
@@ -381,7 +397,8 @@ function Header() {
               }}
               PaperProps={{
                 style: {
-                  backgroundColor: "#E2E8F0",
+                  backgroundImage:
+                    "radial-gradient(circle, rgba(28,181,224,1) 0%, rgba(0,0,70,1) 100%)",
                   borderRadius: "1rem",
                 },
               }}
@@ -603,14 +620,15 @@ function Header() {
                       checked={selectedSort === "lastAdded"}
                       onChange={(e) => handleSort(e, "lastAdded")}
                       sx={{
+                        color: "#E2E8F0",
                         "&.Mui-checked": {
-                          color: "orange",
+                          color: "#FACC15",
                         },
                       }}
                     />
                   }
                   label={
-                    <div className="flex justify-center items-center">
+                    <div className="flex justify-center items-center text-slate-200">
                       <IoCalendarNumberOutline size={20} className="mr-2" />
                       Last Added
                     </div>
@@ -622,14 +640,15 @@ function Header() {
                       checked={selectedSort === "firstAdded"}
                       onChange={(e) => handleSort(e, "firstAdded")}
                       sx={{
+                        color: "#E2E8F0",
                         "&.Mui-checked": {
-                          color: "orange",
+                          color: "#FACC15",
                         },
                       }}
                     />
                   }
                   label={
-                    <div className="flex justify-center items-center">
+                    <div className="flex justify-center items-center text-slate-200">
                       <IoCalendarNumberOutline size={20} className="mr-2" />
                       First Added
                     </div>
@@ -641,14 +660,15 @@ function Header() {
                       checked={selectedSort === "alphabetical-asc"}
                       onChange={(e) => handleSort(e, "alphabetical", "asc")}
                       sx={{
+                        color: "#E2E8F0",
                         "&.Mui-checked": {
-                          color: "orange",
+                          color: "#FACC15",
                         },
                       }}
                     />
                   }
                   label={
-                    <div className="flex justify-center items-center">
+                    <div className="flex justify-center items-center text-slate-200">
                       <LiaSortAlphaDownSolid size={20} className="mr-2" />
                       City Name (A-Z)
                     </div>
@@ -660,14 +680,15 @@ function Header() {
                       checked={selectedSort === "alphabetical-desc"}
                       onChange={(e) => handleSort(e, "alphabetical", "desc")}
                       sx={{
+                        color: "#E2E8F0",
                         "&.Mui-checked": {
-                          color: "orange",
+                          color: "#FACC15",
                         },
                       }}
                     />
                   }
                   label={
-                    <div className="flex justify-center items-center">
+                    <div className="flex justify-center items-center text-slate-200">
                       <LiaSortAlphaDownAltSolid size={20} className="mr-2" />
                       City Name (Z-A)
                     </div>
@@ -679,14 +700,15 @@ function Header() {
                       checked={selectedSort === "temperature-asc"}
                       onChange={(e) => handleSort(e, "temperature", "asc")}
                       sx={{
+                        color: "#E2E8F0",
                         "&.Mui-checked": {
-                          color: "orange",
+                          color: "#FACC15",
                         },
                       }}
                     />
                   }
                   label={
-                    <div className="flex justify-center items-center">
+                    <div className="flex justify-center items-center text-slate-200">
                       <FaTemperatureHigh size={20} className="mr-2" />
                       Temperature (Low to High)
                     </div>
@@ -698,14 +720,15 @@ function Header() {
                       checked={selectedSort === "temperature-desc"}
                       onChange={(e) => handleSort(e, "temperature", "desc")}
                       sx={{
+                        color: "#E2E8F0",
                         "&.Mui-checked": {
-                          color: "orange",
+                          color: "#FACC15",
                         },
                       }}
                     />
                   }
                   label={
-                    <div className="flex justify-center items-center">
+                    <div className="flex justify-center items-center text-slate-200">
                       <FaTemperatureLow size={20} className="mr-2" />
                       Temperature (High to Low)
                     </div>
@@ -717,14 +740,15 @@ function Header() {
                       checked={selectedSort === "wind-asc"}
                       onChange={(e) => handleSort(e, "wind", "asc")}
                       sx={{
+                        color: "#E2E8F0",
                         "&.Mui-checked": {
-                          color: "orange",
+                          color: "#FACC15",
                         },
                       }}
                     />
                   }
                   label={
-                    <div className="flex justify-center items-center">
+                    <div className="flex justify-center items-center text-slate-200">
                       <GiWindsock size={26} className="mr-2" />
                       Wind Speed (Low to High)
                     </div>
@@ -736,14 +760,15 @@ function Header() {
                       checked={selectedSort === "wind-desc"}
                       onChange={(e) => handleSort(e, "wind", "desc")}
                       sx={{
+                        color: "#E2E8F0",
                         "&.Mui-checked": {
-                          color: "orange",
+                          color: "#FACC15",
                         },
                       }}
                     />
                   }
                   label={
-                    <div className="flex justify-center items-center">
+                    <div className="flex justify-center items-center text-slate-200">
                       <GiWindsock size={26} className="mr-2" />
                       Wind Speed (High to Low)
                     </div>
@@ -755,14 +780,15 @@ function Header() {
                       checked={selectedSort === "humidity-asc"}
                       onChange={(e) => handleSort(e, "humidity", "asc")}
                       sx={{
+                        color: "#E2E8F0",
                         "&.Mui-checked": {
-                          color: "orange",
+                          color: "#FACC15",
                         },
                       }}
                     />
                   }
                   label={
-                    <div className="flex justify-center items-center">
+                    <div className="flex justify-center items-center text-slate-200">
                       <WiHumidity size={28} className="mr-2" />
                       Humidity (Low to High)
                     </div>
@@ -774,14 +800,15 @@ function Header() {
                       checked={selectedSort === "humidity-desc"}
                       onChange={(e) => handleSort(e, "humidity", "desc")}
                       sx={{
+                        color: "#E2E8F0",
                         "&.Mui-checked": {
-                          color: "orange",
+                          color: "#FACC15",
                         },
                       }}
                     />
                   }
                   label={
-                    <div className="flex justify-center items-center">
+                    <div className="flex justify-center items-center text-slate-200">
                       <WiHumidity size={28} className="mr-2" />
                       Humidity (High to Low)
                     </div>
@@ -793,14 +820,15 @@ function Header() {
                       checked={selectedSort === "clouds-asc"}
                       onChange={(e) => handleSort(e, "clouds", "asc")}
                       sx={{
+                        color: "#E2E8F0",
                         "&.Mui-checked": {
-                          color: "orange",
+                          color: "#FACC15",
                         },
                       }}
                     />
                   }
                   label={
-                    <div className="flex justify-center items-center">
+                    <div className="flex justify-center items-center text-slate-200">
                       <BsCloudsFill size={20} className="mr-2" />
                       Cloud coverage (Low to High)
                     </div>
@@ -812,14 +840,15 @@ function Header() {
                       checked={selectedSort === "clouds-desc"}
                       onChange={(e) => handleSort(e, "clouds", "desc")}
                       sx={{
+                        color: "#E2E8F0",
                         "&.Mui-checked": {
-                          color: "orange",
+                          color: "#FACC15",
                         },
                       }}
                     />
                   }
                   label={
-                    <div className="flex justify-center items-center">
+                    <div className="flex justify-center items-center text-slate-200">
                       <BsCloudsFill size={20} className="mr-2" />
                       Cloud coverage (High to Low)
                     </div>
@@ -831,14 +860,15 @@ function Header() {
                       checked={selectedSort === "rain-asc"}
                       onChange={(e) => handleSort(e, "rain", "asc")}
                       sx={{
+                        color: "#E2E8F0",
                         "&.Mui-checked": {
-                          color: "orange",
+                          color: "#FACC15",
                         },
                       }}
                     />
                   }
                   label={
-                    <div className="flex justify-center items-center">
+                    <div className="flex justify-center items-center text-slate-200">
                       <FaCloudRain size={20} className="mr-2" />
                       Rain Chance (Low to High)
                     </div>
@@ -850,14 +880,15 @@ function Header() {
                       checked={selectedSort === "rain-desc"}
                       onChange={(e) => handleSort(e, "rain", "desc")}
                       sx={{
+                        color: "#E2E8F0",
                         "&.Mui-checked": {
-                          color: "orange",
+                          color: "#FACC15",
                         },
                       }}
                     />
                   }
                   label={
-                    <div className="flex justify-center items-center">
+                    <div className="flex justify-center items-center text-slate-200">
                       <FaCloudRain size={20} className="mr-2" />
                       Rain Chance (High to Low)
                     </div>
@@ -869,14 +900,15 @@ function Header() {
                       checked={selectedSort === "snow-asc"}
                       onChange={(e) => handleSort(e, "snow", "asc")}
                       sx={{
+                        color: "#E2E8F0",
                         "&.Mui-checked": {
-                          color: "orange",
+                          color: "#FACC15",
                         },
                       }}
                     />
                   }
                   label={
-                    <div className="flex justify-center items-center">
+                    <div className="flex justify-center items-center text-slate-200">
                       <FaRegSnowflake size={20} className="mr-2" />
                       Snow Chance (Low to High)
                     </div>
@@ -888,14 +920,15 @@ function Header() {
                       checked={selectedSort === "snow-desc"}
                       onChange={(e) => handleSort(e, "snow", "desc")}
                       sx={{
+                        color: "#E2E8F0",
                         "&.Mui-checked": {
-                          color: "orange",
+                          color: "#FACC15",
                         },
                       }}
                     />
                   }
                   label={
-                    <div className="flex justify-center items-center">
+                    <div className="flex justify-center items-center text-slate-200">
                       <FaRegSnowflake size={20} className="mr-2" />
                       Snow Chance (High to Low)
                     </div>
