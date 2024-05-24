@@ -30,10 +30,12 @@ import {
 import { WiHumidity } from "react-icons/wi";
 import { BsCloudsFill } from "react-icons/bs";
 
+import Checkbox from "@mui/material/Checkbox";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import FormGroup from "@mui/material/FormGroup";
+
 function Header() {
   const dispatch = useDispatch();
-  const unit = useSelector((state) => state.city.unit);
-  const cities = useSelector((state) => state.city.cities);
 
   // City name
   const [cityName, setCityName] = useState("");
@@ -52,6 +54,16 @@ function Header() {
 
   // Autocomplete options
   const [options, setOptions] = useState([]);
+
+  // Memoize options to prevent unnecessary re-renders
+  const memoizedOptions = useMemo(() => options, [options]);
+
+  // Sort popover
+  const [anchorEl, setAnchorEl] = useState(null);
+  const open = Boolean(anchorEl);
+
+  // Sort selection in popover
+  const [selectedSort, setSelectedSort] = useState("");
 
   // Get cities from API for autocomplete feature
   const fetchCities = useCallback(
@@ -189,12 +201,6 @@ function Header() {
     dispatch(setUnitTemp(newUnit));
   };
 
-  // Memoize options to prevent unnecessary re-renders
-  const memoizedOptions = useMemo(() => options, [options]);
-
-  // Popover sort
-  const [anchorEl, setAnchorEl] = useState(null);
-
   const handlePopoverOpen = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -203,15 +209,24 @@ function Header() {
     setAnchorEl(null);
   };
 
-  const open = Boolean(anchorEl);
+  // const handleSort = (criteria, order) => {
+  //   dispatch(setSortCriteria(criteria));
+  //   dispatch(setSortOrder(order));
+  //   setAnchorEl(null);
+  //   setSelectedSort(`${criteria}-${order}`);
+  // };
 
-  const [selectedSort, setSelectedSort] = useState("");
-
-  const handleSort = (criteria, order) => {
-    dispatch(setSortCriteria(criteria));
-    dispatch(setSortOrder(order));
-    setAnchorEl(null);
-    setSelectedSort(`${criteria}-${order}`);
+  const handleSort = (event, criteria, order = null) => {
+    if (event.target.checked) {
+      dispatch(setSortCriteria(criteria));
+      if (order) {
+        dispatch(setSortOrder(order));
+        setSelectedSort(`${criteria}-${order}`);
+      } else {
+        setSelectedSort(criteria);
+      }
+      setAnchorEl(null);
+    }
   };
 
   return (
@@ -371,7 +386,7 @@ function Header() {
                 },
               }}
             >
-              <div className="flex flex-col p-4">
+              {/* <div className="flex flex-col p-4">
                 <button
                   onClick={() => handleSort("lastAdded")}
                   className={`${
@@ -580,7 +595,313 @@ function Header() {
                     Snow Chance (High to Low)
                   </div>
                 </button>
-              </div>
+              </div> */}
+              <FormGroup className="flex flex-col p-4">
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={selectedSort === "lastAdded"}
+                      onChange={(e) => handleSort(e, "lastAdded")}
+                      sx={{
+                        "&.Mui-checked": {
+                          color: "orange",
+                        },
+                      }}
+                    />
+                  }
+                  label={
+                    <div className="flex justify-center items-center">
+                      <IoCalendarNumberOutline size={20} className="mr-2" />
+                      Last Added
+                    </div>
+                  }
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={selectedSort === "firstAdded"}
+                      onChange={(e) => handleSort(e, "firstAdded")}
+                      sx={{
+                        "&.Mui-checked": {
+                          color: "orange",
+                        },
+                      }}
+                    />
+                  }
+                  label={
+                    <div className="flex justify-center items-center">
+                      <IoCalendarNumberOutline size={20} className="mr-2" />
+                      First Added
+                    </div>
+                  }
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={selectedSort === "alphabetical-asc"}
+                      onChange={(e) => handleSort(e, "alphabetical", "asc")}
+                      sx={{
+                        "&.Mui-checked": {
+                          color: "orange",
+                        },
+                      }}
+                    />
+                  }
+                  label={
+                    <div className="flex justify-center items-center">
+                      <LiaSortAlphaDownSolid size={20} className="mr-2" />
+                      City Name (A-Z)
+                    </div>
+                  }
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={selectedSort === "alphabetical-desc"}
+                      onChange={(e) => handleSort(e, "alphabetical", "desc")}
+                      sx={{
+                        "&.Mui-checked": {
+                          color: "orange",
+                        },
+                      }}
+                    />
+                  }
+                  label={
+                    <div className="flex justify-center items-center">
+                      <LiaSortAlphaDownAltSolid size={20} className="mr-2" />
+                      City Name (Z-A)
+                    </div>
+                  }
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={selectedSort === "temperature-asc"}
+                      onChange={(e) => handleSort(e, "temperature", "asc")}
+                      sx={{
+                        "&.Mui-checked": {
+                          color: "orange",
+                        },
+                      }}
+                    />
+                  }
+                  label={
+                    <div className="flex justify-center items-center">
+                      <FaTemperatureHigh size={20} className="mr-2" />
+                      Temperature (Low to High)
+                    </div>
+                  }
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={selectedSort === "temperature-desc"}
+                      onChange={(e) => handleSort(e, "temperature", "desc")}
+                      sx={{
+                        "&.Mui-checked": {
+                          color: "orange",
+                        },
+                      }}
+                    />
+                  }
+                  label={
+                    <div className="flex justify-center items-center">
+                      <FaTemperatureLow size={20} className="mr-2" />
+                      Temperature (High to Low)
+                    </div>
+                  }
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={selectedSort === "wind-asc"}
+                      onChange={(e) => handleSort(e, "wind", "asc")}
+                      sx={{
+                        "&.Mui-checked": {
+                          color: "orange",
+                        },
+                      }}
+                    />
+                  }
+                  label={
+                    <div className="flex justify-center items-center">
+                      <GiWindsock size={26} className="mr-2" />
+                      Wind Speed (Low to High)
+                    </div>
+                  }
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={selectedSort === "wind-desc"}
+                      onChange={(e) => handleSort(e, "wind", "desc")}
+                      sx={{
+                        "&.Mui-checked": {
+                          color: "orange",
+                        },
+                      }}
+                    />
+                  }
+                  label={
+                    <div className="flex justify-center items-center">
+                      <GiWindsock size={26} className="mr-2" />
+                      Wind Speed (High to Low)
+                    </div>
+                  }
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={selectedSort === "humidity-asc"}
+                      onChange={(e) => handleSort(e, "humidity", "asc")}
+                      sx={{
+                        "&.Mui-checked": {
+                          color: "orange",
+                        },
+                      }}
+                    />
+                  }
+                  label={
+                    <div className="flex justify-center items-center">
+                      <WiHumidity size={28} className="mr-2" />
+                      Humidity (Low to High)
+                    </div>
+                  }
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={selectedSort === "humidity-desc"}
+                      onChange={(e) => handleSort(e, "humidity", "desc")}
+                      sx={{
+                        "&.Mui-checked": {
+                          color: "orange",
+                        },
+                      }}
+                    />
+                  }
+                  label={
+                    <div className="flex justify-center items-center">
+                      <WiHumidity size={28} className="mr-2" />
+                      Humidity (High to Low)
+                    </div>
+                  }
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={selectedSort === "clouds-asc"}
+                      onChange={(e) => handleSort(e, "clouds", "asc")}
+                      sx={{
+                        "&.Mui-checked": {
+                          color: "orange",
+                        },
+                      }}
+                    />
+                  }
+                  label={
+                    <div className="flex justify-center items-center">
+                      <BsCloudsFill size={20} className="mr-2" />
+                      Cloud coverage (Low to High)
+                    </div>
+                  }
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={selectedSort === "clouds-desc"}
+                      onChange={(e) => handleSort(e, "clouds", "desc")}
+                      sx={{
+                        "&.Mui-checked": {
+                          color: "orange",
+                        },
+                      }}
+                    />
+                  }
+                  label={
+                    <div className="flex justify-center items-center">
+                      <BsCloudsFill size={20} className="mr-2" />
+                      Cloud coverage (High to Low)
+                    </div>
+                  }
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={selectedSort === "rain-asc"}
+                      onChange={(e) => handleSort(e, "rain", "asc")}
+                      sx={{
+                        "&.Mui-checked": {
+                          color: "orange",
+                        },
+                      }}
+                    />
+                  }
+                  label={
+                    <div className="flex justify-center items-center">
+                      <FaCloudRain size={20} className="mr-2" />
+                      Rain Chance (Low to High)
+                    </div>
+                  }
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={selectedSort === "rain-desc"}
+                      onChange={(e) => handleSort(e, "rain", "desc")}
+                      sx={{
+                        "&.Mui-checked": {
+                          color: "orange",
+                        },
+                      }}
+                    />
+                  }
+                  label={
+                    <div className="flex justify-center items-center">
+                      <FaCloudRain size={20} className="mr-2" />
+                      Rain Chance (High to Low)
+                    </div>
+                  }
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={selectedSort === "snow-asc"}
+                      onChange={(e) => handleSort(e, "snow", "asc")}
+                      sx={{
+                        "&.Mui-checked": {
+                          color: "orange",
+                        },
+                      }}
+                    />
+                  }
+                  label={
+                    <div className="flex justify-center items-center">
+                      <FaRegSnowflake size={20} className="mr-2" />
+                      Snow Chance (Low to High)
+                    </div>
+                  }
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={selectedSort === "snow-desc"}
+                      onChange={(e) => handleSort(e, "snow", "desc")}
+                      sx={{
+                        "&.Mui-checked": {
+                          color: "orange",
+                        },
+                      }}
+                    />
+                  }
+                  label={
+                    <div className="flex justify-center items-center">
+                      <FaRegSnowflake size={20} className="mr-2" />
+                      Snow Chance (High to Low)
+                    </div>
+                  }
+                />
+              </FormGroup>
             </Popover>
           </div>
         </div>

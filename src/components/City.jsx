@@ -305,7 +305,6 @@ function City() {
     }
   };
 
-  // Sort cities based on the sort criteria and order
   const sortedCities = useMemo(() => {
     // Create a copy of cityNames
     const cities = [...cityNames];
@@ -315,54 +314,35 @@ function City() {
     } else if (sortCriteria === "firstAdded") {
       return cities.reverse();
     } else if (sortCriteria === "temperature") {
-      return cities.sort((a, b) => {
-        if (sortOrder === "asc") {
-          return a.temp - b.temp;
-        }
-        return b.temp - a.temp;
-      });
+      return cities.sort((a, b) =>
+        sortOrder === "asc" ? a.temp - b.temp : b.temp - a.temp
+      );
     } else if (sortCriteria === "alphabetical") {
-      return cities.sort((a, b) => {
-        if (sortOrder === "asc") {
-          return a.cityName.localeCompare(b.cityName);
-        }
-        return b.cityName.localeCompare(a.cityName);
-      });
+      return cities.sort((a, b) =>
+        sortOrder === "asc"
+          ? a.cityName.localeCompare(b.cityName)
+          : b.cityName.localeCompare(a.cityName)
+      );
     } else if (sortCriteria === "humidity") {
-      return cities.sort((a, b) => {
-        if (sortOrder === "asc") {
-          return a.humidity - b.humidity;
-        }
-        return b.humidity - a.humidity;
-      });
+      return cities.sort((a, b) =>
+        sortOrder === "asc" ? a.humidity - b.humidity : b.humidity - a.humidity
+      );
     } else if (sortCriteria === "wind") {
-      return cities.sort((a, b) => {
-        if (sortOrder === "asc") {
-          return a.wind - b.wind;
-        }
-        return b.wind - a.wind;
-      });
+      return cities.sort((a, b) =>
+        sortOrder === "asc" ? a.wind - b.wind : b.wind - a.wind
+      );
     } else if (sortCriteria === "clouds") {
-      return cities.sort((a, b) => {
-        if (sortOrder === "asc") {
-          return a.clouds - b.clouds;
-        }
-        return b.clouds - a.clouds;
-      });
+      return cities.sort((a, b) =>
+        sortOrder === "asc" ? a.clouds - b.clouds : b.clouds - a.clouds
+      );
     } else if (sortCriteria === "rain") {
-      return cities.sort((a, b) => {
-        if (sortOrder === "asc") {
-          return a.rain - b.rain;
-        }
-        return b.rain - a.rain;
-      });
+      return cities.sort((a, b) =>
+        sortOrder === "asc" ? a.rain - b.rain : b.rain - a.rain
+      );
     } else if (sortCriteria === "snow") {
-      return cities.sort((a, b) => {
-        if (sortOrder === "asc") {
-          return a.snow - b.snow;
-        }
-        return b.snow - a.snow;
-      });
+      return cities.sort((a, b) =>
+        sortOrder === "asc" ? a.snow - b.snow : b.snow - a.snow
+      );
     }
     // If sortCriteria is neither "temperature" nor "alphabetical", return the cities as is
     return cities;
