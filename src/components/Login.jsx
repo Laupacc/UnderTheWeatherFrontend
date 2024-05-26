@@ -7,6 +7,7 @@ import Button from "@mui/material/Button";
 import Modal from "@mui/material/Modal";
 import { ToastContainer, toast, Zoom } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { BsCloudsFill } from "react-icons/bs";
 
 function Login() {
   const dispatch = useDispatch();
@@ -28,6 +29,12 @@ function Login() {
   // New state for register part visibility
   const [isRegisterVisible, setIsRegisterVisible] = useState(false);
   const [isLoginVisible, setIsLoginVisible] = useState(true);
+
+  const [isPasswordHidden, setIsPasswordHidden] = useState(true);
+
+  const togglePasswordVisibility = () => {
+    setIsPasswordHidden(!isPasswordHidden);
+  };
 
   // Clear error messages after 3 seconds
   useEffect(() => {
@@ -174,16 +181,25 @@ function Login() {
                       onChange={(e) => setLoginUsername(e.target.value)}
                       className="p-2 m-2 w-56 rounded-lg text-center bg-slate-100 bg-opacity-50"
                     />
-                    <input
-                      type="password"
-                      placeholder="Password"
-                      value={loginPassword}
-                      onChange={(e) => setLoginPassword(e.target.value)}
-                      className="p-2 m-2 w-56 rounded-lg text-center bg-slate-100 bg-opacity-50"
-                    />
+
+                    <div className="relative flex items-center justify-end">
+                      <input
+                        type={isPasswordHidden ? "password" : "text"}
+                        placeholder="Password"
+                        value={loginPassword}
+                        onChange={(e) => setLoginPassword(e.target.value)}
+                        className="p-2 m-2 w-56 rounded-lg text-center bg-slate-100 bg-opacity-50"
+                      />
+                      <div
+                        className="absolute cursor-pointer pr-5"
+                        onClick={togglePasswordVisibility}
+                      >
+                        {isPasswordHidden ? "👁️" : "👁️"}
+                      </div>
+                    </div>
                     <button
                       className="m-2 p-2 w-44 rounded-full bg-slate-100 bg-opacity-70 hover:bg-opacity-90"
-                      onClick={() => handleLogin()}
+                      type="submit"
                     >
                       Login
                     </button>
@@ -220,16 +236,24 @@ function Login() {
                       onChange={(e) => setRegUsername(e.target.value)}
                       className="p-2 m-2 w-56 rounded-lg text-center bg-slate-100 bg-opacity-50 "
                     />
-                    <input
-                      type="password"
-                      placeholder="Password"
-                      value={regPassword}
-                      onChange={(e) => setRegPassword(e.target.value)}
-                      className="p-2 m-2 w-56 rounded-lg text-center bg-slate-100 bg-opacity-50 "
-                    />
+                    <div className="relative flex items-center justify-end">
+                      <input
+                        type={isPasswordHidden ? "password" : "text"}
+                        placeholder="Password"
+                        value={regPassword}
+                        onChange={(e) => setRegPassword(e.target.value)}
+                        className="p-2 m-2 w-56 rounded-lg text-center bg-slate-100 bg-opacity-50"
+                      />
+                      <div
+                        className="absolute cursor-pointer pr-5"
+                        onClick={togglePasswordVisibility}
+                      >
+                        {isPasswordHidden ? "👁️" : "👁️"}
+                      </div>
+                    </div>
                     <button
                       className="m-2 p-2 w-44 rounded-full bg-slate-100 bg-opacity-70 hover:bg-opacity-90"
-                      onClick={() => handleRegister()}
+                      type="submit"
                     >
                       Register
                     </button>

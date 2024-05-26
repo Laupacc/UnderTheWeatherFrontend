@@ -85,37 +85,37 @@ function City() {
     };
 
     fetchUpdatedCities();
-  }, [user]);
+  }, [cities, user.token]);
 
   // Delete city from the backend
-  const deleteCity = async (cityName) => {
-    try {
-      if (!cityName) {
-        throw new Error("City name is undefined or null");
-      }
-      const response = await fetch(
-        `https://under-the-weather-backend.vercel.app/weather/${cityName}`,
-        {
-          method: "DELETE",
-        }
-      );
-      const data = await response.json();
-      console.log(data);
-      if (data.result) {
-        dispatch(removeCity(cityName));
-        setCityNames(cityNames.filter((city) => city.cityName !== cityName));
-        setCityDeleted(
-          `${cityName
-            .split(" ")
-            .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-            .join(" ")} was deleted successfully`
-        );
-      }
-    } catch (error) {
-      setCityDeleted("");
-      console.error("Error deleting city:", error);
-    }
-  };
+  // const deleteCity = async (cityName) => {
+  //   try {
+  //     if (!cityName) {
+  //       throw new Error("City name is undefined or null");
+  //     }
+  //     const response = await fetch(
+  //       `https://under-the-weather-backend.vercel.app/weather/${cityName}`,
+  //       {
+  //         method: "DELETE",
+  //       }
+  //     );
+  //     const data = await response.json();
+  //     console.log(data);
+  //     if (data.result) {
+  //       dispatch(removeCity(cityName));
+  //       setCityNames(cityNames.filter((city) => city.cityName !== cityName));
+  //       setCityDeleted(
+  //         `${cityName
+  //           .split(" ")
+  //           .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+  //           .join(" ")} was deleted successfully`
+  //       );
+  //     }
+  //   } catch (error) {
+  //     setCityDeleted("");
+  //     console.error("Error deleting city:", error);
+  //   }
+  // };
 
   // Delete city from the user's list
   const deleteCityFromUser = async (cityName) => {
@@ -402,7 +402,7 @@ function City() {
   if (!user.token) {
     return (
       <div className="flex flex-col justify-center items-center p-4 mt-14">
-        <p className="text-3xl text-sky-900">
+        <p className="text-3xl text-sky-900 text-center">
           You are not logged in. Please log in to view your cities.
         </p>
       </div>
@@ -412,7 +412,7 @@ function City() {
   return (
     <>
       {cityDeleted && (
-        <Alert severity="success" className="sticky top-36 sm:top-20 bg-white">
+        <Alert severity="success" className="sticky top-56 sm:top-20 bg-white">
           {cityDeleted}
         </Alert>
       )}
@@ -693,7 +693,9 @@ function City() {
         </div>
       ) : (
         <div className="flex flex-col justify-center items-center p-4 mt-14">
-          <p className="text-3xl text-sky-900">You have no cities added</p>
+          <p className="text-3xl text-sky-900 text-center">
+            You have no cities added yet.
+          </p>
         </div>
       )}
 

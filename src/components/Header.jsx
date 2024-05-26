@@ -112,88 +112,58 @@ function Header() {
     });
   }, []);
 
-  // Add city to the database
+  // Fetch API to add city
+  const handleFetch = (body) => {
+    fetch("https://under-the-weather-backend.vercel.app/weather/addCity", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.result) {
+          dispatch(addCity(data.weather.cityName));
+          console.log(data.weather.cityName);
+          setSuccess(
+            `${data.weather.cityName
+              .split(" ")
+              .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+              .join(" ")} has been added to your list!`
+          );
+          setError("");
+        } else {
+          setError(data.error || "Unexpected error occurred");
+          setSuccess("");
+        }
+        setFetchError("");
+        setCityName("");
+      })
+      .catch((error) => {
+        setFetchError("An error occurred while adding the city");
+        setSuccess("");
+        setError("");
+      });
+  };
+
+  // Handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
 
     if (user.token) {
-      fetch("https://under-the-weather-backend.vercel.app/weather/addCity", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ token: user.token, cityName: cityName }),
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          if (data.result) {
-            dispatch(addCity(data.weather.cityName));
-            setSuccess(
-              `${data.weather.cityName
-                .split(" ")
-                .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-                .join(" ")} has been added to your list!`
-            );
-            setError("");
-          } else {
-            setError(data.error);
-            setSuccess("");
-          }
-          setFetchError("");
-          setCityName("");
-        })
-        .catch((error) => {
-          setFetchError(
-            "An error occurred while processing your request. Please verify the city name and try again."
-          );
-          setSuccess("");
-          setError("");
-        });
+      handleFetch({ token: user.token, cityName: cityName });
     } else {
       setError("You must be logged in to add a city");
     }
   };
 
-  // Add current location to the database
+  // Handle location submission
   const handleLocation = (e) => {
     e.preventDefault();
 
     if (user.token) {
-      fetch("https://under-the-weather-backend.vercel.app/weather/addCity", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          token: user.token,
-          lat: lat,
-          lon: lon,
-        }),
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          if (data.result) {
-            dispatch(addCity(data.weather.cityName));
-            setSuccess(
-              `${data.weather.cityName
-                .split(" ")
-                .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-                .join(" ")} has been added to your list!`
-            );
-            setError("");
-          } else {
-            setError(data.error);
-            setSuccess("");
-          }
-          setFetchError("");
-        })
-        .catch((error) => {
-          setFetchError(
-            "An error occurred while processing your request. Please verify the city name and try again."
-          );
-          setSuccess("");
-          setError("");
-        });
+      handleFetch({ token: user.token, lat: lat, lon: lon });
     } else {
       setError("You must be logged in to add a city");
     }
@@ -729,7 +699,7 @@ function Header() {
       </div>
 
       {/* Alerts */}
-      <div className="sticky top-52 sm:top-20 bg-white">
+      <div className="sticky top-56 sm:top-20 bg-white">
         {success && <Alert severity="success">{success}</Alert>}
         {error && <Alert severity="warning">{error}</Alert>}
         {fetchError && <Alert severity="error">{fetchError}</Alert>}
