@@ -117,6 +117,37 @@ function City() {
     }
   };
 
+  // Delete city from the user's list
+  const deleteCityFromUser = async (cityName) => {
+    console.log("City Name:", cityName);
+    try {
+      const response = await fetch(
+        "https://under-the-weather-backend.vercel.app/deleteCity",
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ token: user.token, cityName }),
+        }
+      );
+      const data = await response.json();
+      console.log("Delete City Response:", data);
+      if (data.result) {
+        setCityNames(data.cities);
+        setCityDeleted(
+          `${cityName
+            .split(" ")
+            .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(" ")} was deleted successfully`
+        );
+      }
+    } catch (error) {
+      setCityDeleted("");
+      console.error("Error deleting city from user's list:", error);
+    }
+  };
+
   // Get forecast data for a city
   const fetchForecast = async (cityName) => {
     try {
@@ -352,6 +383,32 @@ function City() {
     return cities;
   }, [cityNames, sortCriteria, sortOrder]);
 
+  if (loading) {
+    return (
+      <div className="flex flex-col justify-center items-center p-4 mt-14">
+        <p className="text-3xl text-sky-900">Loading cities</p>
+        <ProgressBar
+          visible={true}
+          height="100"
+          width="100"
+          barColor="#156ED2"
+          borderColor="#012B5B"
+          ariaLabel="progress-bar-loading"
+        />
+      </div>
+    );
+  }
+
+  if (!user.token) {
+    return (
+      <div className="flex flex-col justify-center items-center p-4 mt-14">
+        <p className="text-3xl text-sky-900">
+          You are not logged in. Please log in to view your cities.
+        </p>
+      </div>
+    );
+  }
+
   return (
     <>
       {cityDeleted && (
@@ -359,7 +416,9 @@ function City() {
           {cityDeleted}
         </Alert>
       )}
-      {typeof sortedCities !== "undefined" && sortedCities.length !== 0 ? (
+      {typeof sortedCities !== "undefined" &&
+      sortedCities.length !== 0 &&
+      user.token ? (
         <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 gap-3 p-3 items-start">
           {sortedCities.map((city) => (
             <div
@@ -385,12 +444,15 @@ function City() {
                       gutterBottom
                       className={`${getTextColor(city.icon)}`}
                     >
-                      {city.cityName
-                        .split(" ")
-                        .map(
-                          (word) => word.charAt(0).toUpperCase() + word.slice(1)
-                        )
-                        .join(" ")}
+                      {city && city.cityName
+                        ? city.cityName
+                            .split(" ")
+                            .map(
+                              (word) =>
+                                word.charAt(0).toUpperCase() + word.slice(1)
+                            )
+                            .join(" ")
+                        : "Cities Not Available"}
                       {/* Country Flag */}
                       <ReactCountryFlag
                         className="ml-2"
@@ -621,7 +683,7 @@ function City() {
                 {/* Delete City Button */}
                 <button
                   className="my-2 px-3 py-1 text-lg border-2 border-red-500 rounded-lg bg-red-500 text-white hover:text-red-500 hover:bg-white"
-                  onClick={() => deleteCity(city.cityName)}
+                  onClick={() => deleteCityFromUser(city.cityName)}
                 >
                   Delete City
                 </button>
@@ -631,15 +693,7 @@ function City() {
         </div>
       ) : (
         <div className="flex flex-col justify-center items-center p-4 mt-14">
-          <p className="text-3xl text-sky-900">Loading cities</p>
-          <ProgressBar
-            visible={true}
-            height="100"
-            width="100"
-            barColor="#156ED2"
-            borderColor="#012B5B"
-            ariaLabel="progress-bar-loading"
-          />
+          <p className="text-3xl text-sky-900">You have no cities added</p>
         </div>
       )}
 

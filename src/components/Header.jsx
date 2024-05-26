@@ -100,7 +100,7 @@ function Header() {
       setError("");
       setSuccess("");
       setFetchError("");
-    }, 3500);
+    }, 2000);
     return () => clearTimeout(timer);
   }, [error, success, fetchError]);
 
@@ -149,6 +149,8 @@ function Header() {
           setSuccess("");
           setError("");
         });
+    } else {
+      setError("You must be logged in to add a city");
     }
   };
 
@@ -192,6 +194,8 @@ function Header() {
           setSuccess("");
           setError("");
         });
+    } else {
+      setError("You must be logged in to add a city");
     }
   };
 
