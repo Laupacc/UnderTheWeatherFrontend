@@ -58,6 +58,7 @@ function Login() {
         if (data.result) {
           console.log("Success:", data);
           dispatch(login({ username: regUsername, token: data.token }));
+          toast("👏🏼 Registered successfully");
           setRegUsername("");
           setRegPassword("");
           setOpen(false);
@@ -88,6 +89,7 @@ function Login() {
         if (data.result) {
           console.log("Success:", data);
           dispatch(login({ username: loginUsername, token: data.token }));
+          toast("👏🏼 Logged in successfully");
           setLoginUsername("");
           setLoginPassword("");
           setOpen(false);
@@ -107,7 +109,6 @@ function Login() {
     dispatch(logout());
     toast("👏🏼 Logged out successfully");
   };
-  //   bg-slate-100 bg-opacity-70 hover:bg-opacity-90
 
   return (
     <>
@@ -253,8 +254,8 @@ function Login() {
         </Modal>
         <ToastContainer
           className={"flex justify-center items-center text-lg"}
-          position="top-right"
-          autoClose={2000}
+          position="top-center"
+          autoClose={1000}
           closeOnClick
           rtl={false}
           theme="colored"

@@ -100,7 +100,7 @@ function Header() {
       setError("");
       setSuccess("");
       setFetchError("");
-    }, 2000);
+    }, 3000);
     return () => clearTimeout(timer);
   }, [error, success, fetchError]);
 
