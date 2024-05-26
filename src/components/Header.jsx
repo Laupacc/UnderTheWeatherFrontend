@@ -112,87 +112,87 @@ function Header() {
     });
   }, []);
 
+  // Add city to the database
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    if (user.token) {
+      fetch("https://under-the-weather-backend.vercel.app/weather/addCity", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ token: user.token, cityName: cityName }),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.result) {
+            dispatch(addCity(data.weather.cityName));
+            setSuccess(
+              `${data.weather.cityName
+                .split(" ")
+                .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                .join(" ")} has been added to your list!`
+            );
+            setError("");
+          } else {
+            setError(data.error);
+            setSuccess("");
+          }
+          setFetchError("");
+          setCityName("");
+        })
+        .catch((error) => {
+          setFetchError(
+            "An error occurred while processing your request. Please verify the city name and try again."
+          );
+          setSuccess("");
+          setError("");
+        });
+    }
+  };
+
   // Add current location to the database
   const handleLocation = (e) => {
     e.preventDefault();
-    fetch(
-      "https://under-the-weather-backend.vercel.app/weather/current/location",
-      {
+
+    if (user.token) {
+      fetch("https://under-the-weather-backend.vercel.app/weather/addCity", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
+          token: user.token,
           lat: lat,
           lon: lon,
         }),
-      }
-    )
-      .then((response) => response.json())
-      .then((data) => {
-        console.log(data);
-        if (data.result) {
-          dispatch(addCity(data.weather.cityName));
-          setSuccess(
-            `${data.weather.cityName
-              .split(" ")
-              .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-              .join(" ")} has been added to your list!`
-          );
-          setError("");
-          setFetchError("");
-        } else {
-          setError("This city is already in your list");
-          setSuccess("");
-          setFetchError("");
-        }
       })
-      .catch((error) => {
-        setFetchError(
-          "An error occurred while processing your request. Please verify the city name and try again."
-        );
-        setSuccess("");
-        setError("");
-      });
-  };
-
-  // Add city to the database
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    fetch("https://under-the-weather-backend.vercel.app/weather/current", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ cityName: cityName }),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.result) {
-          dispatch(addCity(data.weather.cityName));
-          setSuccess(
-            `${data.weather.cityName
-              .split(" ")
-              .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-              .join(" ")} has been added to your list!`
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.result) {
+            dispatch(addCity(data.weather.cityName));
+            setSuccess(
+              `${data.weather.cityName
+                .split(" ")
+                .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                .join(" ")} has been added to your list!`
+            );
+            setError("");
+          } else {
+            setError(data.error);
+            setSuccess("");
+          }
+          setFetchError("");
+        })
+        .catch((error) => {
+          setFetchError(
+            "An error occurred while processing your request. Please verify the city name and try again."
           );
-          setError("");
-          setFetchError("");
-          setCityName("");
-        } else {
-          setError("This city is already in your list");
           setSuccess("");
-          setFetchError("");
-          setCityName("");
-        }
-      })
-      .catch((error) => {
-        setFetchError(
-          "An error occurred while processing your request. Please verify the city name and try again."
-        );
-        setSuccess("");
-        setError("");
-      });
+          setError("");
+        });
+    }
   };
 
   // Handle unit change from switch
@@ -210,13 +210,7 @@ function Header() {
     setAnchorEl(null);
   };
 
-  // const handleSort = (criteria, order) => {
-  //   dispatch(setSortCriteria(criteria));
-  //   dispatch(setSortOrder(order));
-  //   setAnchorEl(null);
-  //   setSelectedSort(`${criteria}-${order}`);
-  // };
-
+  // Handle sort criteria
   const handleSort = (event, criteria, order = null) => {
     if (event.target.checked) {
       dispatch(setSortCriteria(criteria));
@@ -247,7 +241,7 @@ function Header() {
           <div className="flex justify-center items-center">
             {user.token ? (
               <p>
-                Welcome
+                Welcome{" "}
                 {user && user.username
                   ? user.username.charAt(0).toUpperCase() +
                     user.username.slice(1)
@@ -403,216 +397,6 @@ function Header() {
                 },
               }}
             >
-              {/* <div className="flex flex-col p-4">
-                <button
-                  onClick={() => handleSort("lastAdded")}
-                  className={`${
-                    selectedSort === "lastAdded"
-                      ? "p-1 bg-sky-800 rounded-lg text-white"
-                      : "p-1 text-sky-800 hover:bg-sky-800 hover:text-white rounded-lg"
-                  }`}
-                >
-                  <div className="flex justify-center items-center">
-                    <IoCalendarNumberOutline size={20} className="mr-2" />
-                    Last Added
-                  </div>
-                </button>
-                <button
-                  onClick={() => handleSort("firstAdded")}
-                  className={`${
-                    selectedSort === "firstAdded"
-                      ? "p-1 bg-sky-800 rounded-lg text-white"
-                      : "p-1 text-sky-800 hover:bg-sky-800 hover:text-white rounded-lg"
-                  }`}
-                >
-                  <div className="flex justify-center items-center">
-                    <IoCalendarNumberOutline size={20} className="mr-2" />
-                    First Added
-                  </div>
-                </button>
-                <button
-                  onClick={() => handleSort("alphabetical", "asc")}
-                  className={`${
-                    selectedSort === "alphabetical-asc"
-                      ? "p-1 bg-sky-800 rounded-lg text-white"
-                      : "p-1 text-sky-800 hover:bg-sky-800 hover:text-white rounded-lg"
-                  }`}
-                >
-                  <div className="flex justify-center items-center">
-                    <LiaSortAlphaDownSolid size={20} className="mr-2" />
-                    City Name (A-Z)
-                  </div>
-                </button>
-                <button
-                  onClick={() => handleSort("alphabetical", "desc")}
-                  className={`${
-                    selectedSort === "alphabetical-desc"
-                      ? "p-1 bg-sky-800 rounded-lg text-white"
-                      : "p-1 text-sky-800 hover:bg-sky-800 hover:text-white rounded-lg"
-                  }`}
-                >
-                  <div className="flex justify-center items-center">
-                    <LiaSortAlphaDownAltSolid size={20} className="mr-2" />
-                    City Name (Z-A)
-                  </div>
-                </button>
-                <button
-                  onClick={() => handleSort("temperature", "asc")}
-                  className={`${
-                    selectedSort === "temperature-asc"
-                      ? "p-1 bg-sky-800 rounded-lg text-white"
-                      : "p-1 text-sky-800 hover:bg-sky-800 hover:text-white rounded-lg"
-                  }`}
-                >
-                  <div className="flex justify-center items-center">
-                    <FaTemperatureHigh size={20} className="mr-2" />
-                    Temperature (Low to High)
-                  </div>
-                </button>
-                <button
-                  onClick={() => handleSort("temperature", "desc")}
-                  className={`${
-                    selectedSort === "temperature-desc"
-                      ? "p-1 bg-sky-800 rounded-lg text-white"
-                      : "p-1 text-sky-800 hover:bg-sky-800 hover:text-white rounded-lg"
-                  }`}
-                >
-                  <div className="flex justify-center items-center">
-                    <FaTemperatureLow size={20} className="mr-2" />
-                    Temperature (High to Low)
-                  </div>
-                </button>
-                <button
-                  onClick={() => handleSort("wind", "asc")}
-                  className={`${
-                    selectedSort === "wind-asc"
-                      ? "p-1 bg-sky-800 rounded-lg text-white"
-                      : "p-1 text-sky-800 hover:bg-sky-800 hover:text-white rounded-lg"
-                  }`}
-                >
-                  <div className="flex justify-center items-center">
-                    <GiWindsock size={26} className="mr-2" />
-                    Wind Speed (Low to High)
-                  </div>
-                </button>
-                <button
-                  onClick={() => handleSort("wind", "desc")}
-                  className={`${
-                    selectedSort === "wind-desc"
-                      ? "p-1 bg-sky-800 rounded-lg text-white"
-                      : "p-1 text-sky-800 hover:bg-sky-800 hover:text-white rounded-lg"
-                  }`}
-                >
-                  <div className="flex justify-center items-center">
-                    <GiWindsock size={26} className="mr-2" />
-                    Wind Speed (High to Low)
-                  </div>
-                </button>
-                <button
-                  onClick={() => handleSort("humidity", "asc")}
-                  className={`${
-                    selectedSort === "humidity-asc"
-                      ? "p-1 bg-sky-800 rounded-lg text-white"
-                      : "p-1 text-sky-800 hover:bg-sky-800 hover:text-white rounded-lg"
-                  }`}
-                >
-                  <div className="flex justify-center items-center">
-                    <WiHumidity size={28} className="mr-2" />
-                    Humidity (Low to High)
-                  </div>
-                </button>
-                <button
-                  onClick={() => handleSort("humidity", "desc")}
-                  className={`${
-                    selectedSort === "humidity-desc"
-                      ? "p-1 bg-sky-800 rounded-lg text-white"
-                      : "p-1 text-sky-800 hover:bg-sky-800 hover:text-white rounded-lg"
-                  }`}
-                >
-                  <div className="flex justify-center items-center">
-                    <WiHumidity size={28} className="mr-2" />
-                    Humidity (High to Low)
-                  </div>
-                </button>
-                <button
-                  onClick={() => handleSort("clouds", "asc")}
-                  className={`${
-                    selectedSort === "clouds-asc"
-                      ? "p-1 bg-sky-800 rounded-lg text-white"
-                      : "p-1 text-sky-800 hover:bg-sky-800 hover:text-white rounded-lg"
-                  }`}
-                >
-                  <div className="flex justify-center items-center">
-                    <BsCloudsFill size={20} className="mr-2" />
-                    Cloud coverage (Low to High)
-                  </div>
-                </button>
-                <button
-                  onClick={() => handleSort("clouds", "desc")}
-                  className={`${
-                    selectedSort === "clouds-desc"
-                      ? "p-1 bg-sky-800 rounded-lg text-white"
-                      : "p-1 text-sky-800 hover:bg-sky-800 hover:text-white rounded-lg"
-                  }`}
-                >
-                  <div className="flex justify-center items-center">
-                    <BsCloudsFill size={20} className="mr-2" />
-                    Cloud coverage (High to Low)
-                  </div>
-                </button>
-                <button
-                  onClick={() => handleSort("rain", "asc")}
-                  className={`${
-                    selectedSort === "rain-asc"
-                      ? "p-1 bg-sky-800 rounded-lg text-white"
-                      : "p-1 text-sky-800 hover:bg-sky-800 hover:text-white rounded-lg"
-                  }`}
-                >
-                  <div className="flex justify-center items-center">
-                    <FaCloudRain size={20} className="mr-2" />
-                    Rain Chance (Low to High)
-                  </div>
-                </button>
-                <button
-                  onClick={() => handleSort("rain", "desc")}
-                  className={`${
-                    selectedSort === "rain-desc"
-                      ? "p-1 bg-sky-800 rounded-lg text-white"
-                      : "p-1 text-sky-800 hover:bg-sky-800 hover:text-white rounded-lg"
-                  }`}
-                >
-                  <div className="flex justify-center items-center">
-                    <FaCloudRain size={20} className="mr-2" />
-                    Rain Chance (High to Low)
-                  </div>
-                </button>
-                <button
-                  onClick={() => handleSort("snow", "asc")}
-                  className={`${
-                    selectedSort === "snow-asc"
-                      ? "p-1 bg-sky-800 rounded-lg text-white"
-                      : "p-1 text-sky-800 hover:bg-sky-800 hover:text-white rounded-lg"
-                  }`}
-                >
-                  <div className="flex justify-center items-center">
-                    <FaRegSnowflake size={20} className="mr-2" />
-                    Snow Chance (Low to High)
-                  </div>
-                </button>
-                <button
-                  onClick={() => handleSort("snow", "desc")}
-                  className={`${
-                    selectedSort === "snow-desc"
-                      ? "p-1 bg-sky-800 rounded-lg text-white"
-                      : "p-1 text-sky-800 hover:bg-sky-800 hover:text-white rounded-lg"
-                  }`}
-                >
-                  <div className="flex justify-center items-center">
-                    <FaRegSnowflake size={20} className="mr-2" />
-                    Snow Chance (High to Low)
-                  </div>
-                </button>
-              </div> */}
               <FormGroup className="flex flex-col p-4">
                 <FormControlLabel
                   control={

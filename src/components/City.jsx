@@ -14,6 +14,7 @@ import { ProgressBar } from "react-loader-spinner";
 function City() {
   const dispatch = useDispatch();
   const cities = useSelector((state) => state.city.city);
+  const user = useSelector((state) => state.user.value);
   const unit = useSelector((state) => state.city.unit);
   const sortCriteria = useSelector((state) => state.city.sortCriteria);
   const sortOrder = useSelector((state) => state.city.sortOrder);
@@ -44,6 +45,7 @@ function City() {
         const updateResponse = await fetch(
           "https://under-the-weather-backend.vercel.app/weather/updateAll"
         );
+
         const updateData = await updateResponse.json();
         console.log("Update Response:", updateData);
         if (!updateData.result) {
@@ -53,12 +55,14 @@ function City() {
 
         // Fetch the updated city data
         const response = await fetch(
-          "https://under-the-weather-backend.vercel.app/weather"
+          `https://under-the-weather-backend.vercel.app/weather/userCities?token=${user.token}`
         );
+
         const data = await response.json();
         console.log("Weather Data:", data);
-        if (data.weather) {
-          const formattedCities = data.weather.map((city) => {
+
+        if (data.cities) {
+          const formattedCities = data.cities.map((city) => {
             return {
               ...city,
               sunrise: moment
@@ -81,7 +85,7 @@ function City() {
     };
 
     fetchUpdatedCities();
-  }, [cities]);
+  }, [user]);
 
   // Delete city from the backend
   const deleteCity = async (cityName) => {
