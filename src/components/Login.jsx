@@ -7,7 +7,7 @@ import Button from "@mui/material/Button";
 import Modal from "@mui/material/Modal";
 import { ToastContainer, toast, Zoom } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { BsCloudsFill } from "react-icons/bs";
+import { FaEye, FaEyeSlash } from "react-icons/fa6";
 
 function Login() {
   const dispatch = useDispatch();
@@ -126,14 +126,14 @@ function Login() {
       <div>
         {user.token ? (
           <button
-            className="flex justify-center items-center m-2 w-20 h-8 rounded-full bg-slate-100 bg-opacity-60 hover:bg-opacity-90 hover:text-slate-600"
+            className="flex justify-center items-center m-2 w-20 h-8 rounded-full text-white bg-slate-100 bg-opacity-60 hover:bg-opacity-90 hover:text-slate-600"
             onClick={handleSignOut}
           >
             Logout
           </button>
         ) : (
           <button
-            className="flex justify-center items-center m-2 w-20 h-8 rounded-full bg-slate-100 bg-opacity-60 hover:bg-opacity-90 hover:text-slate-600"
+            className="flex justify-center items-center m-2 w-20 h-8 rounded-full text-white bg-slate-100 bg-opacity-60 hover:bg-opacity-90 hover:text-slate-600"
             onClick={handleOpen}
           >
             Login
@@ -174,12 +174,15 @@ function Login() {
                   }}
                 >
                   <div className="flex flex-col justify-center items-center">
+                    <h2 className="text-xl text-blue-300">
+                      Log in to your account
+                    </h2>
                     <input
                       type="text"
                       placeholder="Username"
                       value={loginUsername}
                       onChange={(e) => setLoginUsername(e.target.value)}
-                      className="p-2 m-2 w-56 rounded-lg text-center bg-slate-100 bg-opacity-50"
+                      className="p-2 m-2 w-56 rounded-lg text-center bg-slate-100 bg-opacity-50 text-sky-900"
                     />
 
                     <div className="relative flex items-center justify-end">
@@ -188,20 +191,24 @@ function Login() {
                         placeholder="Password"
                         value={loginPassword}
                         onChange={(e) => setLoginPassword(e.target.value)}
-                        className="p-2 m-2 w-56 rounded-lg text-center bg-slate-100 bg-opacity-50"
+                        className="p-2 m-2 w-56 rounded-lg text-center bg-slate-100 bg-opacity-50 text-sky-900"
                       />
                       <div
                         className="absolute cursor-pointer pr-5"
                         onClick={togglePasswordVisibility}
                       >
-                        {isPasswordHidden ? "👁️" : "👁️"}
+                        {isPasswordHidden ? (
+                          <FaEye color="#0C4A6E" />
+                        ) : (
+                          <FaEyeSlash color="#0C4A6E" />
+                        )}
                       </div>
                     </div>
                     <button
                       className="m-2 p-2 w-44 rounded-full bg-slate-100 bg-opacity-70 hover:bg-opacity-90"
                       type="submit"
                     >
-                      Login
+                      Log in
                     </button>
                     {signInError && <p className="text-white">{signInError}</p>}
                   </div>
@@ -215,7 +222,7 @@ function Login() {
                       setIsLoginVisible(false);
                     }}
                   >
-                    Register
+                    Sign up
                   </button>
                 </div>
               </>
@@ -229,12 +236,13 @@ function Login() {
                   }}
                 >
                   <div className="flex flex-col justify-center items-center">
+                    <h2 className="text-xl text-blue-300">Create an account</h2>
                     <input
                       type="text"
                       placeholder="Username"
                       value={regUsername}
                       onChange={(e) => setRegUsername(e.target.value)}
-                      className="p-2 m-2 w-56 rounded-lg text-center bg-slate-100 bg-opacity-50 "
+                      className="p-2 m-2 w-56 rounded-lg text-center bg-slate-100 bg-opacity-50 text-sky-900"
                     />
                     <div className="relative flex items-center justify-end">
                       <input
@@ -242,20 +250,24 @@ function Login() {
                         placeholder="Password"
                         value={regPassword}
                         onChange={(e) => setRegPassword(e.target.value)}
-                        className="p-2 m-2 w-56 rounded-lg text-center bg-slate-100 bg-opacity-50"
+                        className="p-2 m-2 w-56 rounded-lg text-center bg-slate-100 bg-opacity-50 text-sky-900"
                       />
                       <div
                         className="absolute cursor-pointer pr-5"
                         onClick={togglePasswordVisibility}
                       >
-                        {isPasswordHidden ? "👁️" : "👁️"}
+                        {isPasswordHidden ? (
+                          <FaEye color="#0C4A6E" />
+                        ) : (
+                          <FaEyeSlash color="#0C4A6E" />
+                        )}
                       </div>
                     </div>
                     <button
                       className="m-2 p-2 w-44 rounded-full bg-slate-100 bg-opacity-70 hover:bg-opacity-90"
                       type="submit"
                     >
-                      Register
+                      Sign up
                     </button>
                   </div>
                   {signUpError && <p className="text-white">{signUpError}</p>}

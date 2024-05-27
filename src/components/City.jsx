@@ -43,7 +43,7 @@ function City() {
       try {
         // Trigger the update of all cities' weather data
         const updateResponse = await fetch(
-          "https://under-the-weather-backend.vercel.app/weather/updateAll"
+          `https://under-the-weather-backend.vercel.app/weather/updateUserCities?token=${user.token}`
         );
 
         const updateData = await updateResponse.json();

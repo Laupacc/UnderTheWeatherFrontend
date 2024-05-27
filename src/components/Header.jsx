@@ -94,7 +94,7 @@ function Header() {
     }
   };
 
-  // Clear alerts after 5 seconds
+  // Clear alerts after 3 seconds
   useEffect(() => {
     const timer = setTimeout(() => {
       setError("");
@@ -124,17 +124,18 @@ function Header() {
       .then((response) => response.json())
       .then((data) => {
         if (data.result) {
-          dispatch(addCity(data.weather.cityName));
-          console.log(data.weather.cityName);
+          dispatch(addCity(data.cities));
+          console.log(data.cities);
           setSuccess(
-            `${data.weather.cityName
+            `${data.cities[data.cities.length - 1].cityName
               .split(" ")
               .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
               .join(" ")} has been added to your list!`
           );
           setError("");
+          setCityName("");
         } else {
-          setError(data.error || "Unexpected error occurred");
+          setError("City not found or already in your list");
           setSuccess("");
         }
         setFetchError("");
@@ -202,19 +203,19 @@ function Header() {
     <>
       {/* Header background and title */}
       <div
-        className="px-4 py-2 rounded-2xl text-white sticky top-0 flex flex-col justify-center items-center"
+        className="px-4 py-2 rounded-2xl  sticky top-0 flex flex-col justify-center items-center"
         style={{
           background:
             "radial-gradient(circle, rgba(28,181,224,1) 0%, rgba(0,0,70,1) 100%)",
         }}
       >
         <div className="flex justify-between items-center w-full mb-2">
-          <h1 className="font-UndertheWeather text-4xl sm:text-6xl md:text-7xl text-gray-200">
+          <h1 className="font-UndertheWeather text-4xl sm:text-6xl md:text-7xl text-blue-200">
             Under the Weather
           </h1>
-          <div className="flex justify-center items-center">
+          <div className="flex flex-col justify-center items-center">
             {user.token ? (
-              <p>
+              <p className="text-blue-200">
                 Welcome{" "}
                 {user && user.username
                   ? user.username.charAt(0).toUpperCase() +
@@ -224,7 +225,6 @@ function Header() {
             ) : (
               <></>
             )}
-
             <Login />
           </div>
         </div>
@@ -268,7 +268,9 @@ function Header() {
               clearOnEscape
               options={memoizedOptions}
               getOptionLabel={(option) => `${option.name} (${option.iso2})`}
-              onInputChange={(e, value) => fetchCities(value)}
+              onInputChange={(e, value) => {
+                fetchCities(value);
+              }}
               onChange={handleCityChange}
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
