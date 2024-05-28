@@ -422,7 +422,7 @@ function City() {
         <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 gap-3 p-3 items-start">
           {sortedCities.map((city) => (
             <div
-              key={city.cityName}
+              key={`${city.latitude}-${city.longitude}`}
               className="rounded-lg shadow-xl m-2 w-auto flex flex-col justify-between items-center text-center min-h-[32rem]"
               style={{
                 backgroundImage: `url(${getBackgroundImage(city.icon)})`,

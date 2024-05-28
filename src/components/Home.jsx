@@ -2,8 +2,7 @@ import Head from "next/head";
 import City from "../components/City";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
-import React, { useState, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import React from "react";
 
 function Home() {
   return (

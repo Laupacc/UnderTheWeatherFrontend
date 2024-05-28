@@ -137,9 +137,9 @@ function Header() {
         } else {
           setError("City not found or already in your list");
           setSuccess("");
+          setFetchError("");
+          setCityName("");
         }
-        setFetchError("");
-        setCityName("");
       })
       .catch((error) => {
         setFetchError("An error occurred while adding the city");
