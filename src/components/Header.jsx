@@ -203,7 +203,7 @@ function Header() {
     <>
       {/* Header background and title */}
       <div
-        className="px-4 py-2 rounded-2xl  sticky top-0 flex flex-col justify-center items-center"
+        className="px-4 py-2 rounded-2xl sticky top-0 flex flex-col justify-center items-center"
         style={{
           background:
             "radial-gradient(circle, rgba(28,181,224,1) 0%, rgba(0,0,70,1) 100%)",
