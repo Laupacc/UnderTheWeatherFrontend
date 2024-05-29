@@ -56,6 +56,7 @@ function Header() {
 
   // Autocomplete options
   const [options, setOptions] = useState([]);
+  const [autocompleteKey, setAutocompleteKey] = useState(false);
 
   // Memoize options to prevent unnecessary re-renders
   const memoizedOptions = useMemo(() => options, [options]);
@@ -137,12 +138,10 @@ function Header() {
               .join(" ")}) has been added to your list!`
           );
           setError("");
-          setCityName("");
         } else {
           setError("City not found or already in your list");
           setSuccess("");
           setFetchError("");
-          setCityName("");
         }
       })
       .catch((error) => {
@@ -158,6 +157,8 @@ function Header() {
 
     if (user.token) {
       handleFetch({ token: user.token, cityName: cityName, country: country });
+      // Re-fetch options to clear the autocomplete
+      setAutocompleteKey((prevKey) => !prevKey);
     } else {
       setError("You must be logged in to add a city");
     }
@@ -275,6 +276,7 @@ function Header() {
               required
             /> */}
             <Autocomplete
+              key={autocompleteKey ? "reset" : "normal"}
               sx={{
                 display: "flex",
                 justifyContent: "center",
@@ -289,7 +291,6 @@ function Header() {
               }}
               freeSolo
               id="city"
-              clearOnEscape
               options={memoizedOptions}
               getOptionLabel={(option) => `${option.name} (${option.iso2})`}
               onInputChange={(e, value) => {
