@@ -40,6 +40,7 @@ function Header() {
 
   // City name
   const [cityName, setCityName] = useState("");
+  const [country, setCountry] = useState("");
 
   // Alerts
   const [error, setError] = useState("");
@@ -91,6 +92,7 @@ function Header() {
   const handleCityChange = (event, value) => {
     if (value) {
       setCityName(value.name);
+      setCountry(value.iso2);
     }
   };
 
@@ -127,10 +129,12 @@ function Header() {
           dispatch(addCity(data.cities));
           console.log(data.cities);
           setSuccess(
-            `${data.cities[data.cities.length - 1].cityName
+            `${data.cities[data.cities.length - 1].cityName} (${data.cities[
+              data.cities.length - 1
+            ].country
               .split(" ")
               .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-              .join(" ")} has been added to your list!`
+              .join(" ")}) has been added to your list!`
           );
           setError("");
           setCityName("");
@@ -153,7 +157,7 @@ function Header() {
     e.preventDefault();
 
     if (user.token) {
-      handleFetch({ token: user.token, cityName: cityName });
+      handleFetch({ token: user.token, cityName: cityName, country: country });
     } else {
       setError("You must be logged in to add a city");
     }
@@ -185,6 +189,21 @@ function Header() {
     setAnchorEl(null);
   };
 
+  useEffect(() => {
+    // Get the criteria and order from local storage
+    const criteria = localStorage.getItem("sortCriteria");
+    const order = localStorage.getItem("sortOrder");
+
+    // If there's no criteria in local storage, use 'lastAdded' as default
+    if (!criteria) {
+      const event = { target: { checked: true } };
+      handleSort(event, "lastAdded");
+    } else {
+      const event = { target: { checked: true } };
+      handleSort(event, criteria, order);
+    }
+  }, []);
+
   // Handle sort criteria
   const handleSort = (event, criteria, order = null) => {
     if (event.target.checked) {
@@ -196,6 +215,11 @@ function Header() {
         setSelectedSort(criteria);
       }
       setAnchorEl(null);
+      // Store the criteria and order in local storage
+      localStorage.setItem("sortCriteria", criteria);
+      if (order) {
+        localStorage.setItem("sortOrder", order);
+      }
     }
   };
 
