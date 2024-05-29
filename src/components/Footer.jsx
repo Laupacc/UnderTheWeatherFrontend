@@ -11,7 +11,7 @@ function Footer() {
       </Head>
       <div>
         <footer
-          className=" text-slate-200 text-center flex justify-center items-center h-8 w-full bottom-0 rounded-t-lg"
+          className=" text-slate-200 text-center flex justify-center items-center w-full h-8 rounded-t-lg bottom-0"
           style={{
             background:
               "radial-gradient(circle, rgba(28,181,224,1) 0%, rgba(0,0,70,1) 100%)",

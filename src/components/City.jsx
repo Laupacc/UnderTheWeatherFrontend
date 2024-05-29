@@ -385,7 +385,7 @@ function City() {
 
   if (loading) {
     return (
-      <div className="flex flex-col justify-center items-center p-4 mt-14">
+      <div className="flex flex-col justify-center items-center min-h-screen">
         <p className="text-3xl text-sky-900">Loading cities</p>
         <ProgressBar
           visible={true}
@@ -401,7 +401,7 @@ function City() {
 
   if (!user.token) {
     return (
-      <div className="flex flex-col justify-center items-center p-4 mt-14">
+      <div className="flex flex-col justify-center items-center min-h-screen">
         <p className="text-3xl text-sky-900 text-center">
           You are not logged in. Please log in to view your cities.
         </p>
@@ -692,7 +692,7 @@ function City() {
           ))}
         </div>
       ) : (
-        <div className="flex flex-col justify-center items-center p-4 mt-14">
+        <div className="flex flex-col justify-center items-center min-h-screen">
           <p className="text-3xl text-sky-900 text-center">
             You have no cities added yet.
           </p>
