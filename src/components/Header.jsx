@@ -1,4 +1,4 @@
-import React from "react";
+import React, { forwardRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useState, useCallback, useEffect, useMemo, useRef } from "react";
 import Login from "./Login.jsx";
@@ -345,7 +345,7 @@ function Header() {
     <>
       {/* Header background and title */}
       <div
-        className="px-4 py-2 rounded-2xl sticky top-0 flex flex-col justify-center items-center"
+        className="px-4 py-2 rounded-2xl sticky top-0 flex flex-col justify-center items-center "
         style={{
           background:
             "radial-gradient(circle, rgba(28,181,224,1) 0%, rgba(0,0,70,1) 100%)",
@@ -835,7 +835,7 @@ function Header() {
       </div>
 
       {/* Alerts */}
-      <div className="sticky top-56 sm:top-20 bg-white">
+      <div className="sticky top-52 sm:top-36 bg-white">
         {success && <Alert severity="success">{success}</Alert>}
         {error && <Alert severity="warning">{error}</Alert>}
         {fetchError && <Alert severity="error">{fetchError}</Alert>}

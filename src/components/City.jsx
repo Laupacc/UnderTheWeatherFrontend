@@ -460,26 +460,15 @@ function City() {
     );
   }
 
-  // If the user is not logged in
-  // if (!user.token) {
-  //   return (
-  //     <div className="flex flex-col justify-center items-center min-h-screen">
-  //       <p className="text-3xl text-sky-900 text-center">
-  //         You are not logged in. Please log in to view your cities.
-  //       </p>
-  //     </div>
-  //   );
-  // }
-
   return (
     <>
       {cityDeleted && (
-        <Alert severity="success" className="sticky top-56 sm:top-20 bg-white">
+        <Alert severity="success" className="sticky top-52 sm:top-36 bg-white">
           {cityDeleted}
         </Alert>
       )}
       {typeof sortedCities !== "undefined" && sortedCities.length !== 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 gap-3 p-3 items-start min-h-screen">
+        <div className="grid grid-cols-1 xs:grid-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 p-3 items-start min-h-screen">
           {sortedCities.map((city) => (
             <div
               key={`${city.latitude}-${city.longitude}`}
@@ -677,7 +666,7 @@ function City() {
                           gutterBottom
                           className="text-slate-600"
                         >
-                          {city.rain} mm
+                          {city.rain || 0} mm
                         </Typography>
                       </div>
                       <div className="flex flex-col justify-center items-center my-2 mx-4">
@@ -692,7 +681,7 @@ function City() {
                           gutterBottom
                           className="text-slate-600"
                         >
-                          {city.snow} mm
+                          {city.snow || 0} mm
                         </Typography>
                       </div>
                     </div>
@@ -752,10 +741,10 @@ function City() {
           ))}
         </div>
       ) : (
-        <div className="flex flex-col justify-center items-center min-h-screen">
-          <ImArrowUp className="animate-bounce mt-4 text-sky-900 h-12 w-12" />
+        <div className="flex flex-col justify-center items-center h-screen">
+          <ImArrowUp className="animate-bounce text-sky-900 h-12 w-12" />
           <p className="text-3xl text-sky-900 text-center">
-            Add a city to view the weather
+            Add a city to view the weather or log in to see your saved cities
           </p>
         </div>
       )}
@@ -785,6 +774,7 @@ function City() {
             flexDirection: "column",
             justifyContent: "center",
             alignItems: "center",
+            border: "1px solid #0E2F44",
           }}
         >
           <div className="w-full overflow-auto">
