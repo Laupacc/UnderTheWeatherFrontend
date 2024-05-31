@@ -460,6 +460,17 @@ function City() {
     );
   }
 
+  if (sortedCities.length === 0 && !user.token) {
+    return (
+      <div className="flex flex-col justify-center items-center h-screen">
+        <ImArrowUp className="animate-bounce text-sky-900 h-12 w-12" />
+        <p className="text-3xl text-sky-900 text-center">
+          Add a city to view the weather forecast or log in to save your cities
+        </p>
+      </div>
+    );
+  }
+
   return (
     <>
       {cityDeleted && (
@@ -744,7 +755,7 @@ function City() {
         <div className="flex flex-col justify-center items-center h-screen">
           <ImArrowUp className="animate-bounce text-sky-900 h-12 w-12" />
           <p className="text-3xl text-sky-900 text-center">
-            Add a city to view the weather or log in to see your saved cities
+            Add a city to view the weather forecast
           </p>
         </div>
       )}
