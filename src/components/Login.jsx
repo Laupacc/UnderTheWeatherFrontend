@@ -64,7 +64,7 @@ function Login() {
       .then((response) => response.json())
       .then((data) => {
         if (data.result) {
-          console.log("Success:", data);
+          console.log("Successful registration");
           dispatch(login({ username: regUsername, token: data.token }));
           toast("👏🏼 Registered successfully");
           setRegUsername("");
@@ -95,7 +95,7 @@ function Login() {
       .then((response) => response.json())
       .then((data) => {
         if (data.result) {
-          console.log("Success:", data);
+          console.log("Successful Login");
           dispatch(login({ username: loginUsername, token: data.token }));
           toast("👏🏼 Logged in successfully");
           setLoginUsername("");

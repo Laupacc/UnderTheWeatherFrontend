@@ -192,7 +192,6 @@ function City() {
 
   // Delete city from the user's list
   const deleteCityFromUser = async (cityName) => {
-    console.log("City Name:", cityName);
     if (user.token) {
       try {
         const response = await fetch(
