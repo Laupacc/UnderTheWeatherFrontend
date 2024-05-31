@@ -2,19 +2,26 @@ import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useState, useCallback, useEffect, useMemo, useRef } from "react";
 import Login from "./Login.jsx";
+// Reducer actions
 import {
   addCity,
   setUnitTemp,
   setSortCriteria,
   setSortOrder,
+  updateCities,
 } from "../reducers/city.js";
+// MUI components
 import Alert from "@mui/material/Alert";
 import { Switch } from "@headlessui/react";
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
 import Paper from "@mui/material/Paper";
-import debounce from "lodash.debounce";
 import { Popover } from "@mui/material";
+import Checkbox from "@mui/material/Checkbox";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import FormGroup from "@mui/material/FormGroup";
+import debounce from "lodash.debounce";
+// Icons
 import { GiWindsock } from "react-icons/gi";
 import { IoCalendarNumberOutline } from "react-icons/io5";
 import {
@@ -29,10 +36,6 @@ import {
 } from "react-icons/fa6";
 import { WiHumidity } from "react-icons/wi";
 import { BsCloudsFill } from "react-icons/bs";
-
-import Checkbox from "@mui/material/Checkbox";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import FormGroup from "@mui/material/FormGroup";
 
 function Header() {
   const dispatch = useDispatch();
@@ -116,62 +119,175 @@ function Header() {
   }, []);
 
   // Fetch API to add city
-  const handleFetch = (body) => {
-    fetch("https://under-the-weather-backend.vercel.app/weather/addCity", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(body),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.result) {
-          dispatch(addCity(data.cities));
-          console.log(data.cities);
-          setSuccess(
-            `${data.cities[data.cities.length - 1].cityName} (${data.cities[
-              data.cities.length - 1
-            ].country
-              .split(" ")
-              .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-              .join(" ")}) has been added to your list!`
-          );
-          setError("");
-        } else {
-          setError("City not found or already in your list");
+  // const handleFetch = (body) => {
+  //   fetch("https://under-the-weather-backend.vercel.app/weather/addCity", {
+  //     method: "POST",
+  //     headers: {
+  //       "Content-Type": "application/json",
+  //     },
+  //     body: JSON.stringify(body),
+  //   })
+  //     .then((response) => response.json())
+  //     .then((data) => {
+  //       if (data.result) {
+  //         dispatch(addCity(data.cities));
+  //         console.log(data.cities);
+  //         setSuccess(
+  //           `${data.cities[data.cities.length - 1].cityName} (${data.cities[
+  //             data.cities.length - 1
+  //           ].country
+  //             .split(" ")
+  //             .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+  //             .join(" ")}) has been added to your list!`
+  //         );
+  //         setError("");
+  //       } else {
+  //         setError("City not found or already in your list");
+  //         setSuccess("");
+  //         setFetchError("");
+  //       }
+  //     })
+  //     .catch((error) => {
+  //       setFetchError("An error occurred while adding the city");
+  //       setSuccess("");
+  //       setError("");
+  //     });
+  // };
+
+  // Handle add city submission
+  // const handleSubmit = (e) => {
+  //   e.preventDefault();
+
+  //   if (user.token) {
+  //     handleFetch({ token: user.token, cityName: cityName, country: country });
+  //     // Re-fetch options to clear the autocomplete
+  //     setAutocompleteKey((prevKey) => !prevKey);
+  //   } else {
+  //     setError("You must be logged in to add a city");
+  //   }
+  // };
+
+  // // Handle add location submission
+  // const handleLocation = (e) => {
+  //   e.preventDefault();
+
+  //   if (user.token) {
+  //     handleFetch({ token: user.token, lat: lat, lon: lon });
+  //   } else {
+  //     setError("You must be logged in to add a city");
+  //   }
+  // };
+
+  // Fetch API to add city
+  const handleFetch = (body, isLocal = false) => {
+    const { cityName, country, lat, lon } = body;
+
+    let query =
+      cityName && country
+        ? `?cityName=${cityName}&country=${country}`
+        : `?lat=${lat}&lon=${lon}`;
+
+    if (isLocal || !user.token) {
+      fetch(
+        `https://under-the-weather-backend.vercel.app/weather/getLocal${query}`
+      )
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.result) {
+            const weather = data.weather;
+            const newCity = {
+              cityName: weather.name,
+              country: weather.sys.country,
+              main: weather.weather[0].main,
+              description: weather.weather[0].description,
+              icon: weather.weather[0].icon,
+              temp: weather.main.temp,
+              feels_like: weather.main.feels_like,
+              tempMin: weather.main.temp_min,
+              tempMax: weather.main.temp_max,
+              humidity: weather.main.humidity,
+              wind: weather.wind.speed,
+              clouds: weather.clouds.all,
+              sunrise: weather.sys.sunrise,
+              sunset: weather.sys.sunset,
+              latitude: weather.coord.lat,
+              longitude: weather.coord.lon,
+              timezone: weather.timezone,
+            };
+
+            let localCities = JSON.parse(localStorage.getItem("cities")) || [];
+            localCities.push(newCity);
+            localStorage.setItem("cities", JSON.stringify(localCities));
+
+            dispatch(updateCities(localCities));
+            setSuccess(
+              `${newCity.cityName} (${newCity.country}) has been added to your list!`
+            );
+            setError("");
+            setFetchError("");
+          } else {
+            setError("Error fetching city data");
+            setSuccess("");
+            setFetchError("");
+          }
+        })
+        .catch((error) => {
+          setFetchError("An error occurred while fetching the city data");
           setSuccess("");
-          setFetchError("");
-        }
+          setError("");
+        });
+    } else if (user.token) {
+      fetch("https://under-the-weather-backend.vercel.app/weather/addCity", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${user.token}`,
+        },
+        body: JSON.stringify(body),
       })
-      .catch((error) => {
-        setFetchError("An error occurred while adding the city");
-        setSuccess("");
-        setError("");
-      });
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.result) {
+            dispatch(addCity(data.cities));
+            const lastCity = data.cities[data.cities.length - 1];
+            setSuccess(
+              `${lastCity.cityName} (${lastCity.country}) has been added to your list!`
+            );
+            setError("");
+          } else {
+            setError("City not found or already in your list");
+            setSuccess("");
+            setFetchError("");
+          }
+        })
+        .catch((error) => {
+          setFetchError("An error occurred while adding the city");
+          setSuccess("");
+          setError("");
+        });
+    }
   };
 
-  // Handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
 
     if (user.token) {
       handleFetch({ token: user.token, cityName: cityName, country: country });
-      // Re-fetch options to clear the autocomplete
       setAutocompleteKey((prevKey) => !prevKey);
     } else {
-      setError("You must be logged in to add a city");
+      handleFetch({ cityName: cityName, country: country }, true);
+      setAutocompleteKey((prevKey) => !prevKey);
     }
   };
 
-  // Handle location submission
+  // Handle add location submission
   const handleLocation = (e) => {
     e.preventDefault();
 
     if (user.token) {
       handleFetch({ token: user.token, lat: lat, lon: lon });
     } else {
-      setError("You must be logged in to add a city");
+      handleFetch({ lat: lat, lon: lon }, true);
     }
   };
 
@@ -182,6 +298,7 @@ function Header() {
     dispatch(setUnitTemp(newUnit));
   };
 
+  // Handle sort popover
   const handlePopoverOpen = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -190,8 +307,8 @@ function Header() {
     setAnchorEl(null);
   };
 
+  // Set the sort criteria and order from local storage
   useEffect(() => {
-    // Get the criteria and order from local storage
     const criteria = localStorage.getItem("sortCriteria");
     const order = localStorage.getItem("sortOrder");
 
@@ -267,14 +384,6 @@ function Header() {
             onSubmit={handleSubmit}
             className="mb-2 flex justify-center items-center"
           >
-            {/* <input
-              className="text-black px-4 sm:px-8 rounded mr-4 ml-4"
-              type="text"
-              value={cityName}
-              onChange={(e) => setCityName(e.target.value)}
-              placeholder="Enter a city name"
-              required
-            /> */}
             <Autocomplete
               key={autocompleteKey ? "reset" : "normal"}
               sx={{

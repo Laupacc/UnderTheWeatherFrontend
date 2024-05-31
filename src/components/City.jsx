@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { removeCity } from "../reducers/city.js";
+import { updateCities } from "../reducers/city.js";
 import Box from "@mui/material/Box";
 import { FaCirclePlus, FaCircleMinus } from "react-icons/fa6";
 import Typography from "@mui/material/Typography";
@@ -10,6 +10,7 @@ import ReactCountryFlag from "react-country-flag";
 import { useMemo } from "react";
 import moment from "moment-timezone";
 import { ProgressBar } from "react-loader-spinner";
+import { ImArrowUp } from "react-icons/im";
 
 function City() {
   const dispatch = useDispatch();
@@ -38,48 +39,119 @@ function City() {
   }, [cityDeleted]);
 
   // Fetch updated city data
+  // useEffect(() => {
+  //   const fetchUpdatedCities = async () => {
+  //     try {
+  //       // Trigger the update of all cities' weather data
+  //       const updateResponse = await fetch(
+  //         `https://under-the-weather-backend.vercel.app/weather/updateUserCities?token=${user.token}`
+  //       );
+
+  //       const updateData = await updateResponse.json();
+  //       console.log("Update Response:", updateData);
+  //       if (!updateData.result) {
+  //         console.error("Error updating cities:", updateData.error);
+  //         return;
+  //       }
+
+  //       // Fetch the updated city data
+  //       const response = await fetch(
+  //         `https://under-the-weather-backend.vercel.app/weather/userCities?token=${user.token}`
+  //       );
+
+  //       const data = await response.json();
+  //       console.log("Weather Data:", data);
+
+  //       if (data.cities) {
+  //         const formattedCities = data.cities.map((city) => {
+  //           return {
+  //             ...city,
+  //             sunrise: moment
+  //               .unix(city.sunrise)
+  //               .utcOffset(city.timezone / 60)
+  //               .format("HH:mm"),
+  //             sunset: moment
+  //               .unix(city.sunset)
+  //               .utcOffset(city.timezone / 60)
+  //               .format("HH:mm"),
+  //           };
+  //         });
+  //         setCityNames(formattedCities.reverse());
+  //       }
+  //     } catch (error) {
+  //       console.error("Error fetching cities:", error);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+
+  //   fetchUpdatedCities();
+  // }, [cities, user.token]);
+
+  // Fetch updated city data
   useEffect(() => {
     const fetchUpdatedCities = async () => {
-      try {
-        // Trigger the update of all cities' weather data
-        const updateResponse = await fetch(
-          `https://under-the-weather-backend.vercel.app/weather/updateUserCities?token=${user.token}`
-        );
+      if (user.token) {
+        // localStorage.removeItem("cities");
+        try {
+          // Trigger the update of all cities' weather data
+          const updateResponse = await fetch(
+            `https://under-the-weather-backend.vercel.app/weather/updateUserCities?token=${user.token}`
+          );
 
-        const updateData = await updateResponse.json();
-        console.log("Update Response:", updateData);
-        if (!updateData.result) {
-          console.error("Error updating cities:", updateData.error);
-          return;
+          const updateData = await updateResponse.json();
+          console.log("Update Response:", updateData);
+          if (!updateData.result) {
+            console.error("Error updating cities:", updateData.error);
+            return;
+          }
+
+          // Fetch the updated city data
+          const response = await fetch(
+            `https://under-the-weather-backend.vercel.app/weather/userCities?token=${user.token}`
+          );
+
+          const data = await response.json();
+          console.log("Weather Data:", data);
+
+          if (data.cities) {
+            const formattedCities = data.cities.map((city) => {
+              return {
+                ...city,
+                sunrise: moment
+                  .unix(city.sunrise)
+                  .utcOffset(city.timezone / 60)
+                  .format("HH:mm"),
+                sunset: moment
+                  .unix(city.sunset)
+                  .utcOffset(city.timezone / 60)
+                  .format("HH:mm"),
+              };
+            });
+            setCityNames(formattedCities.reverse());
+          }
+        } catch (error) {
+          console.error("Error fetching cities:", error);
+        } finally {
+          setLoading(false);
         }
-
-        // Fetch the updated city data
-        const response = await fetch(
-          `https://under-the-weather-backend.vercel.app/weather/userCities?token=${user.token}`
-        );
-
-        const data = await response.json();
-        console.log("Weather Data:", data);
-
-        if (data.cities) {
-          const formattedCities = data.cities.map((city) => {
-            return {
-              ...city,
-              sunrise: moment
-                .unix(city.sunrise)
-                .utcOffset(city.timezone / 60)
-                .format("HH:mm"),
-              sunset: moment
-                .unix(city.sunset)
-                .utcOffset(city.timezone / 60)
-                .format("HH:mm"),
-            };
-          });
-          setCityNames(formattedCities.reverse());
-        }
-      } catch (error) {
-        console.error("Error fetching cities:", error);
-      } finally {
+      } else if (!user.token) {
+        // User is not authenticated, fetch cities from local storage
+        const localCities = JSON.parse(localStorage.getItem("cities")) || [];
+        const formattedCities = localCities.map((city) => {
+          return {
+            ...city,
+            sunrise: moment
+              .unix(city.sunrise)
+              .utcOffset(city.timezone / 60)
+              .format("HH:mm"),
+            sunset: moment
+              .unix(city.sunset)
+              .utcOffset(city.timezone / 60)
+              .format("HH:mm"),
+          };
+        });
+        setCityNames(formattedCities);
         setLoading(false);
       }
     };
@@ -87,23 +159,24 @@ function City() {
     fetchUpdatedCities();
   }, [cities, user.token]);
 
-  // Delete city from the backend
-  // const deleteCity = async (cityName) => {
+  // Delete city from the user's list
+  // const deleteCityFromUser = async (cityName) => {
+  //   console.log("City Name:", cityName);
   //   try {
-  //     if (!cityName) {
-  //       throw new Error("City name is undefined or null");
-  //     }
   //     const response = await fetch(
-  //       `https://under-the-weather-backend.vercel.app/weather/${cityName}`,
+  //       "https://under-the-weather-backend.vercel.app/deleteCity",
   //       {
   //         method: "DELETE",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //         },
+  //         body: JSON.stringify({ token: user.token, cityName }),
   //       }
   //     );
   //     const data = await response.json();
-  //     console.log(data);
+  //     console.log("Delete City Response:", data);
   //     if (data.result) {
-  //       dispatch(removeCity(cityName));
-  //       setCityNames(cityNames.filter((city) => city.cityName !== cityName));
+  //       setCityNames(data.cities);
   //       setCityDeleted(
   //         `${cityName
   //           .split(" ")
@@ -113,39 +186,71 @@ function City() {
   //     }
   //   } catch (error) {
   //     setCityDeleted("");
-  //     console.error("Error deleting city:", error);
+  //     console.error("Error deleting city from user's list:", error);
   //   }
   // };
 
   // Delete city from the user's list
   const deleteCityFromUser = async (cityName) => {
     console.log("City Name:", cityName);
-    try {
-      const response = await fetch(
-        "https://under-the-weather-backend.vercel.app/deleteCity",
-        {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ token: user.token, cityName }),
-        }
-      );
-      const data = await response.json();
-      console.log("Delete City Response:", data);
-      if (data.result) {
-        setCityNames(data.cities);
-        setCityDeleted(
-          `${cityName
-            .split(" ")
-            .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-            .join(" ")} was deleted successfully`
+    if (user.token) {
+      try {
+        const response = await fetch(
+          "https://under-the-weather-backend.vercel.app/deleteCity",
+          {
+            method: "DELETE",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ token: user.token, cityName }),
+          }
         );
+        const data = await response.json();
+        console.log("Delete City Response:", data);
+        if (data.result) {
+          setCityNames(data.cities);
+          setCityDeleted(
+            `${data.cityName
+              .split(" ")
+              .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+              .join(" ")} (${data.country}) was deleted successfully`
+          );
+        }
+      } catch (error) {
+        setCityDeleted("");
+        console.error("Error deleting city from user's list:", error);
       }
-    } catch (error) {
-      setCityDeleted("");
-      console.error("Error deleting city from user's list:", error);
+    } else if (!user.token) {
+      // If the user is not logged in, delete the city from local storage
+      const country = deleteCityFromLocalStorage(cityName);
+      deleteCityFromLocalStorage(cityName);
+      setCityDeleted(
+        `${cityName
+          .split(" ")
+          .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(" ")} (${country}) was deleted successfully`
+      );
+      console.log("City Deleted:", cityName);
     }
+  };
+
+  // Function to delete city from local storage
+  const deleteCityFromLocalStorage = (cityName) => {
+    const localCities = JSON.parse(localStorage.getItem("cities")) || [];
+    const cityIndex = localCities.findIndex(
+      (city) => city.cityName.toLowerCase() === cityName.toLowerCase()
+    );
+
+    if (cityIndex !== -1) {
+      const country = localCities[cityIndex].country;
+      localCities.splice(cityIndex, 1);
+      localStorage.setItem("cities", JSON.stringify(localCities));
+
+      dispatch(updateCities(localCities));
+
+      return country;
+    }
+    return null;
   };
 
   // Get forecast data for a city
@@ -254,135 +359,91 @@ function City() {
     setBoxVisible(boxVisible === cityName ? null : cityName);
   };
 
-  const getBackgroundImage = (icon) => {
-    switch (icon) {
-      case "01d": // clear sky day
-        return "backgrounds/01d.jpg";
-      case "01n": // clear sky night
-        return "backgrounds/01n.jpg";
-      case "02d": // few clouds day
-        return "backgrounds/02d.jpg";
-      case "02n": // few clouds night
-        return "backgrounds/02n.jpg";
-      case "03d": // scattered clouds day
-        return "backgrounds/03d.jpg";
-      case "03n": // scattered clouds night
-        return "backgrounds/03n.jpg";
-      case "04d": // broken clouds day
-        return "backgrounds/04d.jpg";
-      case "04n": // broken clouds night
-        return "backgrounds/04n.jpg";
-      case "09d": // shower rain day
-        return "backgrounds/09d.jpg";
-      case "09n": // shower rain night
-        return "backgrounds/09n.jpg";
-      case "10d": // rain day
-        return "backgrounds/10d.jpg";
-      case "10n": // rain night
-        return "backgrounds/10n.jpg";
-      case "11d": // thunderstorm day
-        return "backgrounds/11d.jpg";
-      case "11n": // thunderstorm night
-        return "backgrounds/11n.jpg";
-      case "13d": // snow day
-        return "backgrounds/13d.jpg";
-      case "13n": // snow night
-        return "backgrounds/13n.jpg";
-      case "50d": // mist day
-        return "backgrounds/50d.jpg";
-      case "50n": // mist night
-        return "backgrounds/50n.jpg";
-      default:
-        return "backgrounds/02d.jpg";
-    }
+  // Background images for different weather conditions
+  const backgroundImages = {
+    "01d": "backgrounds/01d.jpg",
+    "01n": "backgrounds/01n.jpg",
+    "02d": "backgrounds/02d.jpg",
+    "02n": "backgrounds/02n.jpg",
+    "03d": "backgrounds/03d.jpg",
+    "03n": "backgrounds/03n.jpg",
+    "04d": "backgrounds/04d.jpg",
+    "04n": "backgrounds/04n.jpg",
+    "09d": "backgrounds/09d.jpg",
+    "09n": "backgrounds/09n.jpg",
+    "10d": "backgrounds/10d.jpg",
+    "10n": "backgrounds/10n.jpg",
+    "11d": "backgrounds/11d.jpg",
+    "11n": "backgrounds/11n.jpg",
+    "13d": "backgrounds/13d.jpg",
+    "13n": "backgrounds/13n.jpg",
+    "50d": "backgrounds/50d.jpg",
+    "50n": "backgrounds/50n.jpg",
   };
+  const getBackgroundImage = (icon) =>
+    backgroundImages[icon] || "backgrounds/02d.jpg";
 
-  const getTextColor = (icon) => {
-    switch (icon) {
-      case "01d": // clear sky day
-        return "text-slate-100";
-      case "01n": // clear sky night
-        return "text-slate-100";
-      case "02d": // few clouds day
-        return "text-slate-100";
-      case "02n": // few clouds night
-        return "text-slate-100";
-      case "03d": // scattered clouds day
-        return "text-slate-100";
-      case "03n": // scattered clouds night
-        return "text-slate-100";
-      case "04d": // broken clouds day
-        return "text-slate-800";
-      case "04n": // broken clouds night
-        return "text-slate-100";
-      case "09d": // shower rain day
-        return "text-slate-100";
-      case "09n": // shower rain night
-        return "text-slate-100";
-      case "10d": // rain day
-        return "text-slate-100";
-      case "10n": // rain night
-        return "text-slate-100";
-      case "11d": // thunderstorm day
-        return "text-slate-100";
-      case "11n": // thunderstorm night
-        return "text-slate-100";
-      case "13d": // snow day
-        return "text-slate-800";
-      case "13n": // snow night
-        return "text-slate-100";
-      case "50d": // mist day
-        return "text-slate-800";
-      case "50n": // mist night
-        return "text-slate-100";
-      default:
-        return "text-slate-100";
-    }
+  // Text colors for different weather conditions
+  const textColors = {
+    "01d": "text-slate-100",
+    "01n": "text-slate-100",
+    "02d": "text-slate-100",
+    "02n": "text-slate-100",
+    "03d": "text-slate-100",
+    "03n": "text-slate-100",
+    "04d": "text-slate-800",
+    "04n": "text-slate-100",
+    "09d": "text-slate-100",
+    "09n": "text-slate-100",
+    "10d": "text-slate-100",
+    "10n": "text-slate-100",
+    "11d": "text-slate-100",
+    "11n": "text-slate-100",
+    "13d": "text-slate-800",
+    "13n": "text-slate-100",
+    "50d": "text-slate-800",
+    "50n": "text-slate-100",
+  };
+  const getTextColor = (icon) => textColors[icon] || "text-slate-100";
+
+  // Sort order for different criteria
+  const sortFunctions = {
+    lastAdded: (cities) => cities,
+    firstAdded: (cities) => cities.reverse(),
+    temperature: (a, b, order) =>
+      order === "asc" ? a.temp - b.temp : b.temp - a.temp,
+    alphabetical: (a, b, order) =>
+      order === "asc"
+        ? a.cityName.localeCompare(b.cityName)
+        : b.cityName.localeCompare(a.cityName),
+    humidity: (a, b, order) =>
+      order === "asc" ? a.humidity - b.humidity : b.humidity - a.humidity,
+    wind: (a, b, order) =>
+      order === "asc" ? a.wind - b.wind : b.wind - a.wind,
+    clouds: (a, b, order) =>
+      order === "asc" ? a.clouds - b.clouds : b.clouds - a.clouds,
+    rain: (a, b, order) =>
+      order === "asc" ? a.rain - b.rain : b.rain - a.rain,
+    snow: (a, b, order) =>
+      order === "asc" ? a.snow - b.snow : b.snow - a.snow,
   };
 
   const sortedCities = useMemo(() => {
-    // Create a copy of cityNames
     const cities = [...cityNames];
 
-    if (sortCriteria === "lastAdded") {
-      return cities;
-    } else if (sortCriteria === "firstAdded") {
-      return cities.reverse();
-    } else if (sortCriteria === "temperature") {
-      return cities.sort((a, b) =>
-        sortOrder === "asc" ? a.temp - b.temp : b.temp - a.temp
-      );
-    } else if (sortCriteria === "alphabetical") {
-      return cities.sort((a, b) =>
-        sortOrder === "asc"
-          ? a.cityName.localeCompare(b.cityName)
-          : b.cityName.localeCompare(a.cityName)
-      );
-    } else if (sortCriteria === "humidity") {
-      return cities.sort((a, b) =>
-        sortOrder === "asc" ? a.humidity - b.humidity : b.humidity - a.humidity
-      );
-    } else if (sortCriteria === "wind") {
-      return cities.sort((a, b) =>
-        sortOrder === "asc" ? a.wind - b.wind : b.wind - a.wind
-      );
-    } else if (sortCriteria === "clouds") {
-      return cities.sort((a, b) =>
-        sortOrder === "asc" ? a.clouds - b.clouds : b.clouds - a.clouds
-      );
-    } else if (sortCriteria === "rain") {
-      return cities.sort((a, b) =>
-        sortOrder === "asc" ? a.rain - b.rain : b.rain - a.rain
-      );
-    } else if (sortCriteria === "snow") {
-      return cities.sort((a, b) =>
-        sortOrder === "asc" ? a.snow - b.snow : b.snow - a.snow
-      );
+    if (sortCriteria in sortFunctions) {
+      const sortFunction = sortFunctions[sortCriteria];
+      if (sortCriteria === "lastAdded" || sortCriteria === "firstAdded") {
+        return sortFunction(cities);
+      } else {
+        return cities.sort((a, b) => sortFunction(a, b, sortOrder));
+      }
     }
-    // If sortCriteria is neither "temperature" nor "alphabetical", return the cities as is
+    // If sortCriteria is not found, return the cities as is
     return cities;
   }, [cityNames, sortCriteria, sortOrder]);
 
+  // Loading screen
   if (loading) {
     return (
       <div className="flex flex-col justify-center items-center min-h-screen">
@@ -399,15 +460,16 @@ function City() {
     );
   }
 
-  if (!user.token) {
-    return (
-      <div className="flex flex-col justify-center items-center min-h-screen">
-        <p className="text-3xl text-sky-900 text-center">
-          You are not logged in. Please log in to view your cities.
-        </p>
-      </div>
-    );
-  }
+  // If the user is not logged in
+  // if (!user.token) {
+  //   return (
+  //     <div className="flex flex-col justify-center items-center min-h-screen">
+  //       <p className="text-3xl text-sky-900 text-center">
+  //         You are not logged in. Please log in to view your cities.
+  //       </p>
+  //     </div>
+  //   );
+  // }
 
   return (
     <>
@@ -416,10 +478,8 @@ function City() {
           {cityDeleted}
         </Alert>
       )}
-      {typeof sortedCities !== "undefined" &&
-      sortedCities.length !== 0 &&
-      user.token ? (
-        <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 gap-3 p-3 items-start">
+      {typeof sortedCities !== "undefined" && sortedCities.length !== 0 ? (
+        <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 gap-3 p-3 items-start min-h-screen">
           {sortedCities.map((city) => (
             <div
               key={`${city.latitude}-${city.longitude}`}
@@ -452,7 +512,7 @@ function City() {
                                 word.charAt(0).toUpperCase() + word.slice(1)
                             )
                             .join(" ")
-                        : "Cities Not Available"}
+                        : "City Not Available"}
                       {/* Country Flag */}
                       <ReactCountryFlag
                         className="ml-2"
@@ -693,8 +753,9 @@ function City() {
         </div>
       ) : (
         <div className="flex flex-col justify-center items-center min-h-screen">
+          <ImArrowUp className="animate-bounce mt-4 text-sky-900 h-12 w-12" />
           <p className="text-3xl text-sky-900 text-center">
-            You have no cities added yet.
+            Add a city to view the weather
           </p>
         </div>
       )}

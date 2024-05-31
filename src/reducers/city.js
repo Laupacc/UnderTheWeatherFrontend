@@ -17,6 +17,9 @@ const citySlice = createSlice({
         removeCity: (state, action) => {
             state.city = state.city.filter((city) => city !== action.payload);
         },
+        updateCities: (state, action) => {
+            state.city = action.payload;
+        },
         setUnitTemp: (state, action) => {
             state.unit = action.payload;
         },
@@ -29,5 +32,5 @@ const citySlice = createSlice({
     },
 });
 
-export const { addCity, removeCity, setUnitTemp, setSortCriteria, setSortOrder } = citySlice.actions;
+export const { addCity, removeCity, setUnitTemp, updateCities, setSortCriteria, setSortOrder } = citySlice.actions;
 export default citySlice.reducer;

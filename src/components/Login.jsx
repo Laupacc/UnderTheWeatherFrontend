@@ -30,6 +30,7 @@ function Login() {
   const [isRegisterVisible, setIsRegisterVisible] = useState(false);
   const [isLoginVisible, setIsLoginVisible] = useState(true);
 
+  // Password visibility state
   const [isPasswordHidden, setIsPasswordHidden] = useState(true);
 
   const togglePasswordVisibility = () => {
