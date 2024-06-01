@@ -119,66 +119,6 @@ function Header() {
   }, []);
 
   // Fetch API to add city
-  // const handleFetch = (body) => {
-  //   fetch("https://under-the-weather-backend.vercel.app/weather/addCity", {
-  //     method: "POST",
-  //     headers: {
-  //       "Content-Type": "application/json",
-  //     },
-  //     body: JSON.stringify(body),
-  //   })
-  //     .then((response) => response.json())
-  //     .then((data) => {
-  //       if (data.result) {
-  //         dispatch(addCity(data.cities));
-  //         console.log(data.cities);
-  //         setSuccess(
-  //           `${data.cities[data.cities.length - 1].cityName} (${data.cities[
-  //             data.cities.length - 1
-  //           ].country
-  //             .split(" ")
-  //             .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-  //             .join(" ")}) has been added to your list!`
-  //         );
-  //         setError("");
-  //       } else {
-  //         setError("City not found or already in your list");
-  //         setSuccess("");
-  //         setFetchError("");
-  //       }
-  //     })
-  //     .catch((error) => {
-  //       setFetchError("An error occurred while adding the city");
-  //       setSuccess("");
-  //       setError("");
-  //     });
-  // };
-
-  // Handle add city submission
-  // const handleSubmit = (e) => {
-  //   e.preventDefault();
-
-  //   if (user.token) {
-  //     handleFetch({ token: user.token, cityName: cityName, country: country });
-  //     // Re-fetch options to clear the autocomplete
-  //     setAutocompleteKey((prevKey) => !prevKey);
-  //   } else {
-  //     setError("You must be logged in to add a city");
-  //   }
-  // };
-
-  // // Handle add location submission
-  // const handleLocation = (e) => {
-  //   e.preventDefault();
-
-  //   if (user.token) {
-  //     handleFetch({ token: user.token, lat: lat, lon: lon });
-  //   } else {
-  //     setError("You must be logged in to add a city");
-  //   }
-  // };
-
-  // Fetch API to add city
   const handleFetch = (body, isLocal = false) => {
     const { cityName, country, lat, lon } = body;
 
@@ -189,7 +129,7 @@ function Header() {
 
     if (isLocal || !user.token) {
       fetch(
-        `https://under-the-weather-backend.vercel.app/weather/getLocal${query}`
+        `https://under-the-weather-backend.vercel.app/weather/localStorageCities${query}`
       )
         .then((response) => response.json())
         .then((data) => {

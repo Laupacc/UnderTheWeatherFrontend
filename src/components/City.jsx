@@ -39,60 +39,9 @@ function City() {
   }, [cityDeleted]);
 
   // Fetch updated city data
-  // useEffect(() => {
-  //   const fetchUpdatedCities = async () => {
-  //     try {
-  //       // Trigger the update of all cities' weather data
-  //       const updateResponse = await fetch(
-  //         `https://under-the-weather-backend.vercel.app/weather/updateUserCities?token=${user.token}`
-  //       );
-
-  //       const updateData = await updateResponse.json();
-  //       console.log("Update Response:", updateData);
-  //       if (!updateData.result) {
-  //         console.error("Error updating cities:", updateData.error);
-  //         return;
-  //       }
-
-  //       // Fetch the updated city data
-  //       const response = await fetch(
-  //         `https://under-the-weather-backend.vercel.app/weather/userCities?token=${user.token}`
-  //       );
-
-  //       const data = await response.json();
-  //       console.log("Weather Data:", data);
-
-  //       if (data.cities) {
-  //         const formattedCities = data.cities.map((city) => {
-  //           return {
-  //             ...city,
-  //             sunrise: moment
-  //               .unix(city.sunrise)
-  //               .utcOffset(city.timezone / 60)
-  //               .format("HH:mm"),
-  //             sunset: moment
-  //               .unix(city.sunset)
-  //               .utcOffset(city.timezone / 60)
-  //               .format("HH:mm"),
-  //           };
-  //         });
-  //         setCityNames(formattedCities.reverse());
-  //       }
-  //     } catch (error) {
-  //       console.error("Error fetching cities:", error);
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
-
-  //   fetchUpdatedCities();
-  // }, [cities, user.token]);
-
-  // Fetch updated city data
   useEffect(() => {
     const fetchUpdatedCities = async () => {
       if (user.token) {
-        // localStorage.removeItem("cities");
         try {
           // Trigger the update of all cities' weather data
           const updateResponse = await fetch(
@@ -156,42 +105,15 @@ function City() {
       }
     };
 
+    //ca pas sure
+    localStorage.setItem("cities", JSON.stringify(cities));
+
     fetchUpdatedCities();
   }, [cities, user.token]);
 
   // Delete city from the user's list
-  // const deleteCityFromUser = async (cityName) => {
-  //   console.log("City Name:", cityName);
-  //   try {
-  //     const response = await fetch(
-  //       "https://under-the-weather-backend.vercel.app/deleteCity",
-  //       {
-  //         method: "DELETE",
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //         },
-  //         body: JSON.stringify({ token: user.token, cityName }),
-  //       }
-  //     );
-  //     const data = await response.json();
-  //     console.log("Delete City Response:", data);
-  //     if (data.result) {
-  //       setCityNames(data.cities);
-  //       setCityDeleted(
-  //         `${cityName
-  //           .split(" ")
-  //           .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-  //           .join(" ")} was deleted successfully`
-  //       );
-  //     }
-  //   } catch (error) {
-  //     setCityDeleted("");
-  //     console.error("Error deleting city from user's list:", error);
-  //   }
-  // };
-
-  // Delete city from the user's list
   const deleteCityFromUser = async (cityName) => {
+    console.log("City Name:", cityName);
     if (user.token) {
       try {
         const response = await fetch(
