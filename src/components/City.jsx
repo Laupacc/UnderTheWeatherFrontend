@@ -42,7 +42,7 @@ function City() {
   useEffect(() => {
     const fetchUpdatedCities = async () => {
       if (user.token) {
-        localStorage.removeItem("cities");
+        // localStorage.removeItem("cities");
         try {
           // Trigger the update of all cities' weather data
           const updateResponse = await fetch(
@@ -161,23 +161,40 @@ function City() {
       }
     } else if (!user.token) {
       // If the user is not logged in, delete the city from local storage
-      const country = deleteCityFromLocalStorage(cityName);
-      setCityDeleted(
-        `${cityName
-          .split(" ")
-          .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-          .join(" ")} (${country}) was deleted successfully`
+      const city = cities.find(
+        (city) => city.cityName.toLowerCase() === cityName.toLowerCase()
       );
-      console.log("City Deleted:", cityName);
+      const country = city
+        ? deleteCityFromLocalStorage(cityName)
+        : deleteCityFromLocalStorage(cityName);
+      if (country) {
+        setCityDeleted(
+          `${cityName
+            .split(" ")
+            .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(" ")} (${country}) was deleted successfully`
+        );
+        console.log("City Deleted:", cityName);
+      }
     }
   };
 
   // Function to delete city from local storage
-  const deleteCityFromLocalStorage = (cityName) => {
+  const deleteCityFromLocalStorage = (cityName, lat, lon) => {
     const localCities = JSON.parse(localStorage.getItem("cities")) || [];
-    const cityIndex = localCities.findIndex(
-      (city) => city.cityName.toLowerCase() === cityName.toLowerCase()
-    );
+    let cityIndex = -1;
+
+    // If coordinates are provided, find the city by coordinates
+    if (lat && lon) {
+      cityIndex = localCities.findIndex(
+        (city) => city.lat === lat && city.lon === lon
+      );
+    } else {
+      // Otherwise, find the city by name
+      cityIndex = localCities.findIndex(
+        (city) => city.cityName.toLowerCase() === cityName.toLowerCase()
+      );
+    }
 
     if (cityIndex !== -1) {
       const country = localCities[cityIndex].country;
