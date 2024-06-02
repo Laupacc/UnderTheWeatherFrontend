@@ -134,28 +134,24 @@ function Header() {
         .then((response) => response.json())
         .then((data) => {
           if (data.result) {
-            const weather = data.weather;
-            const newCity = {
-              cityName: weather.name,
-              country: weather.sys.country,
-              main: weather.weather[0].main,
-              description: weather.weather[0].description,
-              icon: weather.weather[0].icon,
-              temp: weather.main.temp,
-              feels_like: weather.main.feels_like,
-              tempMin: weather.main.temp_min,
-              tempMax: weather.main.temp_max,
-              humidity: weather.main.humidity,
-              wind: weather.wind.speed,
-              clouds: weather.clouds.all,
-              sunrise: weather.sys.sunrise,
-              sunset: weather.sys.sunset,
-              latitude: weather.coord.lat,
-              longitude: weather.coord.lon,
-              timezone: weather.timezone,
-            };
+            const newCity = data.weather;
 
             let localCities = JSON.parse(localStorage.getItem("cities")) || [];
+            let existingCity = localCities.find(
+              (city) =>
+                city.cityName === newCity.cityName &&
+                city.country === newCity.country
+            );
+
+            if (existingCity) {
+              setError(
+                `${newCity.cityName} (${newCity.country}) already exists in your list!`
+              );
+              setSuccess("");
+              setFetchError("");
+              return;
+            }
+
             localCities.push(newCity);
             localStorage.setItem("cities", JSON.stringify(localCities));
 
@@ -775,7 +771,7 @@ function Header() {
       </div>
 
       {/* Alerts */}
-      <div className="sticky top-52 sm:top-36 bg-white">
+      <div className="fixed w-full">
         {success && <Alert severity="success">{success}</Alert>}
         {error && <Alert severity="warning">{error}</Alert>}
         {fetchError && <Alert severity="error">{fetchError}</Alert>}

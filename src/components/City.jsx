@@ -42,6 +42,7 @@ function City() {
   useEffect(() => {
     const fetchUpdatedCities = async () => {
       if (user.token) {
+        localStorage.removeItem("cities");
         try {
           // Trigger the update of all cities' weather data
           const updateResponse = await fetch(
@@ -87,26 +88,43 @@ function City() {
       } else if (!user.token) {
         // User is not authenticated, fetch cities from local storage
         const localCities = JSON.parse(localStorage.getItem("cities")) || [];
-        const formattedCities = localCities.map((city) => {
-          return {
-            ...city,
-            sunrise: moment
-              .unix(city.sunrise)
-              .utcOffset(city.timezone / 60)
-              .format("HH:mm"),
-            sunset: moment
-              .unix(city.sunset)
-              .utcOffset(city.timezone / 60)
-              .format("HH:mm"),
-          };
-        });
-        setCityNames(formattedCities);
-        setLoading(false);
+
+        if (localCities.length > 0) {
+          try {
+            // Fetch updated data for each city in local storage
+            const updatedCities = await Promise.all(
+              localCities.map(async (city) => {
+                const response = await fetch(
+                  `https://under-the-weather-backend.vercel.app/weather/localStorageCities?cityName=${city.cityName}&country=${city.country}`
+                );
+                const data = await response.json();
+                if (data.result) {
+                  return {
+                    ...data.weather,
+                    sunrise: moment
+                      .unix(data.weather.sunrise)
+                      .utcOffset(data.weather.timezone / 60)
+                      .format("HH:mm"),
+                    sunset: moment
+                      .unix(data.weather.sunset)
+                      .utcOffset(data.weather.timezone / 60)
+                      .format("HH:mm"),
+                  };
+                } else {
+                  throw new Error(data.error);
+                }
+              })
+            );
+
+            setCityNames(updatedCities.reverse());
+          } catch (error) {
+            console.error("Error fetching cities:", error);
+          } finally {
+            setLoading(false);
+          }
+        }
       }
     };
-
-    //ca pas sure
-    localStorage.setItem("cities", JSON.stringify(cities));
 
     fetchUpdatedCities();
   }, [cities, user.token]);
@@ -144,7 +162,6 @@ function City() {
     } else if (!user.token) {
       // If the user is not logged in, delete the city from local storage
       const country = deleteCityFromLocalStorage(cityName);
-      deleteCityFromLocalStorage(cityName);
       setCityDeleted(
         `${cityName
           .split(" ")
@@ -395,7 +412,7 @@ function City() {
   return (
     <>
       {cityDeleted && (
-        <Alert severity="success" className="sticky top-52 sm:top-36 bg-white">
+        <Alert severity="success" className="fixed w-full">
           {cityDeleted}
         </Alert>
       )}
@@ -417,7 +434,7 @@ function City() {
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  <div className="flex mx-2 my-2">
+                  <div className="flex justify-center items-center mx-2 my-2">
                     {/* City Name */}
                     <Typography
                       variant="h4"
