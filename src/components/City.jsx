@@ -159,14 +159,9 @@ function City() {
         setCityDeleted("");
         console.error("Error deleting city from user's list:", error);
       }
-    } else if (!user.token) {
+    } else {
       // If the user is not logged in, delete the city from local storage
-      const city = cities.find(
-        (city) => city.cityName.toLowerCase() === cityName.toLowerCase()
-      );
-      const country = city
-        ? deleteCityFromLocalStorage(cityName)
-        : deleteCityFromLocalStorage(cityName);
+      const country = deleteCityFromLocalStorage(cityName);
       if (country) {
         setCityDeleted(
           `${cityName
@@ -175,26 +170,28 @@ function City() {
             .join(" ")} (${country}) was deleted successfully`
         );
         console.log("City Deleted:", cityName);
+
+        // Update UI if there are no cities left in local storage
+        const localCities = JSON.parse(localStorage.getItem("cities")) || [];
+        if (localCities.length === 0) {
+          setCityNames([]); // Empty the city names array to reflect UI changes
+          setLoading(false);
+        }
+      } else {
+        console.log("City not found for deletion:", cityName);
       }
     }
   };
 
   // Function to delete city from local storage
-  const deleteCityFromLocalStorage = (cityName, lat, lon) => {
+  const deleteCityFromLocalStorage = (cityName) => {
     const localCities = JSON.parse(localStorage.getItem("cities")) || [];
-    let cityIndex = -1;
-
-    // If coordinates are provided, find the city by coordinates
-    if (lat && lon) {
-      cityIndex = localCities.findIndex(
-        (city) => city.lat === lat && city.lon === lon
-      );
-    } else {
-      // Otherwise, find the city by name
-      cityIndex = localCities.findIndex(
-        (city) => city.cityName.toLowerCase() === cityName.toLowerCase()
-      );
-    }
+    let cityIndex = localCities.findIndex(
+      (city) =>
+        city.cityName.toLowerCase() === cityName.toLowerCase() ||
+        cityName.toLowerCase().includes(city.cityName.toLowerCase()) ||
+        city.cityName.toLowerCase().includes(cityName.toLowerCase())
+    );
 
     if (cityIndex !== -1) {
       const country = localCities[cityIndex].country;
