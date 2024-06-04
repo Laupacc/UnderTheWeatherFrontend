@@ -31,6 +31,7 @@ function City() {
   const [boxVisible, setBoxVisible] = useState(null);
   const [dailyForecastBoxVisible, setDailyForecastBoxVisible] = useState(null);
   const [dailyForecast, setDailyForecast] = useState([]);
+  const [currentDayHourlyForecast, setCurrentDayHourlyForecast] = useState([]);
 
   // Remove the city deleted alert after 3 seconds
   useEffect(() => {
@@ -128,6 +129,41 @@ function City() {
 
     fetchUpdatedCities();
   }, [cities, user.token]);
+
+  // Display the hourly forecast for the current day
+  useEffect(() => {
+    const fetchNext24HoursForecast = async (cityName) => {
+      try {
+        const response = await fetch(
+          `https://under-the-weather-backend.vercel.app/weather/forecast/${cityName}`
+        );
+        const data = await response.json();
+        if (data.weather.list) {
+          const cityTimezoneOffset = data.weather.city.timezone / 60;
+          const currentDateTime = moment.utc().utcOffset(cityTimezoneOffset);
+          const next24HoursForecast = data.weather.list.filter((forecast) => {
+            const forecastDateTime = moment
+              .utc(forecast.dt_txt)
+              .utcOffset(cityTimezoneOffset);
+            return (
+              forecastDateTime.isSameOrAfter(currentDateTime) &&
+              forecastDateTime.isBefore(
+                currentDateTime.clone().add(24, "hours")
+              )
+            );
+          });
+          setCurrentDayHourlyForecast((prevForecasts) => ({
+            ...prevForecasts,
+            [cityName]: next24HoursForecast,
+          }));
+        }
+      } catch (error) {
+        console.error("Error fetching hourly forecast:", error);
+      }
+    };
+
+    cityNames.forEach((city) => fetchNext24HoursForecast(city.cityName));
+  }, [cityNames]);
 
   // Delete city from the user's list
   const deleteCityFromUser = async (cityName) => {
@@ -508,7 +544,7 @@ function City() {
         </Alert>
       )}
       {typeof sortedCities !== "undefined" && sortedCities.length !== 0 ? (
-        <div className="grid grid-cols-1 xs:grid-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 p-3 items-start min-h-screen">
+        <div className="grid grid-cols-1 xs:grid-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-3 p-3 items-start min-h-screen">
           {sortedCities.map((city) => (
             <div
               key={`${city.latitude}-${city.longitude}`}
@@ -519,13 +555,13 @@ function City() {
                 backgroundPosition: "center",
               }}
             >
-              <div className="flex flex-col items-center justify-center mt-4">
+              <div className="flex flex-col items-center justify-center mt-4 w-full">
                 <a
                   href={generateGoogleSearchLink(city.cityName)}
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  <div className="flex justify-center items-center my-2">
+                  <div className="flex justify-center items-center my-2 mx-2">
                     {/* City Name */}
                     <Typography
                       variant="h5"
@@ -630,6 +666,49 @@ function City() {
                       : "Description Not Available"}
                   </Typography>
                 </div>
+                <p>Today</p>
+
+                {/* Hourly Forecast for current day */}
+                <div className="w-full overflow-x-auto bg-sky-600 bg-opacity-90 rounded-lg m-2">
+                  <div className="flex">
+                    {currentDayHourlyForecast[city.cityName] &&
+                      currentDayHourlyForecast[city.cityName].map(
+                        (forecast, index) => {
+                          const localTime = moment
+                            .utc(forecast.dt_txt)
+                            .utcOffset(city.timezone / 60)
+                            .format("HH:mm");
+                          return (
+                            <div
+                              key={index}
+                              className="flex flex-col justify-center items-center p-2"
+                            >
+                              <Typography
+                                variant="body1"
+                                align="center"
+                                className="text-slate-100"
+                              >
+                                {localTime}
+                              </Typography>
+                              <img
+                                src={`images/${forecast.weather[0].icon}.png`}
+                                alt="Weather Icon"
+                                className="w-8 my-1"
+                              />
+                              <Typography
+                                variant="body1"
+                                align="center"
+                                className="text-slate-100"
+                              >
+                                {formatTemperature(forecast.main.temp)}
+                              </Typography>
+                            </div>
+                          );
+                        }
+                      )}
+                  </div>
+                </div>
+
                 {/* Weather Details */}
                 {boxVisible === city.cityName ? (
                   <FaCircleMinus
@@ -650,7 +729,6 @@ function City() {
                 )}
                 {boxVisible === city.cityName && (
                   <div className="rounded-lg my-3 mx-3 bg-sky-600 bg-opacity-90">
-                    
                     {/* Humidity, Wind */}
                     <div className="flex justify-center items-center">
                       <div className="flex flex-col justify-center items-center my-2 mx-4">
@@ -818,7 +896,7 @@ function City() {
                   className="my-2 px-3 py-1 text-lg border-2 border-blue-500 rounded-lg bg-blue-500 text-white hover:text-blue-500 hover:bg-white"
                   onClick={() => handleForecast(city.cityName)}
                 >
-                  5-Day Forecast
+                  5-Day Hourly Forecast
                 </button>
                 {/* Delete City Button */}
                 <button
@@ -886,7 +964,7 @@ function City() {
               align="center"
               gutterBottom
             >
-              5-Day Forecast
+              Hourly Forecast
             </Typography>
 
             {/* Buttons for each day */}
