@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { updateCities } from "../reducers/city.js";
 import Box from "@mui/material/Box";
-import { FaCirclePlus, FaCircleMinus } from "react-icons/fa6";
+import { FaCirclePlus, FaCircleMinus, FaLocationDot } from "react-icons/fa6";
 import Typography from "@mui/material/Typography";
 import Modal from "@mui/material/Modal";
 import Alert from "@mui/material/Alert";
@@ -29,6 +29,8 @@ function City() {
   const [cityDeleted, setCityDeleted] = useState("");
   const [loading, setLoading] = useState(true);
   const [boxVisible, setBoxVisible] = useState(null);
+  const [dailyForecastBoxVisible, setDailyForecastBoxVisible] = useState(null);
+  const [dailyForecast, setDailyForecast] = useState([]);
 
   // Remove the city deleted alert after 3 seconds
   useEffect(() => {
@@ -89,39 +91,37 @@ function City() {
         // User is not authenticated, fetch cities from local storage
         const localCities = JSON.parse(localStorage.getItem("cities")) || [];
 
-        if (localCities.length > 0) {
-          try {
-            // Fetch updated data for each city in local storage
-            const updatedCities = await Promise.all(
-              localCities.map(async (city) => {
-                const response = await fetch(
-                  `https://under-the-weather-backend.vercel.app/weather/localStorageCities?cityName=${city.cityName}&country=${city.country}`
-                );
-                const data = await response.json();
-                if (data.result) {
-                  return {
-                    ...data.weather,
-                    sunrise: moment
-                      .unix(data.weather.sunrise)
-                      .utcOffset(data.weather.timezone / 60)
-                      .format("HH:mm"),
-                    sunset: moment
-                      .unix(data.weather.sunset)
-                      .utcOffset(data.weather.timezone / 60)
-                      .format("HH:mm"),
-                  };
-                } else {
-                  throw new Error(data.error);
-                }
-              })
-            );
+        try {
+          // Fetch updated data for each city in local storage
+          const updatedCities = await Promise.all(
+            localCities.map(async (city) => {
+              const response = await fetch(
+                `https://under-the-weather-backend.vercel.app/weather/localStorageCities?cityName=${city.cityName}&country=${city.country}`
+              );
+              const data = await response.json();
+              if (data.result) {
+                return {
+                  ...data.weather,
+                  sunrise: moment
+                    .unix(data.weather.sunrise)
+                    .utcOffset(data.weather.timezone / 60)
+                    .format("HH:mm"),
+                  sunset: moment
+                    .unix(data.weather.sunset)
+                    .utcOffset(data.weather.timezone / 60)
+                    .format("HH:mm"),
+                };
+              } else {
+                throw new Error(data.error);
+              }
+            })
+          );
 
-            setCityNames(updatedCities.reverse());
-          } catch (error) {
-            console.error("Error fetching cities:", error);
-          } finally {
-            setLoading(false);
-          }
+          setCityNames(updatedCities.reverse());
+        } catch (error) {
+          console.error("Error fetching cities:", error);
+        } finally {
+          setLoading(false);
         }
       }
     };
@@ -205,7 +205,7 @@ function City() {
     return null;
   };
 
-  // Get forecast data for a city
+  // Get hourly forecast data for a city
   const fetchForecast = async (cityName) => {
     try {
       const response = await fetch(
@@ -242,7 +242,6 @@ function City() {
           return forecastDate === selectedDate;
         });
         setSelectedDayForecast(selectedDayForecasts);
-
         setIsModalOpen(true);
       }
     } catch (error) {
@@ -250,10 +249,74 @@ function City() {
     }
   };
 
-  // Handle forecast data
+  // Get daily forecast data for a city with min and max temperatures
+  const fetchDailyForecast = async (cityName) => {
+    try {
+      const response = await fetch(
+        `https://under-the-weather-backend.vercel.app/weather/forecast/${cityName}`
+      );
+      const data = await response.json();
+      if (data.weather.list) {
+        const cityTimezoneOffset = data.weather.city.timezone / 60;
+
+        const groupedForecast = data.weather.list.reduce((acc, forecast) => {
+          const date = moment
+            .utc(forecast.dt_txt)
+            .utcOffset(cityTimezoneOffset)
+            .format("YYYY-MM-DD");
+          if (!acc[date]) {
+            acc[date] = [];
+          }
+          acc[date].push(forecast);
+          return acc;
+        }, {});
+
+        const dailyForecast = Object.keys(groupedForecast).map((date) => {
+          const forecasts = groupedForecast[date];
+          const minTemp = Math.min(...forecasts.map((f) => f.main.temp_min));
+          const maxTemp = Math.max(...forecasts.map((f) => f.main.temp_max));
+
+          // Calculate the most frequent icon
+          const iconFrequency = forecasts.reduce((acc, forecast) => {
+            const icon = forecast.weather[0].icon;
+            if (!acc[icon]) {
+              acc[icon] = 0;
+            }
+            acc[icon]++;
+            return acc;
+          }, {});
+          const mostFrequentIcon = Object.keys(iconFrequency).reduce((a, b) =>
+            iconFrequency[a] > iconFrequency[b] ? a : b
+          );
+
+          return {
+            date,
+            minTemp,
+            maxTemp,
+            icon: mostFrequentIcon,
+          };
+        });
+
+        setDailyForecast(dailyForecast);
+      } else {
+        setDailyForecast([]); // Ensure it remains an array
+      }
+    } catch (error) {
+      console.error("Error fetching daily forecast:", error);
+      setDailyForecast([]); // Ensure it remains an array
+    }
+  };
+
+  // Handle hourly forecast data
   const handleForecast = (cityName) => {
     setSelectedCity(cityName);
     fetchForecast(cityName);
+  };
+
+  // Handle daily forecast data
+  const handleDailyForecast = (cityName) => {
+    fetchDailyForecast(cityName);
+    setDailyForecast(cityName);
   };
 
   // Close the modal
@@ -286,6 +349,13 @@ function City() {
     return `${weekday}, ${month} ${day}${suffix}`;
   };
 
+  // Get weekday from date string
+  const getWeekday = (dateString) => {
+    const date = new Date(dateString);
+    const weekday = date.toLocaleDateString("en-US", { weekday: "short" });
+    return weekday;
+  };
+
   // Generate Google search link
   const generateGoogleSearchLink = (cityName) => {
     return `https://www.google.com/search?q=${encodeURIComponent(cityName)}`;
@@ -309,6 +379,13 @@ function City() {
   // Toggle visibility of the weather details box
   const toggleBoxVisibility = (cityName) => {
     setBoxVisible(boxVisible === cityName ? null : cityName);
+  };
+
+  const toggleDailyForecastBoxVisibility = (cityName) => {
+    setDailyForecastBoxVisible(
+      dailyForecastBoxVisible === cityName ? null : cityName
+    );
+    handleDailyForecast(cityName);
   };
 
   // Background images for different weather conditions
@@ -448,14 +525,20 @@ function City() {
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  <div className="flex justify-center items-center mx-2 my-2">
+                  <div className="flex justify-center items-center my-2">
                     {/* City Name */}
                     <Typography
-                      variant="h4"
+                      variant="h5"
                       align="center"
                       gutterBottom
-                      className={`${getTextColor(city.icon)}`}
+                      className={`${getTextColor(
+                        city.icon
+                      )} flex justify-center items-center`}
                     >
+                      <FaLocationDot
+                        className={`${getTextColor(city.icon)} mr-1`}
+                        size={20}
+                      />{" "}
                       {city && city.cityName
                         ? city.cityName
                             .split(" ")
@@ -495,6 +578,39 @@ function City() {
                     Real feel {formatTemperature(city.feels_like)}
                   </Typography>
                 </div>
+                {/* Min and Max Temperature */}
+                <div className="flex justify-center items-center">
+                  <div className="flex flex-col justify-center items-center my-2 mx-4">
+                    <img
+                      src="images/thermometerdown1.png"
+                      alt="Temperature"
+                      className="w-6 h-6 sm:w-8 sm:h-8"
+                    />
+                    <Typography
+                      variant="h6"
+                      align="center"
+                      gutterBottom
+                      className={`${getTextColor(city.icon)}`}
+                    >
+                      {formatTemperature(city.tempMin)}
+                    </Typography>
+                  </div>
+                  <div className="flex flex-col justify-center items-center my-2 mx-4">
+                    <img
+                      src="images/thermometerup1.png"
+                      alt="Temperature"
+                      className="w-6 h-6 sm:w-8 sm:h-8"
+                    />
+                    <Typography
+                      variant="h6"
+                      align="center"
+                      gutterBottom
+                      className={`${getTextColor(city.icon)}`}
+                    >
+                      {formatTemperature(city.tempMax)}
+                    </Typography>
+                  </div>
+                </div>
 
                 {/* Weather Description */}
                 <div className="flex flex-col justify-center items-center bg-opacity-80 rounded-lg">
@@ -533,53 +649,21 @@ function City() {
                   />
                 )}
                 {boxVisible === city.cityName && (
-                  <div className="border-2 rounded-lg my-3 mx-3 bg-white bg-opacity-80">
-                    {/* Min and Max Temperature */}
-                    <div className="flex justify-center items-center">
-                      <div className="flex flex-col justify-center items-center my-2 mx-4">
-                        <img
-                          src="images/thermometerdown1.png"
-                          alt="Temperature"
-                          className="w-10 h-10 sm:w-12 sm:h-12"
-                        />
-                        <Typography
-                          variant="h6"
-                          align="center"
-                          gutterBottom
-                          className="text-slate-600"
-                        >
-                          {formatTemperature(city.tempMin)}
-                        </Typography>
-                      </div>
-                      <div className="flex flex-col justify-center items-center my-2 mx-4">
-                        <img
-                          src="images/thermometerup1.png"
-                          alt="Temperature"
-                          className="w-10 h-10 sm:w-12 sm:h-12"
-                        />
-                        <Typography
-                          variant="h6"
-                          align="center"
-                          gutterBottom
-                          className="text-slate-600"
-                        >
-                          {formatTemperature(city.tempMax)}
-                        </Typography>
-                      </div>
-                    </div>
+                  <div className="rounded-lg my-3 mx-3 bg-sky-600 bg-opacity-90">
+                    
                     {/* Humidity, Wind */}
                     <div className="flex justify-center items-center">
                       <div className="flex flex-col justify-center items-center my-2 mx-4">
                         <img
                           src="images/hygrometer1.png"
                           alt="Humidity"
-                          className="w-10 h-10 sm:w-12 sm:h-12"
+                          className="w-8"
                         />
                         <Typography
                           variant="h6"
                           align="center"
                           gutterBottom
-                          className="text-slate-600"
+                          className="text-slate-100"
                         >
                           {city.humidity}%
                         </Typography>
@@ -588,13 +672,13 @@ function City() {
                         <img
                           src="images/windsock1.png"
                           alt="Wind"
-                          className="w-10 h-10 sm:w-12 sm:h-12"
+                          className="w-8"
                         />
                         <Typography
                           variant="h6"
                           align="center"
                           gutterBottom
-                          className="text-slate-600"
+                          className="text-slate-100"
                         >
                           {city.wind} m/s
                         </Typography>
@@ -606,13 +690,13 @@ function City() {
                         <img
                           src="images/cloud1.png"
                           alt="Clouds"
-                          className="w-10 h-10 sm:w-12 sm:h-12"
+                          className="w-8"
                         />
                         <Typography
                           variant="h6"
                           align="center"
                           gutterBottom
-                          className="text-slate-600"
+                          className="text-slate-100"
                         >
                           {city.clouds}%
                         </Typography>
@@ -621,13 +705,13 @@ function City() {
                         <img
                           src="images/rain1.png"
                           alt="Rain"
-                          className="w-10 h-10 sm:w-12 sm:h-12"
+                          className="w-8"
                         />
                         <Typography
                           variant="h6"
                           align="center"
                           gutterBottom
-                          className="text-slate-600"
+                          className="text-slate-100"
                         >
                           {city.rain || 0} mm
                         </Typography>
@@ -636,13 +720,13 @@ function City() {
                         <img
                           src="images/snow1.png"
                           alt="Snow"
-                          className="w-10 h-10 sm:w-12 sm:h-12"
+                          className="w-8"
                         />
                         <Typography
                           variant="h6"
                           align="center"
                           gutterBottom
-                          className="text-slate-600"
+                          className="text-slate-100"
                         >
                           {city.snow || 0} mm
                         </Typography>
@@ -654,13 +738,13 @@ function City() {
                         <img
                           src="images/sunrise1.png"
                           alt="Sunrise"
-                          className="w-10 h-10 sm:w-12 sm:h-12"
+                          className="w-8"
                         />
                         <Typography
                           variant="h6"
                           align="center"
                           gutterBottom
-                          className="text-slate-600"
+                          className="text-slate-100"
                         >
                           {city.sunrise}
                         </Typography>
@@ -669,13 +753,13 @@ function City() {
                         <img
                           src="images/sunset1.png"
                           alt="Sunset"
-                          className="w-10 h-10 sm:w-12 sm:h-12"
+                          className="w-8"
                         />
                         <Typography
                           variant="h6"
                           align="center"
                           gutterBottom
-                          className="text-slate-600"
+                          className="text-slate-100"
                         >
                           {city.sunset}
                         </Typography>
@@ -683,6 +767,50 @@ function City() {
                     </div>
                   </div>
                 )}
+                {dailyForecastBoxVisible === city.cityName ? (
+                  <button
+                    onClick={() =>
+                      toggleDailyForecastBoxVisibility(city.cityName)
+                    }
+                    className={`cursor-pointer hover:text-slate-500 mt-3 ${getTextColor(
+                      city.icon
+                    )}`}
+                  >
+                    Close Daily Forecast
+                  </button>
+                ) : (
+                  <button
+                    onClick={() =>
+                      toggleDailyForecastBoxVisibility(city.cityName)
+                    }
+                    className={`cursor-pointer hover:text-slate-500 mt-3 ${getTextColor(
+                      city.icon
+                    )}`}
+                  >
+                    Daily Forecast
+                  </button>
+                )}
+                {dailyForecastBoxVisible === city.cityName &&
+                  Array.isArray(dailyForecast) && (
+                    <Box className="rounded-lg bg-sky-600 bg-opacity-90 px-3 py-1 my-2">
+                      {dailyForecast.map((day) => (
+                        <Typography
+                          className="flex justify-center items-center text-slate-100"
+                          key={day.date}
+                        >
+                          {`${getWeekday(day.date)} `}
+                          <img
+                            src={`images/${day.icon}.png`}
+                            alt="Weather Icon"
+                            className="w-12 m-3 sm:w-10"
+                          />
+                          {`${formatTemperature(
+                            day.minTemp
+                          )} - ${formatTemperature(day.maxTemp)}`}
+                        </Typography>
+                      ))}
+                    </Box>
+                  )}
               </div>
               {/* View Forecast Button */}
               <div className="flex flex-col mb-4">
@@ -801,11 +929,12 @@ function City() {
                       minHeight: "15rem",
                       maxHeight: "15rem",
 
-                      backgroundImage: `url(${getBackgroundImage(
-                        forecast.weather[0].icon
-                      )})`,
-                      backgroundSize: "cover",
-                      backgroundPosition: "center",
+                      //   backgroundImage: `url(${getBackgroundImage(
+                      //     forecast.weather[0].icon
+                      //   )}
+                      // )`,
+                      //   backgroundSize: "cover",
+                      //   backgroundPosition: "center",
                     }}
                   >
                     {/* Time */}
@@ -813,7 +942,8 @@ function City() {
                       sx={{ typography: { sm: "h5", xs: "h6" } }}
                       align="center"
                       fontWeight={600}
-                      className={`${getTextColor(forecast.weather[0].icon)}`}
+                      // className={`${getTextColor(forecast.weather[0].icon)}`}
+                      className="text-slate-600"
                     >
                       {forecast.dt_txt.split(" ")[1].slice(0, 5)}
                     </Typography>
@@ -827,9 +957,10 @@ function City() {
 
                     {/* Temperature */}
                     <p
-                      className={`${getTextColor(
-                        forecast.weather[0].icon
-                      )} text-2xl font-semibold lg:text-xl xl:text-2xl`}
+                      // className={`${getTextColor(
+                      //   forecast.weather[0].icon
+                      // )}
+                      className="text-slate-600 text-2xl font-semibold lg:text-xl xl:text-2xl"
                     >
                       {formatTemperature(forecast.main.temp)}
                     </p>
@@ -838,7 +969,8 @@ function City() {
                     <Typography
                       variant="body1"
                       align="center"
-                      className={`${getTextColor(forecast.weather[0].icon)}`}
+                      // className={`${getTextColor(forecast.weather[0].icon)}`}
+                      className="text-slate-600"
                     >
                       {forecast.weather[0].description.charAt(0).toUpperCase() +
                         forecast.weather[0].description.slice(1)}
