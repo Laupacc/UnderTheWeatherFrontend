@@ -666,46 +666,50 @@ function City() {
                       : "Description Not Available"}
                   </Typography>
                 </div>
-                <p>Today</p>
 
                 {/* Hourly Forecast for current day */}
-                <div className="w-full overflow-x-auto bg-sky-600 bg-opacity-90 rounded-lg m-2">
-                  <div className="flex">
-                    {currentDayHourlyForecast[city.cityName] &&
-                      currentDayHourlyForecast[city.cityName].map(
-                        (forecast, index) => {
-                          const localTime = moment
-                            .utc(forecast.dt_txt)
-                            .utcOffset(city.timezone / 60)
-                            .format("HH:mm");
-                          return (
-                            <div
-                              key={index}
-                              className="flex flex-col justify-center items-center p-2"
-                            >
-                              <Typography
-                                variant="body1"
-                                align="center"
-                                className="text-slate-100"
+                <p className="text-slate-100 text-xl mt-3 bg-sky-600 bg-opacity-90 px-2 pt-1 rounded-tl-lg rounded-tr-lg">
+                  Today
+                </p>
+                <div className="px-3 w-full">
+                  <div className="overflow-x-auto bg-sky-600 bg-opacity-90 rounded-lg mb-2">
+                    <div className="flex">
+                      {currentDayHourlyForecast[city.cityName] &&
+                        currentDayHourlyForecast[city.cityName].map(
+                          (forecast, index) => {
+                            const localTime = moment
+                              .utc(forecast.dt_txt)
+                              .utcOffset(city.timezone / 60)
+                              .format("HH:mm");
+                            return (
+                              <div
+                                key={index}
+                                className="flex flex-col justify-center items-center py-3 px-2"
                               >
-                                {localTime}
-                              </Typography>
-                              <img
-                                src={`images/${forecast.weather[0].icon}.png`}
-                                alt="Weather Icon"
-                                className="w-8 my-1"
-                              />
-                              <Typography
-                                variant="body1"
-                                align="center"
-                                className="text-slate-100"
-                              >
-                                {formatTemperature(forecast.main.temp)}
-                              </Typography>
-                            </div>
-                          );
-                        }
-                      )}
+                                <Typography
+                                  variant="body1"
+                                  align="center"
+                                  className="text-slate-100"
+                                >
+                                  {localTime}
+                                </Typography>
+                                <img
+                                  src={`images/${forecast.weather[0].icon}.png`}
+                                  alt="Weather Icon"
+                                  className="w-8 my-1"
+                                />
+                                <Typography
+                                  variant="body1"
+                                  align="center"
+                                  className="text-slate-100"
+                                >
+                                  {formatTemperature(forecast.main.temp)}
+                                </Typography>
+                              </div>
+                            );
+                          }
+                        )}
+                    </div>
                   </div>
                 </div>
 
@@ -719,13 +723,17 @@ function City() {
                     )}`}
                   />
                 ) : (
-                  <FaCirclePlus
-                    size={34}
+                  <button
                     onClick={() => toggleBoxVisibility(city.cityName)}
-                    className={`cursor-pointer hover:text-slate-500 mt-3 ${getTextColor(
+                    className={`flex flex-col items-center cursor-pointer hover:text-slate-500 mt-3 ${getTextColor(
                       city.icon
                     )}`}
-                  />
+                  >
+                    <Typography variant="h6" align="center">
+                      Details
+                    </Typography>
+                    <FaCirclePlus size={34} />
+                  </button>
                 )}
                 {boxVisible === city.cityName && (
                   <div className="rounded-lg my-3 mx-3 bg-sky-600 bg-opacity-90">
@@ -738,7 +746,7 @@ function City() {
                           className="w-8"
                         />
                         <Typography
-                          variant="h6"
+                          variant="body1"
                           align="center"
                           gutterBottom
                           className="text-slate-100"
@@ -753,7 +761,7 @@ function City() {
                           className="w-8"
                         />
                         <Typography
-                          variant="h6"
+                          variant="body1"
                           align="center"
                           gutterBottom
                           className="text-slate-100"
@@ -771,7 +779,7 @@ function City() {
                           className="w-8"
                         />
                         <Typography
-                          variant="h6"
+                          variant="body1"
                           align="center"
                           gutterBottom
                           className="text-slate-100"
@@ -786,7 +794,7 @@ function City() {
                           className="w-8"
                         />
                         <Typography
-                          variant="h6"
+                          variant="body1"
                           align="center"
                           gutterBottom
                           className="text-slate-100"
@@ -801,7 +809,7 @@ function City() {
                           className="w-8"
                         />
                         <Typography
-                          variant="h6"
+                          variant="body1"
                           align="center"
                           gutterBottom
                           className="text-slate-100"
@@ -819,7 +827,7 @@ function City() {
                           className="w-8"
                         />
                         <Typography
-                          variant="h6"
+                          variant="body1"
                           align="center"
                           gutterBottom
                           className="text-slate-100"
@@ -834,7 +842,7 @@ function City() {
                           className="w-8"
                         />
                         <Typography
-                          variant="h6"
+                          variant="body1"
                           align="center"
                           gutterBottom
                           className="text-slate-100"
@@ -845,27 +853,31 @@ function City() {
                     </div>
                   </div>
                 )}
+
                 {dailyForecastBoxVisible === city.cityName ? (
                   <button
                     onClick={() =>
                       toggleDailyForecastBoxVisibility(city.cityName)
                     }
-                    className={`cursor-pointer hover:text-slate-500 mt-3 ${getTextColor(
+                    className={`flex flex-col items-center cursor-pointer hover:text-slate-500 my-3 ${getTextColor(
                       city.icon
                     )}`}
                   >
-                    Close Daily Forecast
+                    <FaCircleMinus size={34} />
                   </button>
                 ) : (
                   <button
                     onClick={() =>
                       toggleDailyForecastBoxVisibility(city.cityName)
                     }
-                    className={`cursor-pointer hover:text-slate-500 mt-3 ${getTextColor(
+                    className={`flex flex-col items-center cursor-pointer hover:text-slate-500 my-3 ${getTextColor(
                       city.icon
                     )}`}
                   >
-                    Daily Forecast
+                    <Typography variant="h6" align="center">
+                      Weekly Forecast
+                    </Typography>
+                    <FaCirclePlus size={34} />
                   </button>
                 )}
                 {dailyForecastBoxVisible === city.cityName &&
