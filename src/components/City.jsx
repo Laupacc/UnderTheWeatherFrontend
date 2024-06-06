@@ -32,6 +32,7 @@ function City() {
   const [dailyForecastBoxVisible, setDailyForecastBoxVisible] = useState(null);
   const [dailyForecast, setDailyForecast] = useState([]);
   const [currentDayHourlyForecast, setCurrentDayHourlyForecast] = useState([]);
+  const [detailsOrWeekly, setDetailsOrWeekly] = useState({});
 
   // Remove the city deleted alert after 3 seconds
   useEffect(() => {
@@ -414,14 +415,22 @@ function City() {
 
   // Toggle visibility of the weather details box
   const toggleBoxVisibility = (cityName) => {
-    setBoxVisible(boxVisible === cityName ? null : cityName);
+    if (boxVisible === cityName) {
+      setBoxVisible(null);
+    } else {
+      setBoxVisible(cityName);
+      setDailyForecastBoxVisible(null);
+    }
   };
 
   const toggleDailyForecastBoxVisibility = (cityName) => {
-    setDailyForecastBoxVisible(
-      dailyForecastBoxVisible === cityName ? null : cityName
-    );
-    handleDailyForecast(cityName);
+    if (dailyForecastBoxVisible === cityName) {
+      setDailyForecastBoxVisible(null);
+    } else {
+      setDailyForecastBoxVisible(cityName);
+      handleDailyForecast(cityName);
+      setBoxVisible(null);
+    }
   };
 
   // Background images for different weather conditions
@@ -470,6 +479,13 @@ function City() {
     "50n": "text-slate-100",
   };
   const getTextColor = (icon) => textColors[icon] || "text-slate-100";
+
+  function getBorderColor(icon) {
+    const textColor = getTextColor(icon);
+    const borderColor = textColor.replace("text", "border");
+    console.log(`Border color for icon ${icon}: ${borderColor}`); // Log the output
+    return borderColor;
+  }
 
   // Sort order for different criteria
   const sortFunctions = {
@@ -544,11 +560,11 @@ function City() {
         </Alert>
       )}
       {typeof sortedCities !== "undefined" && sortedCities.length !== 0 ? (
-        <div className="grid grid-cols-1 xs:grid-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-3 p-3 items-start min-h-screen">
+        <div className="grid grid-cols-1 xs:grid-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 p-3 items-start min-h-screen">
           {sortedCities.map((city) => (
             <div
               key={`${city.latitude}-${city.longitude}`}
-              className="rounded-lg shadow-xl m-2 w-auto flex flex-col justify-between items-center text-center min-h-[32rem]"
+              className="rounded-lg shadow-2xl m-2 w-auto flex flex-col justify-between items-center text-center min-h-[32rem]"
               style={{
                 backgroundImage: `url(${getBackgroundImage(city.icon)})`,
                 backgroundSize: "cover",
@@ -668,11 +684,15 @@ function City() {
                 </div>
 
                 {/* Hourly Forecast for current day */}
-                <p className="text-slate-100 text-xl mt-3 bg-sky-600 bg-opacity-90 px-2 pt-1 rounded-tl-lg rounded-tr-lg">
+                <p
+                  className={`${getTextColor(city.icon)} ${getBorderColor(
+                    city.icon
+                  )} text-xl my-3 border-b-2 px-5 py-1 rounded-bl-md rounded-br-md shadow-inner`}
+                >
                   Today
                 </p>
                 <div className="px-3 w-full">
-                  <div className="overflow-x-auto bg-sky-600 bg-opacity-90 rounded-lg mb-2">
+                  <div className="overflow-x-auto bg-gradient-to-r from-slate-100/95 to-slate-400/95 rounded-md shadow-2xl mb-2">
                     <div className="flex">
                       {currentDayHourlyForecast[city.cityName] &&
                         currentDayHourlyForecast[city.cityName].map(
@@ -689,7 +709,7 @@ function City() {
                                 <Typography
                                   variant="body1"
                                   align="center"
-                                  className="text-slate-100"
+                                  className="text-slate-800"
                                 >
                                   {localTime}
                                 </Typography>
@@ -701,7 +721,7 @@ function City() {
                                 <Typography
                                   variant="body1"
                                   align="center"
-                                  className="text-slate-100"
+                                  className="text-slate-800"
                                 >
                                   {formatTemperature(forecast.main.temp)}
                                 </Typography>
@@ -713,30 +733,46 @@ function City() {
                   </div>
                 </div>
 
-                {/* Weather Details */}
-                {boxVisible === city.cityName ? (
-                  <FaCircleMinus
-                    size={34}
-                    onClick={() => toggleBoxVisibility(city.cityName)}
-                    className={`cursor-pointer hover:text-slate-500 mt-3 ${getTextColor(
-                      city.icon
-                    )}`}
-                  />
-                ) : (
+                {/* Details and Weekly Forecast Buttons */}
+                <div className="flex justify-center items-center">
                   <button
-                    onClick={() => toggleBoxVisibility(city.cityName)}
-                    className={`flex flex-col items-center cursor-pointer hover:text-slate-500 mt-3 ${getTextColor(
-                      city.icon
-                    )}`}
+                    onClick={() => {
+                      toggleBoxVisibility(city.cityName);
+                      setDetailsOrWeekly((prevState) => ({
+                        ...prevState,
+                        [city.cityName]: "details",
+                      }));
+                    }}
+                    className={`flex flex-col justify-center items-center text-xl border-b-2 border-r-2 px-5 py-1 my-3 mx-1 rounded-bl-md rounded-tr-md shadow-2xl cursor-pointer transition-all duration-200 transform hover:scale-95 hover:shadow-inner ${
+                      detailsOrWeekly[city.cityName] === "details"
+                        ? "scale-95 shadow-inner"
+                        : ""
+                    } ${getTextColor(city.icon)} ${getBorderColor(city.icon)}`}
                   >
-                    <Typography variant="h6" align="center">
-                      Details
-                    </Typography>
-                    <FaCirclePlus size={34} />
+                    Details
                   </button>
-                )}
+
+                  <button
+                    onClick={() => {
+                      toggleDailyForecastBoxVisibility(city.cityName);
+                      setDetailsOrWeekly((prevState) => ({
+                        ...prevState,
+                        [city.cityName]: "weekly",
+                      }));
+                    }}
+                    className={`flex flex-col justify-center items-center text-xl border-b-2 border-r-2 px-5 py-1 my-3 mx-1 rounded-bl-md rounded-tr-md shadow-2xl cursor-pointer transition-all duration-200 transform hover:scale-95 hover:shadow-inner ${
+                      detailsOrWeekly[city.cityName] === "weekly"
+                        ? "scale-95 shadow-inner"
+                        : ""
+                    } ${getTextColor(city.icon)} ${getBorderColor(city.icon)}`}
+                  >
+                    Weekly
+                  </button>
+                </div>
+
+                {/* Weather Details Box */}
                 {boxVisible === city.cityName && (
-                  <div className="rounded-lg my-3 mx-3 bg-sky-600 bg-opacity-90">
+                  <div className="rounded-md my-3 mx-3 bg-gradient-to-r from-slate-100/95 to-slate-400/95 shadow-2xl">
                     {/* Humidity, Wind */}
                     <div className="flex justify-center items-center">
                       <div className="flex flex-col justify-center items-center my-2 mx-4">
@@ -749,7 +785,7 @@ function City() {
                           variant="body1"
                           align="center"
                           gutterBottom
-                          className="text-slate-100"
+                          className="text-slate-800"
                         >
                           {city.humidity}%
                         </Typography>
@@ -764,7 +800,7 @@ function City() {
                           variant="body1"
                           align="center"
                           gutterBottom
-                          className="text-slate-100"
+                          className="text-slate-800"
                         >
                           {city.wind} m/s
                         </Typography>
@@ -782,7 +818,7 @@ function City() {
                           variant="body1"
                           align="center"
                           gutterBottom
-                          className="text-slate-100"
+                          className="text-slate-800"
                         >
                           {city.clouds}%
                         </Typography>
@@ -797,7 +833,7 @@ function City() {
                           variant="body1"
                           align="center"
                           gutterBottom
-                          className="text-slate-100"
+                          className="text-slate-800"
                         >
                           {city.rain || 0} mm
                         </Typography>
@@ -812,7 +848,7 @@ function City() {
                           variant="body1"
                           align="center"
                           gutterBottom
-                          className="text-slate-100"
+                          className="text-slate-800"
                         >
                           {city.snow || 0} mm
                         </Typography>
@@ -830,7 +866,7 @@ function City() {
                           variant="body1"
                           align="center"
                           gutterBottom
-                          className="text-slate-100"
+                          className="text-slate-800"
                         >
                           {city.sunrise}
                         </Typography>
@@ -845,7 +881,7 @@ function City() {
                           variant="body1"
                           align="center"
                           gutterBottom
-                          className="text-slate-100"
+                          className="text-slate-800"
                         >
                           {city.sunset}
                         </Typography>
@@ -854,38 +890,13 @@ function City() {
                   </div>
                 )}
 
-                {dailyForecastBoxVisible === city.cityName ? (
-                  <button
-                    onClick={() =>
-                      toggleDailyForecastBoxVisibility(city.cityName)
-                    }
-                    className={`flex flex-col items-center cursor-pointer hover:text-slate-500 my-3 ${getTextColor(
-                      city.icon
-                    )}`}
-                  >
-                    <FaCircleMinus size={34} />
-                  </button>
-                ) : (
-                  <button
-                    onClick={() =>
-                      toggleDailyForecastBoxVisibility(city.cityName)
-                    }
-                    className={`flex flex-col items-center cursor-pointer hover:text-slate-500 my-3 ${getTextColor(
-                      city.icon
-                    )}`}
-                  >
-                    <Typography variant="h6" align="center">
-                      Weekly Forecast
-                    </Typography>
-                    <FaCirclePlus size={34} />
-                  </button>
-                )}
+                {/* Daily Forecast */}
                 {dailyForecastBoxVisible === city.cityName &&
                   Array.isArray(dailyForecast) && (
-                    <Box className="rounded-lg bg-sky-600 bg-opacity-90 px-3 py-1 my-2">
+                    <Box className="rounded-md bg-gradient-to-r from-slate-100/95 to-slate-400/95 px-3 py-1 my-2 shadow-2xl">
                       {dailyForecast.map((day) => (
                         <Typography
-                          className="flex justify-center items-center text-slate-100"
+                          className="flex justify-center items-center text-slate-800"
                           key={day.date}
                         >
                           {`${getWeekday(day.date)} `}
@@ -905,14 +916,14 @@ function City() {
               {/* View Forecast Button */}
               <div className="flex flex-col mb-4">
                 <button
-                  className="my-2 px-3 py-1 text-lg border-2 border-blue-500 rounded-lg bg-blue-500 text-white hover:text-blue-500 hover:bg-white"
+                  className="my-2 px-3 py-1 text-lg rounded-md bg-cyan-600 text-white shadow-xl hover:text-cyan-600 hover:bg-slate-200"
                   onClick={() => handleForecast(city.cityName)}
                 >
                   5-Day Hourly Forecast
                 </button>
                 {/* Delete City Button */}
                 <button
-                  className="my-2 px-3 py-1 text-lg border-2 border-red-500 rounded-lg bg-red-500 text-white hover:text-red-500 hover:bg-white"
+                  className="my-2 px-3 py-1 text-lg rounded-md bg-red-500 text-white shadow-xl hover:text-red-500 hover:bg-slate-200"
                   onClick={() => deleteCityFromUser(city.cityName)}
                 >
                   Delete City
