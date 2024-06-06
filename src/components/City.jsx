@@ -480,12 +480,13 @@ function City() {
   };
   const getTextColor = (icon) => textColors[icon] || "text-slate-100";
 
-  function getBorderColor(icon) {
-    const textColor = getTextColor(icon);
-    const borderColor = textColor.replace("text", "border");
-    console.log(`Border color for icon ${icon}: ${borderColor}`); // Log the output
-    return borderColor;
-  }
+  const getBorderColor = (icon) => {
+    let borderColors = { ...textColors };
+    for (let key in borderColors) {
+      borderColors[key] = borderColors[key].replace("text", "border");
+    }
+    return borderColors[icon] || "border-slate-100";
+  };
 
   // Sort order for different criteria
   const sortFunctions = {
@@ -687,7 +688,7 @@ function City() {
                 <p
                   className={`${getTextColor(city.icon)} ${getBorderColor(
                     city.icon
-                  )} text-xl my-3 border-b-2 px-5 py-1 rounded-bl-md rounded-br-md shadow-inner`}
+                  )} text-lg my-3 border-b-2 px-5 py-1 rounded-md shadow-inner`}
                 >
                   Today
                 </p>
@@ -740,14 +741,15 @@ function City() {
                       toggleBoxVisibility(city.cityName);
                       setDetailsOrWeekly((prevState) => ({
                         ...prevState,
-                        [city.cityName]: "details",
+                        [city.cityName]: boxVisible ? "" : "details",
                       }));
                     }}
-                    className={`flex flex-col justify-center items-center text-xl border-b-2 border-r-2 px-5 py-1 my-3 mx-1 rounded-bl-md rounded-tr-md shadow-2xl cursor-pointer transition-all duration-200 transform hover:scale-95 hover:shadow-inner ${
+                    className={`
+                    flex flex-col justify-center items-center bg-gradient-to-r from-emerald-300 to-cyan-600 text-lg text-slate-100 border-b-2 border-slate-300 px-5 py-1 my-3 mx-1 rounded-md shadow-2xl cursor-pointer hover:scale-95 hover:shadow-inner hover:border-none ${
                       detailsOrWeekly[city.cityName] === "details"
-                        ? "scale-95 shadow-inner"
+                        ? "scale-95 shadow-inner border-none"
                         : ""
-                    } ${getTextColor(city.icon)} ${getBorderColor(city.icon)}`}
+                    }`}
                   >
                     Details
                   </button>
@@ -757,14 +759,16 @@ function City() {
                       toggleDailyForecastBoxVisibility(city.cityName);
                       setDetailsOrWeekly((prevState) => ({
                         ...prevState,
-                        [city.cityName]: "weekly",
+                        [city.cityName]: dailyForecastBoxVisible
+                          ? ""
+                          : "weekly",
                       }));
                     }}
-                    className={`flex flex-col justify-center items-center text-xl border-b-2 border-r-2 px-5 py-1 my-3 mx-1 rounded-bl-md rounded-tr-md shadow-2xl cursor-pointer transition-all duration-200 transform hover:scale-95 hover:shadow-inner ${
+                    className={` flex flex-col justify-center items-center bg-gradient-to-r from-emerald-300 to-cyan-600 text-lg text-slate-100 border-b-2 border-slate-300 px-5 py-1 my-3 mx-1 rounded-md shadow-2xl cursor-pointer hover:scale-95 hover:shadow-inner hover:border-none ${
                       detailsOrWeekly[city.cityName] === "weekly"
-                        ? "scale-95 shadow-inner"
+                        ? "scale-95 shadow-inner border-none"
                         : ""
-                    } ${getTextColor(city.icon)} ${getBorderColor(city.icon)}`}
+                    }`}
                   >
                     Weekly
                   </button>
