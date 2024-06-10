@@ -10,7 +10,7 @@ function Home() {
       <Head>
         <title>Under the Weather</title>
       </Head>
-      <div className="bg-gray-200 min-h-screen">
+      <div className="bg-gray-200 flex flex-col min-h-screen">
         <Header />
         <City />
         <Footer />

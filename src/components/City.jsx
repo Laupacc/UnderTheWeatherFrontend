@@ -92,7 +92,6 @@ function City() {
       } else if (!user.token) {
         // User is not authenticated, fetch cities from local storage
         const localCities = JSON.parse(localStorage.getItem("cities")) || [];
-
         try {
           // Fetch updated data for each city in local storage
           const updatedCities = await Promise.all(
@@ -336,11 +335,11 @@ function City() {
 
         setDailyForecast(dailyForecast);
       } else {
-        setDailyForecast([]); // Ensure it remains an array
+        setDailyForecast([]);
       }
     } catch (error) {
       console.error("Error fetching daily forecast:", error);
-      setDailyForecast([]); // Ensure it remains an array
+      setDailyForecast([]);
     }
   };
 
@@ -480,14 +479,6 @@ function City() {
   };
   const getTextColor = (icon) => textColors[icon] || "text-slate-100";
 
-  const getBorderColor = (icon) => {
-    let borderColors = { ...textColors };
-    for (let key in borderColors) {
-      borderColors[key] = borderColors[key].replace("text", "border");
-    }
-    return borderColors[icon] || "border-slate-100";
-  };
-
   // Sort order for different criteria
   const sortFunctions = {
     lastAdded: (cities) => cities,
@@ -528,8 +519,8 @@ function City() {
   // Loading screen
   if (loading) {
     return (
-      <div className="flex flex-col justify-center items-center min-h-screen">
-        <p className="text-3xl text-sky-900">Loading cities</p>
+      <div className="flex flex-col justify-center items-center flex-grow">
+        <p className="text-3xl text-sky-900 text-center">Loading cities</p>
         <ProgressBar
           visible={true}
           height="100"
@@ -542,9 +533,10 @@ function City() {
     );
   }
 
+  // Display message if there are no cities and the user is not logged in
   if (sortedCities.length === 0 && !user.token) {
     return (
-      <div className="flex flex-col justify-center items-center h-screen">
+      <div className="flex flex-col justify-center items-center flex-grow">
         <ImArrowUp className="animate-bounce text-sky-900 h-12 w-12" />
         <p className="text-3xl text-sky-900 text-center">
           Add a city to view the weather forecast or log in to save your cities
@@ -553,19 +545,31 @@ function City() {
     );
   }
 
+  // Display message if there are no cities and user is logged in
+  if (sortedCities.length === 0 && user.token) {
+    return (
+      <div className="flex flex-col justify-center items-center flex-grow">
+        <ImArrowUp className="animate-bounce text-sky-900 h-12 w-12" />
+        <p className="text-3xl text-sky-900 text-center">
+          Add a city to view the weather forecast
+        </p>
+      </div>
+    );
+  }
+
   return (
-    <>
+    <div className="flex-grow overflow-y-auto">
       {cityDeleted && (
-        <Alert severity="success" className="fixed w-full">
+        <Alert severity="success" className="w-full">
           {cityDeleted}
         </Alert>
       )}
       {typeof sortedCities !== "undefined" && sortedCities.length !== 0 ? (
-        <div className="grid grid-cols-1 xs:grid-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 p-3 items-start min-h-screen">
+        <div className="grid grid-cols-1 xs:grid-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 p-3 items-start m-2">
           {sortedCities.map((city) => (
             <div
               key={`${city.latitude}-${city.longitude}`}
-              className="rounded-lg shadow-2xl m-2 w-auto flex flex-col justify-between items-center text-center min-h-[32rem]"
+              className="rounded-lg shadow-2xl flex flex-col justify-between items-center text-center w-auto min-h-[47rem]"
               style={{
                 backgroundImage: `url(${getBackgroundImage(city.icon)})`,
                 backgroundSize: "cover",
@@ -578,20 +582,14 @@ function City() {
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  <div className="flex justify-center items-center my-2 mx-2">
+                  <div className="flex justify-center items-center my-2 mx-1">
                     {/* City Name */}
-                    <Typography
-                      variant="h5"
-                      align="center"
-                      gutterBottom
-                      className={`${getTextColor(
-                        city.icon
-                      )} flex justify-center items-center`}
-                    >
-                      <FaLocationDot
-                        className={`${getTextColor(city.icon)} mr-1`}
+                    <div className={`${getTextColor(city.icon)} text-2xl`}>
+                      {/* <FaLocationDot
+                        className={`${getTextColor(city.icon)}`}
                         size={20}
-                      />{" "}
+                      />{" "} */}
+                      <span className="mr-1">📍</span>
                       {city && city.cityName
                         ? city.cityName
                             .split(" ")
@@ -608,7 +606,7 @@ function City() {
                         svg
                         title={city.country}
                       />
-                    </Typography>
+                    </div>
                   </div>
                 </a>
                 {/* Temperature */}
@@ -686,14 +684,12 @@ function City() {
 
                 {/* Hourly Forecast for current day */}
                 <p
-                  className={`${getTextColor(city.icon)} ${getBorderColor(
-                    city.icon
-                  )} text-lg my-3 border-b-2 px-5 py-1 rounded-md shadow-inner`}
+                  className={`text-lg my-3 border-b-2 px-5 py-1 rounded-md shadow-inner bg-slate-200 text-cyan-800`}
                 >
-                  Today
+                  Next 24 hours
                 </p>
                 <div className="px-3 w-full">
-                  <div className="overflow-x-auto bg-gradient-to-r from-slate-100/95 to-slate-400/95 rounded-md shadow-2xl mb-2">
+                  <div className="overflow-x-auto bg-gradient-to-r from-emerald-100/95 to-sky-300/95 rounded-md shadow-2xl mb-2">
                     <div className="flex">
                       {currentDayHourlyForecast[city.cityName] &&
                         currentDayHourlyForecast[city.cityName].map(
@@ -745,9 +741,9 @@ function City() {
                       }));
                     }}
                     className={`
-                    flex flex-col justify-center items-center bg-gradient-to-r from-emerald-300 to-cyan-600 text-lg text-slate-100 border-b-2 border-slate-300 px-5 py-1 my-3 mx-1 rounded-md shadow-2xl cursor-pointer hover:scale-95 hover:shadow-inner hover:border-none ${
+                    flex flex-col justify-center items-center bg-cyan-800 text-lg text-white border-b-2 border-white px-5 py-1 my-3 mx-1 rounded-md shadow-2xl cursor-pointer hover:scale-95 hover:shadow-inner hover:border-none ${
                       detailsOrWeekly[city.cityName] === "details"
-                        ? "scale-95 shadow-inner border-none"
+                        ? " text-cyan-800 !bg-slate-200 scale-95 shadow-inner border-none"
                         : ""
                     }`}
                   >
@@ -764,9 +760,9 @@ function City() {
                           : "weekly",
                       }));
                     }}
-                    className={` flex flex-col justify-center items-center bg-gradient-to-r from-emerald-300 to-cyan-600 text-lg text-slate-100 border-b-2 border-slate-300 px-5 py-1 my-3 mx-1 rounded-md shadow-2xl cursor-pointer hover:scale-95 hover:shadow-inner hover:border-none ${
+                    className={`flex flex-col justify-center items-center bg-cyan-800 text-lg text-white border-b-2 border-white px-5 py-1 my-3 mx-1 rounded-md shadow-2xl cursor-pointer hover:scale-95 hover:shadow-inner hover:border-none ${
                       detailsOrWeekly[city.cityName] === "weekly"
-                        ? "scale-95 shadow-inner border-none"
+                        ? " text-cyan-800 !bg-slate-200 scale-95 shadow-inner border-none"
                         : ""
                     }`}
                   >
@@ -776,7 +772,7 @@ function City() {
 
                 {/* Weather Details Box */}
                 {boxVisible === city.cityName && (
-                  <div className="rounded-md my-3 mx-3 bg-gradient-to-r from-slate-100/95 to-slate-400/95 shadow-2xl">
+                  <div className="rounded-md my-3 mx-3 bg-gradient-to-r from-emerald-100/95 to-sky-300/95 shadow-2xl">
                     {/* Humidity, Wind */}
                     <div className="flex justify-center items-center">
                       <div className="flex flex-col justify-center items-center my-2 mx-4">
@@ -897,7 +893,7 @@ function City() {
                 {/* Daily Forecast */}
                 {dailyForecastBoxVisible === city.cityName &&
                   Array.isArray(dailyForecast) && (
-                    <Box className="rounded-md bg-gradient-to-r from-slate-100/95 to-slate-400/95 px-3 py-1 my-2 shadow-2xl">
+                    <Box className="rounded-md bg-gradient-to-r from-emerald-100/95 to-sky-300/95 px-3 py-1 my-2 shadow-2xl">
                       {dailyForecast.map((day) => (
                         <Typography
                           className="flex justify-center items-center text-slate-800"
@@ -917,8 +913,9 @@ function City() {
                     </Box>
                   )}
               </div>
-              {/* View Forecast Button */}
+              {/* View Forecast and Delete Button */}
               <div className="flex flex-col mb-4">
+                {/* View Forecast Button */}
                 <button
                   className="my-2 px-3 py-1 text-lg rounded-md bg-cyan-600 text-white shadow-xl hover:text-cyan-600 hover:bg-slate-200"
                   onClick={() => handleForecast(city.cityName)}
@@ -937,12 +934,7 @@ function City() {
           ))}
         </div>
       ) : (
-        <div className="flex flex-col justify-center items-center h-screen">
-          <ImArrowUp className="animate-bounce text-sky-900 h-12 w-12" />
-          <p className="text-3xl text-sky-900 text-center">
-            Add a city to view the weather forecast
-          </p>
-        </div>
+        <></>
       )}
 
       {/* Modal for 5-day forecast */}
@@ -1087,7 +1079,7 @@ function City() {
           </div>
         </Box>
       </Modal>
-    </>
+    </div>
   );
 }
 
