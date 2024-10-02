@@ -197,6 +197,7 @@ function Header() {
           }
         })
         .catch((error) => {
+          console.log(error);
           setFetchError("An error occurred while adding the city");
           setSuccess("");
           setError("");
@@ -282,13 +283,13 @@ function Header() {
       {/* Header background and title */}
       <div>
         <div
-          className="px-4 py-2 rounded-2xl sticky top-0 flex flex-col justify-center items-center"
+          className="top-0 sticky px-4 py-2 rounded-br-2xl rounded-bl-2xl flex flex-col justify-center items-center"
           style={{
             background:
               "radial-gradient(circle, rgba(28,181,224,1) 0%, rgba(0,0,70,1) 100%)",
           }}
         >
-          <div className="flex justify-between items-center w-full mb-2">
+          <div className="flex justify-between items-center w-full mb-2 ">
             <h1 className="font-UndertheWeather text-4xl sm:text-6xl md:text-7xl text-blue-200">
               Under the Weather
             </h1>
